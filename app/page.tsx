@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LayoutDashboard, FileText, MessageSquare, Zap, Bell, ChevronRight, Activity, Calendar } from 'lucide-react';
+import { LayoutDashboard, FileText, MessageSquare, MessageCircle, Zap, Bell, ChevronRight, Activity, Calendar } from 'lucide-react';
 
 export default function Home() {
   const QUICK_MENUS = [
@@ -7,7 +7,7 @@ export default function Home() {
     { name: '행정 자료실', href: '/archive', desc: '서식 및 공문 보관', icon: <FileText size={32} />, color: 'bg-indigo-50 text-indigo-600' },
     { name: '미니 프로그램', href: '/tools', desc: '업무 자동화 도구', icon: <Zap size={32} />, color: 'bg-amber-50 text-amber-600' },
     { name: 'AI 지침 챗봇 (구글 ID 필요)', href: '/chatbot', desc: '24시간 지침 안내', icon: <MessageSquare size={32} />, color: 'bg-emerald-50 text-emerald-600' },
-    { name: '준비 중', href: '#', desc: '신규 업데이트 예정', icon: <Bell size={32} />, color: 'bg-slate-50 text-slate-300' },
+    { name: 'AI 챗봇 (바로가기)', href: 'https://aisen-chatbot.streamlit.app/', desc: '구글 로그인 없이 이용', icon: <MessageCircle size={32} />, color: 'bg-teal-50 text-teal-600' },
   ];
 
   return (
@@ -27,7 +27,7 @@ export default function Home() {
           </h1>
           <p className="text-slate-400 font-medium text-sm mt-1">원하시는 업무 메뉴를 선택하세요.</p>
         </header>
-
+ 
         {/* Restored Premium Grid Layout */}
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -48,14 +48,16 @@ export default function Home() {
               </Link>
             ))}
           </div>
-
+ 
           {/* Bottom 2 Menus - Centered */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[600px] mx-auto w-full">
             {QUICK_MENUS.slice(3, 5).map((menu, idx) => (
               <Link 
                 key={idx} 
                 href={menu.href}
-                className={`group bg-white border border-blue-50 p-6 flex flex-col items-center text-center gap-4 rounded-[32px] hover:scale-[1.05] hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300 shadow-xl shadow-blue-100/10 ${menu.name.includes('준비 중') ? 'opacity-60 grayscale' : ''}`}
+                target={menu.href.startsWith('http') ? '_blank' : undefined}
+                rel={menu.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className="group bg-white border border-blue-50 p-6 flex flex-col items-center text-center gap-4 rounded-[32px] hover:scale-[1.05] hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300 shadow-xl shadow-blue-100/10"
               >
                 <div className={`w-20 h-20 ${menu.color} rounded-[24px] flex items-center justify-center transition-transform group-hover:rotate-6`}>
                   {menu.icon}
