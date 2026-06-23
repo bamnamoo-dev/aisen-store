@@ -6,8 +6,8 @@ export default function Home() {
     { name: '업무 게시판', href: '/board', desc: '공지 및 업무 공유', icon: <LayoutDashboard size={32} />, color: 'bg-blue-50 text-blue-600' },
     { name: '행정 자료실', href: '/archive', desc: '서식 및 공문 보관', icon: <FileText size={32} />, color: 'bg-indigo-50 text-indigo-600' },
     { name: '미니 프로그램', href: '/tools', desc: '업무 자동화 도구', icon: <Zap size={32} />, color: 'bg-amber-50 text-amber-600' },
-    { name: 'AI 지침 챗봇 (구글 ID 필요)', href: '/chatbot', desc: '24시간 지침 안내', icon: <MessageSquare size={32} />, color: 'bg-emerald-50 text-emerald-600' },
-    { name: 'AI 챗봇 (바로가기)', href: 'https://aisen-chatbot.streamlit.app/', desc: '구글 로그인 없이 이용', icon: <MessageCircle size={32} />, color: 'bg-teal-50 text-teal-600' },
+    { name: 'AI 챗봇 (바로가기)', href: 'https://chatbot.aisen.store', desc: '구글 로그인없이 이용', icon: <MessageSquare size={32} />, color: 'bg-emerald-50 text-emerald-600' },
+    { name: 'AI 챗봇 (바로가기)', href: 'https://chatbot.aisen.store', desc: '구글 로그인없이 이용', icon: <MessageCircle size={32} />, color: 'bg-emerald-50 text-emerald-600' },
   ];
 
   return (
@@ -36,6 +36,8 @@ export default function Home() {
               <Link 
                 key={idx} 
                 href={menu.href}
+                target={menu.href.startsWith('http') ? '_blank' : undefined}
+                rel={menu.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="group bg-white border border-blue-50 p-8 flex flex-col items-center text-center gap-4 rounded-[32px] hover:scale-[1.05] hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300 shadow-xl shadow-blue-100/10"
               >
                 <div className={`w-20 h-20 ${menu.color} rounded-[24px] flex items-center justify-center transition-transform group-hover:rotate-6`}>

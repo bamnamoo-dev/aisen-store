@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { name: '업무 게시판', href: '/board', icon: <LayoutDashboard size={22} /> },
   { name: '행정 자료실', href: '/archive', icon: <FileText size={22} /> },
   { name: '미니 프로그램', href: '/tools', icon: <Zap size={22} /> },
-  { name: 'AI 지침 챗봇 (구글 ID 필요)', href: '/chatbot', icon: <MessageSquare size={22} /> },
+  { name: 'AI 챗봇 (바로가기)', href: 'https://chatbot.aisen.store', icon: <MessageSquare size={22} /> },
 ];
 
 export default function Navbar() {
@@ -53,6 +53,8 @@ export default function Navbar() {
               <Link 
                 key={item.href}
                 href={item.href}
+                target={item.href.startsWith('http') ? '_blank' : undefined}
+                rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-[15px] font-black transition-all whitespace-nowrap ${
                   isActive 
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-100' 
