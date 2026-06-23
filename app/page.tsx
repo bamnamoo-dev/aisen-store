@@ -6,7 +6,7 @@ export default function Home() {
     { name: '업무 게시판', href: '/board', desc: '공지 및 업무 공유', icon: <LayoutDashboard size={32} />, color: 'bg-blue-50 text-blue-600' },
     { name: '행정 자료실', href: '/archive', desc: '서식 및 공문 보관', icon: <FileText size={32} />, color: 'bg-indigo-50 text-indigo-600' },
     { name: '미니 프로그램', href: '/tools', desc: '업무 자동화 도구', icon: <Zap size={32} />, color: 'bg-amber-50 text-amber-600' },
-    { name: 'AI 챗봇 (바로가기)', href: 'https://chatbot.aisen.store', desc: '구글 로그인없이 이용', icon: <MessageSquare size={32} />, color: 'bg-emerald-50 text-emerald-600' },
+    { name: '구글 챗봇 (노트북LM)', href: 'https://www.aisen.store/chatbot', desc: '구글 ID 필요', icon: <MessageSquare size={32} />, color: 'bg-emerald-50 text-emerald-600' },
     { name: 'AI 챗봇 (바로가기)', href: 'https://chatbot.aisen.store', desc: '구글 로그인없이 이용', icon: <MessageCircle size={32} />, color: 'bg-emerald-50 text-emerald-600' },
   ];
 
