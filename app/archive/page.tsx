@@ -1,7 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FileText, Download, Search, Trash2, ChevronRight, Hash, FolderOpen, ArrowUpRight, Share2, FileDown, Edit3, X, Upload } from 'lucide-react';
+import { 
+  FileText, 
+  Download, 
+  Search, 
+  Trash2, 
+  ChevronRight, 
+  ExternalLink,
+  FolderOpen, 
+  ArrowUpRight, 
+  Edit3, 
+  X, 
+  Upload,
+  BookOpen,
+  Layers,
+  Sparkles,
+  CheckCircle2,
+  FileDown
+} from 'lucide-react';
 import FileUpload from '@/components/features/FileUpload';
 import { supabase } from '@/lib/supabase';
 
@@ -24,6 +41,52 @@ interface GroupedDocument {
   files: { id: string; file_name: string; original_name: string; file_path: string; file_size: number }[];
 }
 
+// 102 Official Guidelines Category Quick Links from sen-chatbot-v2
+const OFFICIAL_GUIDELINE_CATEGORIES = [
+  { 
+    name: '계약 업무', 
+    count: '18권 (4,656쪽)', 
+    desc: '물품·용역·공사 계약집행기준, 수의계약, 낙찰자 결정기준, Q&A',
+    sample: '계약',
+    icon: '📝'
+  },
+  { 
+    name: '예산 및 회계', 
+    count: '12권 (2,140쪽)', 
+    desc: '학교회계 예산편성 기본지침, 세입세출 예산과목, 회계규칙',
+    sample: '예산',
+    icon: '💰'
+  },
+  { 
+    name: '공무원 인사/복무', 
+    count: '15권 (3,210쪽)', 
+    desc: '국가공무원 복무·징계·근무성적평정 실무, 휴직 및 겸직 지침',
+    sample: '공무원',
+    icon: '👔'
+  },
+  { 
+    name: '출장 및 여비', 
+    count: '6권 (890쪽)', 
+    desc: '공무원보수 등의 업무지침(여비업무 처리기준), 유류비 및 운임 기준',
+    sample: '여비',
+    icon: '🚗'
+  },
+  { 
+    name: '교육공무직원', 
+    count: '8권 (1,150쪽)', 
+    desc: '교육공무직원 취업규칙, 단체협약, 임금체계 및 복무 기준',
+    sample: '공무직',
+    icon: '👥'
+  },
+  { 
+    name: '급식 및 시설안전', 
+    count: '14권 (1,800쪽)', 
+    desc: '학교급식 기본방향, 산업안전보건, 시설적립금, 물품·재산 관리',
+    sample: '급식',
+    icon: '🍱'
+  },
+];
+
 const CATEGORIES = ['전체 자료', '예산지침', '계약', '인사', '급여', '회계', '지출', '매뉴얼', '기타'];
 
 export default function ArchivePage() {
@@ -32,21 +95,18 @@ export default function ArchivePage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("전체 자료");
-  const [isEditDragging, setIsEditDragging] = useState(false);
 
   // Edit Modal State
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
-  const [editForm, setEditForm] = useState<{file_name: string, category: string, files: FileList | null}>({ 
+  const [editForm, setEditForm] = useState<{file_name: string, category: string}>({ 
     file_name: '', 
-    category: '', 
-    files: null 
+    category: '' 
   });
 
   // Download Modal State
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [downloadGroup, setDownloadGroup] = useState<GroupedDocument | null>(null);
-  const [selectedFileIds, setSelectedFileIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     checkAdmin();
@@ -79,452 +139,349 @@ export default function ArchivePage() {
     setEditingDoc(doc);
     setEditForm({ 
       file_name: doc.file_name, 
-      category: doc.category || '기타',
-      files: null
+      category: doc.category 
     });
     setShowEditModal(true);
   };
 
-  const handleDeleteGroup = async (group: GroupedDocument) => {
-    if (!isAdmin) return alert('삭제 권한이 없습니다.');
-    if (!confirm(`이 그룹에 포함된 모든 파일(${group.files.length}개)이 삭제됩니다. 정말 삭제하시겠습니까?`)) return;
-    
+  const handleUpdateDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDoc) return;
+
     try {
-      const filePaths = group.files.map(f => f.file_path);
-      const { error: storageError } = await supabase.storage.from('documents').remove(filePaths);
-      if (storageError) throw storageError;
-
-      const { error: dbError } = await supabase
+      const { error } = await supabase
         .from('documents')
-        .delete()
-        .eq('group_id', group.group_id);
-      
-      if (dbError) throw dbError;
+        .update({
+          file_name: editForm.file_name,
+          category: editForm.category
+        })
+        .eq('id', editingDoc.id);
 
+      if (error) throw error;
+      setShowEditModal(false);
       fetchDocuments();
-      alert('자료 그룹이 삭제되었습니다.');
+    } catch (error: any) {
+      alert(`수정 실패: ${error.message}`);
+    }
+  };
+
+  const handleDeleteDocument = async (id: string, filePath: string) => {
+    if (!confirm('이 문서를 삭제하시겠습니까?')) return;
+    try {
+      await supabase.storage.from('documents').remove([filePath]);
+      const { error } = await supabase.from('documents').delete().eq('id', id);
+      if (error) throw error;
+      fetchDocuments();
     } catch (error: any) {
       alert(`삭제 실패: ${error.message}`);
     }
   };
 
-  const handleUpdateGroup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingDoc) return;
-    
-    setLoading(true);
+  const handleDownloadFile = async (filePath: string, fileName: string) => {
     try {
-      if (editForm.files && editForm.files.length > 0) {
-        const filesArray = Array.from(editForm.files);
-        const { data: oldFiles } = await supabase.from('documents').select('file_path').eq('group_id', editingDoc.group_id);
-        
-        if (oldFiles && oldFiles.length > 0) {
-          await supabase.storage.from('documents').remove(oldFiles.map(f => f.file_path));
-        }
-        
-        await supabase.from('documents').delete().eq('group_id', editingDoc.group_id);
+      const { data, error } = await supabase.storage
+        .from('documents')
+        .download(filePath);
 
-        for (let i = 0; i < filesArray.length; i++) {
-          const file = filesArray[i];
-          const fileExt = file.name.split('.').pop();
-          const randomName = `${Math.random().toString(36).substring(7)}_${Date.now()}.${fileExt}`;
-          const newFilePath = `${randomName}`;
-          await supabase.storage.from('documents').upload(newFilePath, file);
-          await supabase.from('documents').insert([{
-            file_name: i === 0 ? editForm.file_name : file.name,
-            original_name: file.name,
-            category: editForm.category,
-            file_path: newFilePath,
-            file_size: file.size,
-            group_id: editingDoc.group_id
-          }]);
-        }
-      } else {
-        await supabase
-          .from('documents')
-          .update({ 
-            file_name: editForm.file_name, 
-            category: editForm.category 
-          })
-          .eq('group_id', editingDoc.group_id);
-      }
+      if (error) throw error;
 
-      setShowEditModal(false);
-      fetchDocuments();
-      alert('자료 정보가 수정되었습니다.');
+      const url = window.URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
     } catch (error: any) {
-      console.error('Update error:', error);
-      alert(`수정 실패: ${error.message}`);
-    } finally {
-      setLoading(false);
+      alert(`다운로드 실패: ${error.message}`);
     }
   };
 
-  const handleDownload = async (path: string, name: string) => {
-    const { data, error } = await supabase.storage.from('documents').download(path);
-    if (error) {
-      alert('파일 다운로드 실패');
-      return;
-    }
-    const url = window.URL.createObjectURL(data);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', name);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  };
-
-  const handleEditDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setIsEditDragging(true);
-    } else if (e.type === 'dragleave') {
-      setIsEditDragging(false);
-    }
-  };
-
-  const handleEditDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsEditDragging(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setEditForm({ ...editForm, files: e.dataTransfer.files });
-    }
-  };
-
-  const handleOpenDownloadModal = (group: GroupedDocument) => {
-    setDownloadGroup(group);
-    setSelectedFileIds(new Set(group.files.map(f => f.id))); // 기본으로 전체 선택
-    setShowDownloadModal(true);
-  };
-
-  const toggleFileSelection = (fileId: string) => {
-    const newSet = new Set(selectedFileIds);
-    if (newSet.has(fileId)) newSet.delete(fileId);
-    else newSet.add(fileId);
-    setSelectedFileIds(newSet);
-  };
-
-  const handleDownloadBatch = async () => {
-    if (!downloadGroup || selectedFileIds.size === 0) return;
-    
-    const filesToDownload = downloadGroup.files.filter(f => selectedFileIds.has(f.id));
-    
-    for (const file of filesToDownload) {
-      await handleDownload(file.file_path, file.file_name);
-      // 브라우저 차단 방지를 위해 아주 짧은 간격 부여
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-    setShowDownloadModal(false);
-  };
-
-  const getGroupedDocs = () => {
-    const groups: { [key: string]: GroupedDocument } = {};
-    documents.forEach(doc => {
-      const gid = doc.group_id || doc.id;
-      if (!groups[gid]) {
-        groups[gid] = {
-          group_id: gid,
-          file_name: doc.file_name,
-          category: doc.category || '기타',
-          created_at: doc.created_at,
-          files: []
-        };
-      }
-      groups[gid].files.push({
-        id: doc.id,
+  // Grouping documents by group_id or id
+  const groupedDocuments = documents.reduce((acc: { [key: string]: GroupedDocument }, doc) => {
+    const key = doc.group_id || doc.id;
+    if (!acc[key]) {
+      acc[key] = {
+        group_id: key,
         file_name: doc.file_name,
-        original_name: doc.original_name || doc.file_name,
-        file_path: doc.file_path,
-        file_size: doc.file_size
-      });
+        category: doc.category,
+        created_at: doc.created_at,
+        files: []
+      };
+    }
+    acc[key].files.push({
+      id: doc.id,
+      file_name: doc.file_name,
+      original_name: doc.original_name,
+      file_path: doc.file_path,
+      file_size: doc.file_size
     });
-    return Object.values(groups).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-  };
+    return acc;
+  }, {});
 
-  const filteredGroups = getGroupedDocs().filter(group => {
-    const titleMatch = group.file_name.toLowerCase().includes(search.toLowerCase());
-    const groupCat = (group.category || "").normalize('NFC').trim();
-    const activeCat = activeCategory.normalize('NFC').trim();
-    const categoryMatch = activeCategory === "전체 자료" || groupCat === activeCat;
-    return titleMatch && categoryMatch;
+  const groupedList = Object.values(groupedDocuments).filter(group => {
+    const titleMatch = group.file_name.toLowerCase().includes(search.toLowerCase()) ||
+                       group.files.some(f => f.original_name.toLowerCase().includes(search.toLowerCase()));
+    const catMatch = activeCategory === "전체 자료" || group.category === activeCategory;
+    return titleMatch && catMatch;
   });
 
   return (
-    <div className="h-screen bg-md-surface flex pt-16 overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-blue-50 hidden md:flex flex-col p-8 fixed top-16 bottom-0 shadow-sm overflow-y-auto">
-        <div className="space-y-2">
-          <p className="text-[10px] font-black text-slate-300 px-4 mb-6 uppercase tracking-widest">Library Navigator</p>
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-black transition-all group ${
-                activeCategory === cat 
-                ? 'bg-blue-600 text-white shadow-xl shadow-blue-200 translate-x-2' 
-                : 'text-slate-500 hover:bg-blue-50 hover:text-blue-600'
-              }`}
-            >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                activeCategory === cat ? 'bg-white/20' : 'bg-blue-50 text-blue-400'
-              }`}>
-                <Hash size={16} />
-              </div>
-              <span className="flex-1 text-left">{cat}</span>
-              {activeCategory === cat && <ChevronRight size={14} className="opacity-50" />}
-            </button>
-          ))}
+    <div className="min-h-screen bg-[#0a0e17] text-slate-100 px-4 md:px-6 py-10 flex flex-col items-center">
+      <div className="w-full max-w-[1200px] flex flex-col gap-10">
+        
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-xs font-bold text-blue-300 mb-2">
+              <FolderOpen size={14} className="text-blue-400" />
+              <span>통합 행정 아카이브</span>
+            </div>
+            <h1 className="text-3xl font-black text-white tracking-tight">행정 자료실 &amp; 공식 지침서</h1>
+            <p className="text-sm text-slate-400 mt-1">
+              102권 공식 지침서 실시간 1:1 쪽수 뷰어와 교직원 실무 서식을 통합 제공합니다.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {isAdmin && <FileUpload onUploadSuccess={fetchDocuments} defaultCategory={activeCategory} />}
+          </div>
         </div>
-      </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 md:ml-72 p-6 md:p-8 overflow-y-auto h-full">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-8">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-widest mb-3">
-                Digital Archive System
-              </div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-                {activeCategory}
-              </h1>
-              <p className="text-sm text-slate-500 mt-2 font-medium">서울 교육 행정의 다양한 지침과 서식을 신속하게 공유합니다.</p>
+        {/* ========================================================
+            SECTION 1: 102권 공식 지침서 1:1 바로보기 서고 (Live API)
+        ======================================================== */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BookOpen size={20} className="text-blue-400" />
+              <h2 className="text-xl font-bold text-white">102권 공식 지침서 1:1 스트리밍 서고</h2>
             </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="relative w-full md:w-72 group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={18} />
-                <input 
-                  type="text"
-                  placeholder="지침서 명칭 검색..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="modern-input pl-12 h-12 shadow-blue-50"
-                />
-              </div>
-              {isAdmin && (
-                <FileUpload onUploadSuccess={fetchDocuments} defaultCategory={activeCategory} />
-              )}
-            </div>
-          </header>
+            <span className="text-xs text-sky-400 font-bold bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
+              0.1초 원본 스트리밍 뷰어
+            </span>
+          </div>
 
-          {/* Document List */}
-          <div className="space-y-4">
-            {loading ? (
-              <div className="text-center py-20 flex flex-col items-center gap-4 animate-pulse">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-xs font-black text-blue-600 tracking-widest uppercase">Syncing Archive...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {OFFICIAL_GUIDELINE_CATEGORIES.map((guide, idx) => (
+              <div 
+                key={idx}
+                className="glass-card p-5 flex flex-col justify-between group border-slate-800 hover:border-blue-500/40"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-2xl">{guide.icon}</span>
+                    <span className="text-xs font-black text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-md border border-sky-500/20">
+                      {guide.count}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
+                    {guide.name}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                    {guide.desc}
+                  </p>
+                </div>
+
+                <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500">1:1 쪽수 앵커링 완비</span>
+                  <a 
+                    href={`https://chatbot.aisen.store`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1"
+                  >
+                    <span>챗봇 서고 열기</span>
+                    <ExternalLink size={13} />
+                  </a>
+                </div>
               </div>
-            ) : filteredGroups.length > 0 ? (
-              filteredGroups.map((group) => (
-                <div key={group.group_id} className="modern-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-100 group">
-                  <div className="flex items-center gap-6 flex-1 min-w-0">
-                    <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-inner shrink-0">
-                      {group.files.length > 1 ? <FolderOpen size={28} /> : <FileText size={28} />}
+            ))}
+          </div>
+        </div>
+
+        {/* ========================================================
+            SECTION 2: 사용자 실무 서식 및 문서 다운로드 (Supabase)
+        ======================================================== */}
+        <div className="flex flex-col gap-5 pt-6 border-t border-slate-800/80">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers size={20} className="text-emerald-400" />
+              <h2 className="text-xl font-bold text-white">실무 서식 및 공문서 다운로드</h2>
+            </div>
+            <span className="text-xs text-slate-400">총 {groupedList.length}건 등록됨</span>
+          </div>
+
+          {/* Filter & Search Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 w-full sm:w-auto overflow-x-auto no-scrollbar">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                    activeCategory === cat
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative w-full sm:w-[280px]">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+              <input 
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="서식명 또는 파일 검색..."
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Documents Table / Grid */}
+          {loading ? (
+            <div className="py-20 text-center text-slate-400">자료를 불러오는 중...</div>
+          ) : groupedList.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {groupedList.map((group) => (
+                <div 
+                  key={group.group_id} 
+                  className="glass-card p-5 flex flex-col justify-between group border-slate-800 hover:border-emerald-500/40"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-emerald-300 border border-emerald-500/20">
+                        {group.category}
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        {new Date(group.created_at).toLocaleDateString()}
+                      </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-1.5">
-                        <h3 className="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
-                          {group.file_name}
-                        </h3>
-                        <span className="text-[9px] font-black px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md uppercase tracking-wider">
-                          {group.category}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-slate-400 font-bold">
-                        <span>{new Date(group.created_at).toLocaleDateString()}</span>
-                        <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                        <span className="uppercase tracking-widest">
-                          총 {group.files.length}개 ({(group.files.reduce((acc, f) => acc + f.file_size, 0) / 1024 / 1024).toFixed(2)} MB)
-                        </span>
-                      </div>
-                      
-                      {/* 파일 목록 강조 표시 */}
-                      <div className="flex flex-col gap-2 mt-4">
-                        {group.files.map(file => (
-                          <div key={file.id} className="flex items-center gap-3 px-4 py-2.5 bg-blue-50/50 text-slate-700 rounded-xl border border-blue-100/50 group/file transition-colors hover:bg-blue-100/50">
-                            <FileDown size={16} className="text-blue-500" />
-                            <span className="text-[13px] font-black leading-tight">{file.original_name}</span>
-                            <span className="text-[10px] font-bold text-slate-400 ml-auto uppercase tracking-tighter">{(file.file_size / 1024 / 1024).toFixed(2)} MB</span>
-                          </div>
-                        ))}
-                      </div>
+
+                    <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
+                      {group.file_name}
+                    </h3>
+
+                    {/* Files List in Group */}
+                    <div className="mt-3 flex flex-col gap-1.5">
+                      {group.files.map((file) => (
+                        <div 
+                          key={file.id} 
+                          className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-slate-800/80 text-xs text-slate-300"
+                        >
+                          <span className="truncate max-w-[200px]" title={file.original_name}>
+                            {file.original_name}
+                          </span>
+                          <button
+                            onClick={() => handleDownloadFile(file.file_path, file.original_name)}
+                            className="p-1 rounded text-sky-400 hover:text-white hover:bg-sky-600/30 transition-all shrink-0 ml-2"
+                            title="다운로드"
+                          >
+                            <Download size={14} />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={() => group.files.length === 1 
-                        ? handleDownload(group.files[0].file_path, group.files[0].file_name)
-                        : handleOpenDownloadModal(group)
-                      }
-                      className={`h-12 px-6 text-xs font-black border transition-all rounded-xl flex items-center gap-2 ${
-                        group.files.length === 1 
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 hover:scale-105' 
-                        : 'bg-white text-blue-600 border-blue-100 hover:border-blue-600 hover:bg-blue-50'
-                      }`}
-                    >
-                      <span>{group.files.length === 1 ? '바로 다운로드' : '다운로드 선택'}</span>
-                      {group.files.length === 1 ? <FileDown size={18} /> : <Download size={18} />}
-                    </button>
 
+                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-500">파일 {group.files.length}개</span>
+                    
                     {isAdmin && (
                       <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => handleOpenEditModal({
-                            id: group.files[0].id,
-                            file_name: group.file_name,
-                            category: group.category,
-                            file_path: group.files[0].file_path,
-                            file_size: group.files[0].file_size,
-                            created_at: group.created_at,
-                            group_id: group.group_id
-                          } as any)}
-                          className="p-3 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all shadow-sm"
-                          title="수정"
+                        <button
+                          onClick={() => handleOpenEditModal(group.files[0] as any)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800"
+                          title="제목 수정"
                         >
-                          <Edit3 size={18} />
+                          <Edit3 size={14} />
                         </button>
-                        <button 
-                          onClick={() => handleDeleteGroup(group)}
-                          className="p-3 bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
-                          title="삭제"
+                        <button
+                          onClick={() => {
+                            group.files.forEach(f => handleDeleteDocument(f.id, f.file_path));
+                          }}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800"
+                          title="전체 삭제"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     )}
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-24 bg-white rounded-[40px] border border-dashed border-blue-100">
-                <p className="text-slate-400 font-black italic opacity-60">등록된 자료가 없습니다.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center text-slate-400 bg-slate-900/30 rounded-2xl border border-slate-800/60">
+              등록된 서식 자료가 없습니다.
+            </div>
+          )}
 
-      {/* Modern Edit Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-blue-900/40 backdrop-blur-md z-[200] flex items-center justify-center p-6">
-          <div className="bg-white rounded-[40px] w-full max-w-2xl shadow-2xl border border-white overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="px-10 py-8 bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-black text-white">지침 자료 정보 수정</h2>
-                <p className="text-blue-100 text-xs font-bold mt-1 uppercase tracking-widest">Document Meta Management</p>
-              </div>
-              <button onClick={() => setShowEditModal(false)} className="p-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all">
-                <X size={24} />
+        </div>
+
+      </div>
+
+      {/* Edit Title Modal */}
+      {showEditModal && editingDoc && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel bg-slate-950 p-6 max-w-[450px] w-full border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+              <h3 className="text-base font-bold text-white">서식 제목 및 분류 수정</h3>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-white">
+                <X size={18} />
               </button>
             </div>
-            <form onSubmit={handleUpdateGroup} className="p-10 space-y-8 text-sm">
+
+            <form onSubmit={handleUpdateDocument} className="flex flex-col gap-4">
               <div>
-                <label className="block text-[10px] font-black text-slate-400 mb-3 px-1 uppercase tracking-widest">파일 명칭</label>
-                <input required type="text" value={editForm.file_name} onChange={e => setEditForm({...editForm, file_name: e.target.value})} className="modern-input h-14 font-bold" />
+                <label className="text-xs font-bold text-slate-300 mb-1.5 block">서식 제목</label>
+                <input 
+                  type="text" 
+                  required
+                  value={editForm.file_name}
+                  onChange={(e) => setEditForm({...editForm, file_name: e.target.value})}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                />
               </div>
+
               <div>
-                <label className="block text-[10px] font-black text-slate-400 mb-3 px-1 uppercase tracking-widest">카테고리 분류</label>
-                <select value={editForm.category} onChange={e => setEditForm({...editForm, category: e.target.value})} className="modern-input h-14 appearance-none font-bold text-blue-600">
-                  {CATEGORIES.slice(1).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                <label className="text-xs font-bold text-slate-300 mb-1.5 block">카테고리</label>
+                <select 
+                  value={editForm.category}
+                  onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                >
+                  {CATEGORIES.filter(c => c !== "전체 자료").map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 mb-3 px-1 uppercase tracking-widest">파일 교체 (선택사항)</label>
-                <div className="flex flex-col gap-2">
-                  <label 
-                    onDragEnter={handleEditDrag}
-                    onDragOver={handleEditDrag}
-                    onDragLeave={handleEditDrag}
-                    onDrop={handleEditDrop}
-                    className={`flex items-center justify-center gap-3 h-14 rounded-2xl border-2 border-dashed transition-all cursor-pointer ${
-                      isEditDragging ? 'border-blue-600 bg-blue-50 scale-[1.02]' :
-                      editForm.files ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-slate-200 text-slate-400 hover:border-blue-400'
-                    }`}
-                  >
-                    <Upload size={20} />
-                    <span className="text-xs font-black">
-                      {isEditDragging ? '여기에 놓으세요!' : editForm.files ? `${editForm.files.length}개의 파일 선택됨` : '교체할 새 파일 선택 또는 드래그...'}
-                    </span>
-                    <input 
-                      type="file" 
-                      multiple
-                      onChange={e => setEditForm({...editForm, files: e.target.files})} 
-                      className="hidden" 
-                    />
-                  </label>
-                  {!editForm.files && (
-                    <p className="text-[10px] text-slate-400 px-1 italic">* 기존 파일을 유지하려면 비워두세요.</p>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-4 pt-4">
-                <button type="button" onClick={() => setShowEditModal(false)} className="btn-secondary flex-1 h-14" disabled={loading}>취소하기</button>
-                <button type="submit" onClick={handleUpdateGroup} className="btn-primary flex-[2] h-14 text-lg" disabled={loading}>
-                  {loading ? '처리 중...' : '자료 정보 업데이트'}
+
+              <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-slate-800">
+                <button 
+                  type="button" 
+                  onClick={() => setShowEditModal(false)}
+                  className="btn-secondary py-1.5 px-3.5 text-xs"
+                >
+                  취소
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-primary py-1.5 px-4 text-xs font-bold"
+                >
+                  저장
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-      {/* Download Selection Modal */}
-      {showDownloadModal && downloadGroup && (
-        <div className="fixed inset-0 bg-blue-900/40 backdrop-blur-md z-[200] flex items-center justify-center p-6">
-          <div className="bg-white rounded-[40px] w-full max-w-lg shadow-2xl border border-white overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="px-10 py-8 bg-blue-600 flex items-center justify-between text-white">
-              <div>
-                <h2 className="text-xl font-black">다운로드 파일 선택</h2>
-                <p className="text-blue-100 text-[10px] font-bold mt-1 uppercase tracking-widest">{downloadGroup.file_name}</p>
-              </div>
-              <button onClick={() => setShowDownloadModal(false)} className="p-2 bg-white/20 hover:bg-white/30 rounded-xl">
-                <X size={24} />
-              </button>
-            </div>
-            <div className="p-8">
-              <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                <div className="space-y-3">
-                  {downloadGroup.files.map(file => (
-                    <div 
-                      key={file.id}
-                      onClick={() => toggleFileSelection(file.id)}
-                      className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${
-                        selectedFileIds.has(file.id) ? 'border-blue-600 bg-blue-50' : 'border-slate-50 hover:border-slate-200'
-                      }`}
-                    >
-                      <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
-                        selectedFileIds.has(file.id) ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-200'
-                      }`}>
-                        {selectedFileIds.has(file.id) && <ArrowUpRight size={14} className="rotate-90" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-black text-slate-800 truncate">{file.original_name}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{(file.file_size / 1024 / 1024).toFixed(2)} MB</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="flex gap-4 mt-8">
-                <button onClick={() => setShowDownloadModal(false)} className="btn-secondary flex-1 h-14">취소</button>
-                <button 
-                  onClick={handleDownloadBatch}
-                  disabled={selectedFileIds.size === 0}
-                  className="btn-primary flex-[2] h-14 text-lg shadow-blue-200 disabled:opacity-50"
-                >
-                  {selectedFileIds.size}개 파일 다운로드
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }
