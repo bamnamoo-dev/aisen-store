@@ -13,13 +13,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning className="dark">
+    <html lang="ko" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" as="style" crossOrigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
       </head>
-      <body className="antialiased bg-[#0a0e17] text-[#f8fafc] selection:bg-blue-600 selection:text-white">
+      <body className="antialiased bg-[#f8fafc] text-[#0f172a] selection:bg-blue-600 selection:text-white">
         <Navbar />
-        <main className="min-h-screen pt-16">
+        <main className="min-h-screen pt-14">
           {children}
         </main>
       </body>

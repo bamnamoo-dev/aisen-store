@@ -48,14 +48,14 @@ export default function Navbar() {
         
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-sm">
+          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-sm shadow-sm shadow-blue-500/20">
             i
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors">
+            <span className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors">
               아이센스토어
             </span>
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
+            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
               Live
             </span>
           </div>
@@ -73,8 +73,8 @@ export default function Navbar() {
                 rel={item.isExternal ? 'noopener noreferrer' : undefined}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   isActive 
-                  ? 'bg-blue-600 text-white font-semibold' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-blue-600 text-white font-semibold shadow-sm' 
+                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/70'
                 }`}
               >
                 <span className={isActive ? 'text-white' : 'text-slate-400'}>{item.icon}</span>
@@ -88,10 +88,10 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
           {user ? (
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-slate-300 font-medium">{user.email.split('@')[0]}님</span>
+              <span className="text-slate-700 font-medium">{user.email.split('@')[0]}님</span>
               <button 
                 onClick={handleLogout}
-                className="text-[11px] text-slate-400 hover:text-red-400 px-2 py-1 rounded hover:bg-slate-800"
+                className="text-[11px] text-slate-500 hover:text-red-600 px-2 py-1 rounded hover:bg-slate-100"
                 title="로그아웃"
               >
                 로그아웃
@@ -100,7 +100,7 @@ export default function Navbar() {
           ) : (
             <Link 
               href="/login" 
-              className="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg hover:bg-slate-800"
+              className="text-xs font-medium text-slate-700 hover:text-blue-600 px-3 py-1.5 rounded-lg hover:bg-slate-100 border border-slate-200"
             >
               로그인
             </Link>
@@ -110,7 +110,7 @@ export default function Navbar() {
         {/* Mobile Hamburger Button */}
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg"
+          className="lg:hidden p-1.5 text-slate-600 hover:text-slate-900 rounded-lg"
           aria-label="메뉴 열기"
         >
           {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -119,7 +119,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-slate-950/95 border-b border-slate-800 px-5 py-4 flex flex-col gap-2">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-5 py-4 flex flex-col gap-2 shadow-lg">
           {NAV_ITEMS.map((item) => (
             <Link 
               key={item.href}
@@ -127,23 +127,23 @@ export default function Navbar() {
               target={item.isExternal ? '_blank' : undefined}
               rel={item.isExternal ? 'noopener noreferrer' : undefined}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2.5 p-2 rounded-lg text-slate-200 text-xs font-medium hover:bg-slate-900"
+              className="flex items-center gap-2.5 p-2 rounded-lg text-slate-700 text-xs font-medium hover:bg-blue-50"
             >
-              <span className="text-blue-400">{item.icon}</span>
+              <span className="text-blue-600">{item.icon}</span>
               <span>{item.name}</span>
             </Link>
           ))}
-          <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-xs">
+          <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-xs">
             {user ? (
               <div className="flex items-center justify-between w-full">
-                <span className="text-slate-400">{user.email}</span>
-                <button onClick={handleLogout} className="text-red-400 font-medium">로그아웃</button>
+                <span className="text-slate-600">{user.email}</span>
+                <button onClick={handleLogout} className="text-red-600 font-medium">로그아웃</button>
               </div>
             ) : (
               <Link 
                 href="/login" 
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2 rounded-lg bg-blue-600 text-white font-medium text-xs"
+                className="w-full text-center py-2 rounded-lg bg-blue-600 text-white font-medium text-xs shadow-sm"
               >
                 로그인
               </Link>

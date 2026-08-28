@@ -6,18 +6,12 @@ import {
   Download, 
   Search, 
   Trash2, 
-  ChevronRight, 
   ExternalLink,
   FolderOpen, 
-  ArrowUpRight, 
   Edit3, 
   X, 
-  Upload,
   BookOpen,
-  Layers,
-  Sparkles,
-  CheckCircle2,
-  FileDown
+  Layers
 } from 'lucide-react';
 import FileUpload from '@/components/features/FileUpload';
 import { supabase } from '@/lib/supabase';
@@ -41,50 +35,13 @@ interface GroupedDocument {
   files: { id: string; file_name: string; original_name: string; file_path: string; file_size: number }[];
 }
 
-// 102 Official Guidelines Category Quick Links from sen-chatbot-v2
 const OFFICIAL_GUIDELINE_CATEGORIES = [
-  { 
-    name: '계약 업무', 
-    count: '18권 (4,656쪽)', 
-    desc: '물품·용역·공사 계약집행기준, 수의계약, 낙찰자 결정기준, Q&A',
-    sample: '계약',
-    icon: '📝'
-  },
-  { 
-    name: '예산 및 회계', 
-    count: '12권 (2,140쪽)', 
-    desc: '학교회계 예산편성 기본지침, 세입세출 예산과목, 회계규칙',
-    sample: '예산',
-    icon: '💰'
-  },
-  { 
-    name: '공무원 인사/복무', 
-    count: '15권 (3,210쪽)', 
-    desc: '국가공무원 복무·징계·근무성적평정 실무, 휴직 및 겸직 지침',
-    sample: '공무원',
-    icon: '👔'
-  },
-  { 
-    name: '출장 및 여비', 
-    count: '6권 (890쪽)', 
-    desc: '공무원보수 등의 업무지침(여비업무 처리기준), 유류비 및 운임 기준',
-    sample: '여비',
-    icon: '🚗'
-  },
-  { 
-    name: '교육공무직원', 
-    count: '8권 (1,150쪽)', 
-    desc: '교육공무직원 취업규칙, 단체협약, 임금체계 및 복무 기준',
-    sample: '공무직',
-    icon: '👥'
-  },
-  { 
-    name: '급식 및 시설안전', 
-    count: '14권 (1,800쪽)', 
-    desc: '학교급식 기본방향, 산업안전보건, 시설적립금, 물품·재산 관리',
-    sample: '급식',
-    icon: '🍱'
-  },
+  { name: '계약 업무', count: '18권 (4,656쪽)', desc: '물품·용역·공사 계약집행기준, 수의계약, 낙찰자 결정기준', icon: '📝' },
+  { name: '예산 및 회계', count: '12권 (2,140쪽)', desc: '학교회계 예산편성 기본지침, 세입세출 예산과목, 회계규칙', icon: '💰' },
+  { name: '공무원 인사/복무', count: '15권 (3,210쪽)', desc: '국가공무원 복무·징계 실무, 휴직 및 겸직 지침', icon: '👔' },
+  { name: '출장 및 여비', count: '6권 (890쪽)', desc: '공무원보수 등의 업무지침(여비업무 처리기준), 유류비 기준', icon: '🚗' },
+  { name: '교육공무직원', count: '8권 (1,150쪽)', desc: '교육공무직원 취업규칙, 단체협약, 임금체계 및 복무 기준', icon: '👥' },
+  { name: '급식 및 시설안전', count: '14권 (1,800쪽)', desc: '학교급식 기본방향, 산업안전보건, 시설적립금, 물품·재산 관리', icon: '🍱' },
 ];
 
 const CATEGORIES = ['전체 자료', '예산지침', '계약', '인사', '급여', '회계', '지출', '매뉴얼', '기타'];
@@ -96,17 +53,12 @@ export default function ArchivePage() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("전체 자료");
 
-  // Edit Modal State
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [editForm, setEditForm] = useState<{file_name: string, category: string}>({ 
     file_name: '', 
     category: '' 
   });
-
-  // Download Modal State
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const [downloadGroup, setDownloadGroup] = useState<GroupedDocument | null>(null);
 
   useEffect(() => {
     checkAdmin();
@@ -198,7 +150,6 @@ export default function ArchivePage() {
     }
   };
 
-  // Grouping documents by group_id or id
   const groupedDocuments = documents.reduce((acc: { [key: string]: GroupedDocument }, doc) => {
     const key = doc.group_id || doc.id;
     if (!acc[key]) {
@@ -228,19 +179,19 @@ export default function ArchivePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0a0e17] text-slate-100 px-4 md:px-6 py-10 flex flex-col items-center">
-      <div className="w-full max-w-[1200px] flex flex-col gap-10">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 px-4 md:px-6 py-10 flex flex-col items-center">
+      <div className="w-full max-w-[1100px] flex flex-col gap-10">
         
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-xs font-bold text-blue-300 mb-2">
-              <FolderOpen size={14} className="text-blue-400" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-xs font-bold text-blue-600 mb-2">
+              <FolderOpen size={13} className="text-blue-600" />
               <span>통합 행정 아카이브</span>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight">행정 자료실 &amp; 공식 지침서</h1>
-            <p className="text-sm text-slate-400 mt-1">
-              102권 공식 지침서 실시간 1:1 쪽수 뷰어와 교직원 실무 서식을 통합 제공합니다.
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">행정 자료실 &amp; 공식 지침서</h1>
+            <p className="text-sm text-slate-500 mt-1">
+              102권 공식 지침서 1:1 스트리밍 뷰어와 교직원 실무 서식을 통합 제공합니다.
             </p>
           </div>
 
@@ -249,17 +200,15 @@ export default function ArchivePage() {
           </div>
         </div>
 
-        {/* ========================================================
-            SECTION 1: 102권 공식 지침서 1:1 바로보기 서고 (Live API)
-        ======================================================== */}
+        {/* SECTION 1: 102 Official Guidelines */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BookOpen size={20} className="text-blue-400" />
-              <h2 className="text-xl font-bold text-white">102권 공식 지침서 1:1 스트리밍 서고</h2>
+              <BookOpen size={18} className="text-blue-600" />
+              <h2 className="text-lg font-bold text-slate-900">102권 공식 지침서 1:1 스트리밍 서고</h2>
             </div>
-            <span className="text-xs text-sky-400 font-bold bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
-              0.1초 원본 스트리밍 뷰어
+            <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2.5 py-0.5 rounded border border-blue-100">
+              0.1초 원본 스트리밍
             </span>
           </div>
 
@@ -267,33 +216,33 @@ export default function ArchivePage() {
             {OFFICIAL_GUIDELINE_CATEGORIES.map((guide, idx) => (
               <div 
                 key={idx}
-                className="glass-card p-5 flex flex-col justify-between group border-slate-800 hover:border-blue-500/40"
+                className="glass-card p-5 flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="text-2xl">{guide.icon}</span>
-                    <span className="text-xs font-black text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-md border border-sky-500/20">
+                    <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
                       {guide.count}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                     {guide.name}
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                     {guide.desc}
                   </p>
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-500">1:1 쪽수 앵커링 완비</span>
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-400">1:1 쪽수 앵커링</span>
                   <a 
                     href={`https://chatbot.aisen.store`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1"
+                    className="btn-secondary py-1 px-3 text-xs flex items-center gap-1"
                   >
-                    <span>챗봇 서고 열기</span>
-                    <ExternalLink size={13} />
+                    <span>서고 열기</span>
+                    <ExternalLink size={12} />
                   </a>
                 </div>
               </div>
@@ -301,29 +250,27 @@ export default function ArchivePage() {
           </div>
         </div>
 
-        {/* ========================================================
-            SECTION 2: 사용자 실무 서식 및 문서 다운로드 (Supabase)
-        ======================================================== */}
-        <div className="flex flex-col gap-5 pt-6 border-t border-slate-800/80">
+        {/* SECTION 2: User Documents */}
+        <div className="flex flex-col gap-5 pt-4 border-t border-slate-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Layers size={20} className="text-emerald-400" />
-              <h2 className="text-xl font-bold text-white">실무 서식 및 공문서 다운로드</h2>
+              <Layers size={18} className="text-emerald-600" />
+              <h2 className="text-lg font-bold text-slate-900">실무 서식 및 공문서 다운로드</h2>
             </div>
-            <span className="text-xs text-slate-400">총 {groupedList.length}건 등록됨</span>
+            <span className="text-xs text-slate-500">총 {groupedList.length}건 등록됨</span>
           </div>
 
           {/* Filter & Search Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 w-full sm:w-auto overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-white border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     activeCategory === cat
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-blue-600 text-white font-semibold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`}
                 >
                   {cat}
@@ -331,19 +278,19 @@ export default function ArchivePage() {
               ))}
             </div>
 
-            <div className="relative w-full sm:w-[280px]">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+            <div className="relative w-full sm:w-[260px]">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
               <input 
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="서식명 또는 파일 검색..."
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 shadow-sm"
               />
             </div>
           </div>
 
-          {/* Documents Table / Grid */}
+          {/* Documents Grid */}
           {loading ? (
             <div className="py-20 text-center text-slate-400">자료를 불러오는 중...</div>
           ) : groupedList.length > 0 ? (
@@ -351,52 +298,51 @@ export default function ArchivePage() {
               {groupedList.map((group) => (
                 <div 
                   key={group.group_id} 
-                  className="glass-card p-5 flex flex-col justify-between group border-slate-800 hover:border-emerald-500/40"
+                  className="glass-card p-5 flex flex-col justify-between group"
                 >
                   <div>
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-emerald-300 border border-emerald-500/20">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
                         {group.category}
                       </span>
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-slate-400">
                         {new Date(group.created_at).toLocaleDateString()}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
+                    <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
                       {group.file_name}
                     </h3>
 
-                    {/* Files List in Group */}
                     <div className="mt-3 flex flex-col gap-1.5">
                       {group.files.map((file) => (
                         <div 
                           key={file.id} 
-                          className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-slate-800/80 text-xs text-slate-300"
+                          className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100 text-xs text-slate-700"
                         >
-                          <span className="truncate max-w-[200px]" title={file.original_name}>
+                          <span className="truncate max-w-[190px]" title={file.original_name}>
                             {file.original_name}
                           </span>
                           <button
                             onClick={() => handleDownloadFile(file.file_path, file.original_name)}
-                            className="p-1 rounded text-sky-400 hover:text-white hover:bg-sky-600/30 transition-all shrink-0 ml-2"
+                            className="p-1 rounded text-blue-600 hover:bg-blue-100 transition-all shrink-0 ml-2"
                             title="다운로드"
                           >
-                            <Download size={14} />
+                            <Download size={13} />
                           </button>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-500">파일 {group.files.length}개</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-400">파일 {group.files.length}개</span>
                     
                     {isAdmin && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => handleOpenEditModal(group.files[0] as any)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800"
+                          className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100"
                           title="제목 수정"
                         >
                           <Edit3 size={14} />
@@ -405,7 +351,7 @@ export default function ArchivePage() {
                           onClick={() => {
                             group.files.forEach(f => handleDeleteDocument(f.id, f.file_path));
                           }}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800"
+                          className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-slate-100"
                           title="전체 삭제"
                         >
                           <Trash2 size={14} />
@@ -417,7 +363,7 @@ export default function ArchivePage() {
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center text-slate-400 bg-slate-900/30 rounded-2xl border border-slate-800/60">
+            <div className="py-20 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
               등록된 서식 자료가 없습니다.
             </div>
           )}
@@ -428,33 +374,33 @@ export default function ArchivePage() {
 
       {/* Edit Title Modal */}
       {showEditModal && editingDoc && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-950 p-6 max-w-[450px] w-full border-slate-800">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-              <h3 className="text-base font-bold text-white">서식 제목 및 분류 수정</h3>
-              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-white">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white p-6 max-w-[420px] w-full rounded-2xl shadow-xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h3 className="text-base font-bold text-slate-900">서식 제목 수정</h3>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-slate-700">
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleUpdateDocument} className="flex flex-col gap-4">
+            <form onSubmit={handleUpdateDocument} className="flex flex-col gap-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">서식 제목</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">서식 제목</label>
                 <input 
                   type="text" 
                   required
                   value={editForm.file_name}
                   onChange={(e) => setEditForm({...editForm, file_name: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">카테고리</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">카테고리</label>
                 <select 
                   value={editForm.category}
                   onChange={(e) => setEditForm({...editForm, category: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                 >
                   {CATEGORIES.filter(c => c !== "전체 자료").map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -462,7 +408,7 @@ export default function ArchivePage() {
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-slate-100">
                 <button 
                   type="button" 
                   onClick={() => setShowEditModal(false)}

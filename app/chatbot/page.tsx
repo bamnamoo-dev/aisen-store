@@ -120,28 +120,28 @@ export default function ChatbotPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 px-4 md:px-6 py-10 flex flex-col items-center">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 px-4 md:px-6 py-10 flex flex-col items-center">
       <div className="w-full max-w-[1100px] flex flex-col gap-8">
         
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-xs font-bold text-blue-300 mb-2">
-              <MessageSquare size={14} className="text-blue-400" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-xs font-bold text-blue-600 mb-2">
+              <MessageSquare size={13} className="text-blue-600" />
               <span>노트북LM &amp; 맞춤형 지침 봇</span>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight">구글 챗봇 모음</h1>
-            <p className="text-sm text-slate-400 mt-1">
-              구글 노트북LM(NotebookLM) 및 커스텀 AI로 생성된 분야별 특화 지침 챗봇 링크 목록입니다.
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">구글 챗봇 모음</h1>
+            <p className="text-sm text-slate-500 mt-1">
+              구글 노트북LM(NotebookLM) 기반 분야별 특화 지침 챗봇 링크 목록입니다.
             </p>
           </div>
 
           {isAdmin && (
             <button 
               onClick={() => handleOpenAddModal()} 
-              className="btn-primary py-2.5 px-5 self-start md:self-auto text-xs font-bold"
+              className="btn-primary py-2 px-4 self-start md:self-auto text-xs font-bold"
             >
-              <Plus size={16} />
+              <Plus size={15} />
               <span>새 챗봇 등록</span>
             </button>
           )}
@@ -149,15 +149,15 @@ export default function ChatbotPage() {
 
         {/* Filter & Search Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 w-full sm:w-auto overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-white border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeCategory === cat
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-blue-600 text-white font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {cat}
@@ -165,14 +165,14 @@ export default function ChatbotPage() {
             ))}
           </div>
 
-          <div className="relative w-full sm:w-[280px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+          <div className="relative w-full sm:w-[260px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
             <input 
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="챗봇 이름 검색..."
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 shadow-sm"
             />
           </div>
         </div>
@@ -185,36 +185,36 @@ export default function ChatbotPage() {
             {filteredBots.map((bot) => (
               <div 
                 key={bot.id} 
-                className="glass-card p-6 flex flex-col justify-between group border-slate-800 hover:border-blue-500/40"
+                className="glass-card p-5 flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-900 text-blue-300 border border-slate-800">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-700">
                       {bot.category}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                     {bot.title}
                   </h3>
-                  <p className="mt-2 text-xs text-slate-400 leading-relaxed line-clamp-3">
+                  <p className="mt-1.5 text-xs text-slate-500 leading-relaxed line-clamp-3">
                     {bot.description || '구글 노트북LM 기반 교육행정 특화 챗봇입니다.'}
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
                   {isAdmin && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button 
                         onClick={() => handleOpenAddModal(bot)} 
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800"
+                        className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100"
                         title="수정"
                       >
                         <Edit3 size={14} />
                       </button>
                       <button 
                         onClick={() => handleDeleteBot(bot.id)} 
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800"
+                        className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-slate-100"
                         title="삭제"
                       >
                         <Trash2 size={14} />
@@ -226,17 +226,17 @@ export default function ChatbotPage() {
                     href={bot.url} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="btn-secondary py-1.5 px-3.5 text-xs ml-auto flex items-center gap-1"
+                    className="btn-secondary py-1 px-3 text-xs ml-auto flex items-center gap-1"
                   >
                     <span>챗봇 열기</span>
-                    <ArrowUpRight size={14} />
+                    <ArrowUpRight size={13} />
                   </a>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="py-20 text-center text-slate-400 bg-slate-900/30 rounded-2xl border border-slate-800/60">
+          <div className="py-20 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
             등록된 구글 챗봇이 없습니다.
           </div>
         )}
@@ -245,48 +245,48 @@ export default function ChatbotPage() {
 
       {/* Add/Edit Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-950 p-6 md:p-8 max-w-[500px] w-full border-slate-800">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-              <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white p-6 md:p-8 max-w-[480px] w-full rounded-2xl shadow-xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h3 className="text-base font-bold text-slate-900">
                 {editingBotId ? '구글 챗봇 수정' : '새 구글 챗봇 등록'}
               </h3>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white">
-                <X size={20} />
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-700">
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitBot} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmitBot} className="flex flex-col gap-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">챗봇 제목</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">챗봇 제목</label>
                 <input 
                   type="text" 
                   required
                   value={newBot.title}
                   onChange={(e) => setNewBot({...newBot, title: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                   placeholder="예: 2026 계약실무 지침 챗봇"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">구글 노트북LM 또는 챗봇 URL</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">구글 노트북LM 또는 챗봇 URL</label>
                 <input 
                   type="url" 
                   required
                   value={newBot.url}
                   onChange={(e) => setNewBot({...newBot, url: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                   placeholder="https://notebooklm.google.com/..."
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">카테고리</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">카테고리</label>
                 <select 
                   value={newBot.category}
                   onChange={(e) => setNewBot({...newBot, category: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                 >
                   {CATEGORIES.filter(c => c !== "전체").map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -295,27 +295,27 @@ export default function ChatbotPage() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">설명</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">설명</label>
                 <textarea 
                   rows={3}
                   value={newBot.description}
                   onChange={(e) => setNewBot({...newBot, description: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
-                  placeholder="챗봇의 주요 답변 범위와 활용 팁을 작성하세요."
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
+                  placeholder="챗봇의 주요 답변 범위를 간단히 작성하세요."
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-slate-100">
                 <button 
                   type="button" 
                   onClick={() => setShowAddModal(false)}
-                  className="btn-secondary py-2 px-4 text-xs"
+                  className="btn-secondary py-1.5 px-3.5 text-xs"
                 >
                   취소
                 </button>
                 <button 
                   type="submit" 
-                  className="btn-primary py-2 px-5 text-xs"
+                  className="btn-primary py-1.5 px-4 text-xs font-bold"
                 >
                   {editingBotId ? '수정 완료' : '등록하기'}
                 </button>

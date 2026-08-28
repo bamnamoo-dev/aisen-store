@@ -61,33 +61,33 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col items-center pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col items-center pb-20 overflow-x-hidden">
       
-      {/* Background Accent */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1100px] h-[350px] bg-gradient-to-b from-blue-600/10 to-transparent pointer-events-none -z-10 blur-3xl"></div>
+      {/* Background Accent - Subtle Light Blue Gradient */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1100px] h-[300px] bg-gradient-to-b from-blue-100/60 to-transparent pointer-events-none -z-10 blur-3xl"></div>
 
       <div className="w-full max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col gap-6">
         
         {/* ========================================================
-            FOLD 1: Hero & Wide Command Bar
+            FOLD 1: Hero & Clean Wide Search Bar
         ======================================================== */}
         <section className="w-full pt-8 md:pt-12 pb-2 flex flex-col items-center text-center">
           
           {/* Status Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs text-slate-400 mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            <span className="font-medium text-slate-300">v4.9.2 엔진 가동중</span>
-            <span className="text-slate-600">|</span>
-            <Fuel size={13} className="text-amber-400" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600 mb-4 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span className="font-medium text-slate-700">v4.9.2 엔진 가동중</span>
+            <span className="text-slate-300">|</span>
+            <Fuel size={13} className="text-amber-500" />
             <span>오피넷 실시간 유가 연동</span>
           </div>
 
           {/* Hero Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-snug">
-            교육행정의 모든 기준과 계산, <span className="text-blue-400">AI-SEN</span>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-snug">
+            교육행정의 모든 기준과 계산, <span className="text-blue-600">AI-SEN</span>
           </h1>
           
-          <p className="mt-2 text-xs sm:text-sm text-slate-400 max-w-[580px] leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-[580px] leading-relaxed">
             102권 공식 지침서 1:1 앵커링 RAG 챗봇과 오피넷 실시간 연동 스마트 여비정산기
           </p>
 
@@ -112,19 +112,19 @@ export default function HomePage() {
             </form>
           </div>
 
-          {/* Metrics Ribbon (Full Width 1100px Aligned) */}
-          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-7 p-3 rounded-xl bg-slate-900/40 border border-slate-800/80">
+          {/* Metrics Ribbon */}
+          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-7 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
             {METRICS.map((metric, idx) => (
-              <div key={idx} className="flex flex-col items-center justify-center p-1 text-center border-r border-slate-800/60 last:border-r-0">
+              <div key={idx} className="flex flex-col items-center justify-center p-1 text-center border-r border-slate-100 last:border-r-0">
                 <span className="text-[11px] text-slate-400 font-medium">{metric.label}</span>
-                <span className="text-xs sm:text-sm font-bold text-slate-200 mt-0.5">{metric.value}</span>
+                <span className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5">{metric.value}</span>
               </div>
             ))}
           </div>
         </section>
 
         {/* ========================================================
-            FOLD 2: 4대 핵심 서비스 (Compact & Balanced Grid)
+            FOLD 2: 4대 핵심 서비스 (Clean White Cards)
         ======================================================== */}
         <section className="w-full py-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -133,23 +133,23 @@ export default function HomePage() {
             <div className="glass-card p-6 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 text-[11px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[11px] font-bold border border-blue-100">
                     <Navigation size={12} />
                     여비정산기 v4.9.2
                   </span>
                   <span className="text-[11px] text-slate-400">오피넷 1일 6회 자동 연동</span>
                 </div>
 
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-lg font-bold text-slate-900">
                   공무원 스마트 여비정산기 &amp; 출장 유류비 계산기
                 </h3>
                 
-                <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
                   카카오 모빌리티 3개 경유지 길찾기와 오피넷 유가를 연동하여 관내/관외 출장비 산출, 19종 법정 감액, A4 1페이지 에코 화이트 공문서 인쇄를 지원합니다.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-800/80">
+              <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100">
                 <a 
                   href="https://chatbot.aisen.store/travel" 
                   target="_blank" 
@@ -173,23 +173,23 @@ export default function HomePage() {
             <div className="glass-card p-6 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-400 text-[11px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 text-indigo-600 text-[11px] font-bold border border-indigo-100">
                     <Bot size={12} />
                     3-Tier RAG Engine
                   </span>
                   <span className="text-[11px] text-slate-400">102권 지침서 1:1 쪽수 앵커링</span>
                 </div>
 
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-lg font-bold text-slate-900">
                   3-Tier AI-SEN 지능형 행정 챗봇
                 </h3>
 
-                <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
                   28개 서고 지침서, 법령·조례, 에듀파인을 3-Tier로 격리하여 100% 원본 쪽수 뷰어(#page=N) 및 국가법령정보센터 조문 링크와 함께 답변합니다.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-800/80">
+              <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100">
                 <a 
                   href="https://chatbot.aisen.store" 
                   target="_blank" 
@@ -213,16 +213,16 @@ export default function HomePage() {
             <div className="glass-card p-5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-400">자료실 &amp; 서식</span>
-                  <span className="text-[11px] text-slate-500">102권 공식 지침서</span>
+                  <span className="text-[11px] font-bold text-slate-500">자료실 &amp; 서식</span>
+                  <span className="text-[11px] text-slate-400">102권 공식 지침서</span>
                 </div>
-                <h3 className="text-base font-bold text-white">행정 자료실 및 지침서 서고</h3>
-                <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-base font-bold text-slate-900">행정 자료실 및 지침서 서고</h3>
+                <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
                   28개 분야 102권 공식 지침서 PDF 원본 뷰어와 학교별 실무 서식을 다운로드하세요.
                 </p>
               </div>
-              <div className="mt-5 pt-3 border-t border-slate-800/60 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500">PDF 및 실무 서식 지원</span>
+              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-400">PDF 및 실무 서식 지원</span>
                 <Link href="/archive" className="btn-secondary py-1.5 px-3 text-xs">
                   <span>자료실 이동</span>
                   <ChevronRight size={13} />
@@ -234,16 +234,16 @@ export default function HomePage() {
             <div className="glass-card p-5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-emerald-400">열린 소통 광장</span>
-                  <span className="text-[11px] text-slate-500">미가입 자유 작성</span>
+                  <span className="text-[11px] font-bold text-emerald-600">열린 소통 광장</span>
+                  <span className="text-[11px] text-slate-400">미가입 자유 작성</span>
                 </div>
-                <h3 className="text-base font-bold text-white">교육행정 업무 소통 게시판</h3>
-                <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-base font-bold text-slate-900">교육행정 업무 소통 게시판</h3>
+                <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
                   가입 없이 닉네임과 비밀번호로 자유롭게 실무 질의와 노하우를 공유하는 공간입니다.
                 </p>
               </div>
-              <div className="mt-5 pt-3 border-t border-slate-800/60 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500">공지 · 업무공유 · Q&amp;A</span>
+              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-400">공지 · 업무공유 · Q&amp;A</span>
                 <Link href="/board" className="btn-secondary py-1.5 px-3 text-xs">
                   <span>게시판 이동</span>
                   <ChevronRight size={13} />
@@ -255,19 +255,19 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================
-            FOLD 3: 실시간 피드 (1100px Aligned)
+            FOLD 3: 실시간 피드
         ======================================================== */}
         <section className="w-full py-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             
             {/* Latest Posts Feed */}
             <div className="glass-panel p-5">
-              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-                  <MessageSquareShare size={15} className="text-blue-400" />
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                  <MessageSquareShare size={15} className="text-blue-600" />
                   <span>최신 공지 및 업무 공유</span>
                 </div>
-                <Link href="/board" className="text-[11px] text-slate-400 hover:text-blue-400">
+                <Link href="/board" className="text-[11px] text-slate-500 hover:text-blue-600">
                   더보기 &rarr;
                 </Link>
               </div>
@@ -278,33 +278,33 @@ export default function HomePage() {
                     <Link 
                       key={post.id} 
                       href="/board" 
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/40 hover:bg-slate-800/60 transition-colors border border-slate-800/40 text-xs"
+                      className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50/70 hover:bg-slate-100/80 transition-colors border border-slate-100 text-xs"
                     >
                       <div className="flex items-center gap-2 overflow-hidden">
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-blue-300 shrink-0">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-medium shrink-0">
                           {post.category || '공지'}
                         </span>
-                        <span className="text-slate-200 truncate">{post.title}</span>
+                        <span className="text-slate-700 font-medium truncate">{post.title}</span>
                       </div>
-                      <span className="text-[10px] text-slate-500 shrink-0 ml-2">
+                      <span className="text-[10px] text-slate-400 shrink-0 ml-2">
                         {new Date(post.created_at).toLocaleDateString()}
                       </span>
                     </Link>
                   ))
                 ) : (
-                  <div className="py-4 text-center text-xs text-slate-500">등록된 게시물이 없습니다.</div>
+                  <div className="py-4 text-center text-xs text-slate-400">등록된 게시물이 없습니다.</div>
                 )}
               </div>
             </div>
 
             {/* Latest Docs Feed */}
             <div className="glass-panel p-5">
-              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-                  <FileCheck2 size={15} className="text-emerald-400" />
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                  <FileCheck2 size={15} className="text-emerald-600" />
                   <span>최신 등록 서식 문서</span>
                 </div>
-                <Link href="/archive" className="text-[11px] text-slate-400 hover:text-emerald-400">
+                <Link href="/archive" className="text-[11px] text-slate-500 hover:text-emerald-600">
                   더보기 &rarr;
                 </Link>
               </div>
@@ -315,21 +315,21 @@ export default function HomePage() {
                     <Link 
                       key={doc.id} 
                       href="/archive" 
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/40 hover:bg-slate-800/60 transition-colors border border-slate-800/40 text-xs"
+                      className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50/70 hover:bg-slate-100/80 transition-colors border border-slate-100 text-xs"
                     >
                       <div className="flex items-center gap-2 overflow-hidden">
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 shrink-0">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium shrink-0">
                           {doc.category || '서식'}
                         </span>
-                        <span className="text-slate-200 truncate">{doc.file_name}</span>
+                        <span className="text-slate-700 font-medium truncate">{doc.file_name}</span>
                       </div>
-                      <span className="text-[10px] text-slate-500 shrink-0 ml-2">
+                      <span className="text-[10px] text-slate-400 shrink-0 ml-2">
                         {new Date(doc.created_at).toLocaleDateString()}
                       </span>
                     </Link>
                   ))
                 ) : (
-                  <div className="py-4 text-center text-xs text-slate-500">등록된 서식이 없습니다.</div>
+                  <div className="py-4 text-center text-xs text-slate-400">등록된 서식이 없습니다.</div>
                 )}
               </div>
             </div>
@@ -338,17 +338,17 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="w-full pt-6 pb-4 mt-4 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <footer className="w-full pt-6 pb-4 mt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div>
             <span>&copy; 2026 AI-SEN STORE. All rights reserved.</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <a href="https://chatbot.aisen.store" target="_blank" rel="noopener noreferrer" className="hover:text-slate-200">AI 챗봇</a>
-            <Link href="/chatbot" className="hover:text-slate-200">구글 챗봇</Link>
-            <a href="https://chatbot.aisen.store/travel" target="_blank" rel="noopener noreferrer" className="hover:text-slate-200">여비정산기</a>
-            <Link href="/archive" className="hover:text-slate-200">자료실</Link>
-            <Link href="/tools" className="hover:text-slate-200">미니툴</Link>
-            <Link href="/board" className="hover:text-slate-200">게시판</Link>
+          <div className="flex items-center gap-4 text-slate-500">
+            <a href="https://chatbot.aisen.store" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">AI 챗봇</a>
+            <Link href="/chatbot" className="hover:text-blue-600">구글 챗봇</Link>
+            <a href="https://chatbot.aisen.store/travel" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">여비정산기</a>
+            <Link href="/archive" className="hover:text-blue-600">자료실</Link>
+            <Link href="/tools" className="hover:text-blue-600">미니툴</Link>
+            <Link href="/board" className="hover:text-blue-600">게시판</Link>
           </div>
         </footer>
 

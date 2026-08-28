@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Upload, Loader2, CheckCircle2, X, FilePlus, Files } from 'lucide-react';
+import { Upload, Loader2, CheckCircle2, X } from 'lucide-react';
 
 const CATEGORIES = ['예산지침', '계약', '인사', '급여', '회계', '지출', '매뉴얼', '기타'];
 
@@ -13,7 +13,6 @@ export default function FileUpload({ onUploadSuccess, defaultCategory = '기타'
   const [category, setCategory] = useState(defaultCategory === '전체 자료' ? '기타' : defaultCategory);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -103,48 +102,48 @@ export default function FileUpload({ onUploadSuccess, defaultCategory = '기타'
     <>
       <button 
         onClick={() => setShowModal(true)}
-        className="btn-primary py-2.5 px-5 text-xs font-bold"
+        className="btn-primary py-2 px-4 text-xs font-bold"
       >
-        <Upload size={16} />
+        <Upload size={14} />
         <span>새 서식 등록</span>
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-950 border border-slate-800 p-6 md:p-8 max-w-[520px] w-full rounded-2xl shadow-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white p-6 md:p-8 max-w-[480px] w-full rounded-2xl shadow-xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
-                  <Upload size={18} />
+                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Upload size={15} />
                 </div>
-                <h3 className="text-lg font-bold text-white">행정 자료 및 서식 등록</h3>
+                <h3 className="text-base font-bold text-slate-900">행정 자료 및 서식 등록</h3>
               </div>
               <button 
                 onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-slate-700"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleUpload} className="flex flex-col gap-4">
+            <form onSubmit={handleUpload} className="flex flex-col gap-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">자료 제목 (선택)</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">자료 제목 (선택)</label>
                 <input 
                   type="text" 
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="미입력 시 첫 번째 파일명이 제목으로 사용됩니다"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  placeholder="미입력 시 파일명이 제목으로 사용됩니다"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">카테고리</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">카테고리</label>
                 <select 
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                 >
                   {CATEGORIES.map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -153,14 +152,14 @@ export default function FileUpload({ onUploadSuccess, defaultCategory = '기타'
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">첨부 파일 (다중 선택 가능)</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">첨부 파일</label>
                 <div 
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
-                    isDragging ? 'border-blue-400 bg-blue-500/10' : 'border-slate-800 hover:border-slate-700 bg-slate-900/50'
+                  className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all ${
+                    isDragging ? 'border-blue-500 bg-blue-50/50' : 'border-slate-300 hover:border-slate-400 bg-slate-50/50'
                   }`}
                   onClick={() => document.getElementById('archive-file-input')?.click()}
                 >
@@ -171,50 +170,48 @@ export default function FileUpload({ onUploadSuccess, defaultCategory = '기타'
                     onChange={handleFileChange}
                     className="hidden"
                   />
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-blue-600/15 text-blue-400 flex items-center justify-center">
-                      <Upload size={20} />
-                    </div>
-                    <span className="text-xs font-bold text-slate-300">
+                  <div className="flex flex-col items-center gap-1.5">
+                    <Upload size={18} className="text-slate-400" />
+                    <span className="text-xs font-bold text-slate-700">
                       클릭하여 파일 선택 또는 드래그 앤 드롭
                     </span>
-                    <span className="text-[11px] text-slate-500">PDF, HWP, HWPX, XLSX, ZIP 등 모든 문서</span>
+                    <span className="text-[11px] text-slate-400">PDF, HWP, HWPX, XLSX 등</span>
                   </div>
                 </div>
 
                 {selectedFiles && selectedFiles.length > 0 && (
-                  <div className="mt-3 flex flex-col gap-1.5 max-h-[120px] overflow-y-auto no-scrollbar">
+                  <div className="mt-2.5 flex flex-col gap-1 max-h-[100px] overflow-y-auto no-scrollbar">
                     {Array.from(selectedFiles).map((f, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs p-2 bg-slate-900 rounded-lg border border-slate-800 text-slate-300">
-                        <span className="truncate max-w-[280px]">{f.name}</span>
-                        <span className="text-slate-500 text-[10px]">{(f.size / 1024 / 1024).toFixed(2)} MB</span>
+                      <div key={i} className="flex items-center justify-between text-xs p-1.5 bg-slate-50 rounded border border-slate-200 text-slate-700">
+                        <span className="truncate max-w-[240px]">{f.name}</span>
+                        <span className="text-slate-400 text-[10px]">{(f.size / 1024 / 1024).toFixed(2)} MB</span>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-slate-100">
                 <button 
                   type="button" 
                   onClick={() => setShowModal(false)}
-                  className="btn-secondary py-2 px-4 text-xs"
+                  className="btn-secondary py-1.5 px-3.5 text-xs"
                 >
                   취소
                 </button>
                 <button 
                   type="submit" 
                   disabled={uploading}
-                  className="btn-primary py-2 px-5 text-xs font-bold disabled:opacity-50"
+                  className="btn-primary py-1.5 px-4 text-xs font-bold disabled:opacity-50"
                 >
                   {uploading ? (
                     <>
-                      <Loader2 size={16} className="animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                       <span>업로드 중...</span>
                     </>
                   ) : status === 'success' ? (
                     <>
-                      <CheckCircle2 size={16} className="text-emerald-400" />
+                      <CheckCircle2 size={14} className="text-emerald-400" />
                       <span>완료!</span>
                     </>
                   ) : (

@@ -11,13 +11,8 @@ import {
   MessageSquare, 
   HelpCircle, 
   Megaphone, 
-  Edit3, 
   ChevronRight, 
-  Clock, 
-  Share2,
-  Lock,
-  CheckCircle2,
-  ShieldAlert
+  Share2
 } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -33,10 +28,10 @@ interface Post {
 }
 
 const BOARDS = [
-  { id: 'notice', name: '공지사항', icon: <Megaphone size={16} />, color: 'text-blue-400' },
-  { id: 'work_share', name: '업무공유', icon: <Share2 size={16} />, color: 'text-emerald-400' },
-  { id: 'free', name: '자유게시판', icon: <MessageSquare size={16} />, color: 'text-sky-400' },
-  { id: 'qna', name: '질의응답', icon: <HelpCircle size={16} />, color: 'text-purple-400' },
+  { id: 'notice', name: '공지사항', icon: <Megaphone size={16} />, color: 'text-blue-600' },
+  { id: 'work_share', name: '업무공유', icon: <Share2 size={16} />, color: 'text-emerald-600' },
+  { id: 'free', name: '자유게시판', icon: <MessageSquare size={16} />, color: 'text-sky-600' },
+  { id: 'qna', name: '질의응답', icon: <HelpCircle size={16} />, color: 'text-purple-600' },
 ];
 
 const CATEGORIES = ["전체", "공지", "협조", "긴급", "질문", "정보", "일반"];
@@ -53,7 +48,6 @@ export default function BoardPage() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-  // Form State
   const [newPost, setNewPost] = useState({ 
     title: '', 
     content: '', 
@@ -125,12 +119,10 @@ export default function BoardPage() {
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Notice board is admin only
     if (activeBoard === 'notice' && !isAdmin) {
       return alert('공지사항은 관리자만 작성할 수 있습니다. 다른 게시판을 이용해주세요.');
     }
 
-    // Guest validation
     if (!user && (!newPost.nickname.trim() || !newPost.password.trim())) {
       return alert('닉네임과 4자리 비밀번호를 입력해주세요.');
     }
@@ -198,7 +190,6 @@ export default function BoardPage() {
       return;
     }
 
-    // Guest post delete with password
     if (post.author_email && post.author_email.startsWith('guest:')) {
       const parts = post.author_email.replace('guest:', '').split('#');
       const savedPw = parts[1];
@@ -241,27 +232,27 @@ export default function BoardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0a0e17] text-slate-100 px-4 md:px-6 py-10 flex flex-col items-center">
-      <div className="w-full max-w-[1200px] flex flex-col gap-8">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 px-4 md:px-6 py-10 flex flex-col items-center">
+      <div className="w-full max-w-[1100px] flex flex-col gap-8">
         
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-xs font-bold text-emerald-300 mb-2">
-              <LayoutDashboard size={14} className="text-emerald-400" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-xs font-bold text-emerald-600 mb-2">
+              <LayoutDashboard size={13} className="text-emerald-600" />
               <span>실시간 소통 광장</span>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight">교육행정 업무 소통 게시판</h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">교육행정 업무 소통 게시판</h1>
+            <p className="text-sm text-slate-500 mt-1">
               로그인 없이도 닉네임과 비밀번호로 자유롭게 실무 질의와 팁을 공유할 수 있습니다.
             </p>
           </div>
 
           <button 
             onClick={() => handleOpenWriteModal()} 
-            className="btn-primary py-2.5 px-5 self-start md:self-auto text-xs font-bold"
+            className="btn-primary py-2 px-4 self-start md:self-auto text-xs font-bold"
           >
-            <Plus size={16} />
+            <Plus size={15} />
             <span>글쓰기</span>
           </button>
         </div>
@@ -277,21 +268,21 @@ export default function BoardPage() {
                   setActiveBoard(board.id);
                   setActiveCategory("전체");
                 }}
-                className={`p-4 rounded-2xl flex items-center justify-between border transition-all ${
+                className={`p-3.5 rounded-xl flex items-center justify-between border transition-all ${
                   isActive 
-                    ? 'bg-slate-900 border-blue-500/60 shadow-lg shadow-blue-500/10' 
-                    : 'bg-slate-950/60 border-slate-800/80 hover:bg-slate-900/60 text-slate-400 hover:text-white'
+                    ? 'bg-white border-blue-500 shadow-sm text-slate-900' 
+                    : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-600'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center ${board.color}`}>
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-7 h-7 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center ${board.color}`}>
                     {board.icon}
                   </div>
-                  <span className={`text-sm font-bold ${isActive ? 'text-white' : ''}`}>
+                  <span className={`text-xs font-bold ${isActive ? 'text-blue-600' : ''}`}>
                     {board.name}
                   </span>
                 </div>
-                {isActive && <span className="w-2 h-2 rounded-full bg-blue-400"></span>}
+                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>}
               </button>
             );
           })}
@@ -299,15 +290,15 @@ export default function BoardPage() {
 
         {/* Filter & Search Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 w-full sm:w-auto overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-white border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeCategory === cat
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-blue-600 text-white font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {cat}
@@ -315,114 +306,107 @@ export default function BoardPage() {
             ))}
           </div>
 
-          <div className="relative w-full sm:w-[280px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+          <div className="relative w-full sm:w-[260px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
             <input 
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="게시글 검색..."
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 shadow-sm"
             />
           </div>
         </div>
 
-        {/* Posts Table / List */}
+        {/* Posts List */}
         {loading ? (
           <div className="py-20 text-center text-slate-400">게시글을 불러오는 중...</div>
         ) : filteredPosts.length > 0 ? (
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2">
             {filteredPosts.map((post) => {
               const author = getAuthorDisplay(post.author_email);
               return (
                 <div 
                   key={post.id}
                   onClick={() => handleOpenViewModal(post)}
-                  className="glass-card p-4 md:p-5 flex items-center justify-between cursor-pointer group border-slate-800 hover:border-blue-500/40"
+                  className="glass-card p-4 flex items-center justify-between cursor-pointer group hover:border-blue-300"
                 >
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-900 text-blue-300 border border-slate-800 shrink-0">
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100 shrink-0">
                       {post.category || '일반'}
                     </span>
-                    <span className="text-sm md:text-base font-bold text-slate-200 group-hover:text-blue-300 transition-colors truncate">
+                    <span className="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors truncate">
                       {post.title}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-4 shrink-0 ml-4">
-                    <div className="flex items-center gap-1.5">
-                      {author.isOfficial ? (
-                        <span className="text-[11px] font-black px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30 flex items-center gap-1">
-                          👑 {author.name}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-slate-400 font-medium">
-                          {author.name}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs text-slate-500 hidden sm:inline">
+                  <div className="flex items-center gap-3 shrink-0 ml-3 text-xs">
+                    {author.isOfficial ? (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                        👑 관리자
+                      </span>
+                    ) : (
+                      <span className="text-slate-500 font-medium">{author.name}</span>
+                    )}
+                    <span className="text-slate-400 text-[11px] hidden sm:inline">
                       {new Date(post.created_at).toLocaleDateString()}
                     </span>
-                    <ChevronRight size={16} className="text-slate-600 group-hover:text-blue-400 transition-colors" />
+                    <ChevronRight size={14} className="text-slate-400 group-hover:text-blue-600" />
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          <div className="py-20 text-center text-slate-400 bg-slate-900/30 rounded-2xl border border-slate-800/60">
+          <div className="py-20 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
             등록된 게시물이 없습니다. 첫 번째 글을 작성해보세요!
           </div>
         )}
 
       </div>
 
-      {/* View Post Modal */}
+      {/* View Modal */}
       {showViewModal && selectedPost && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-950 border border-slate-800 p-6 md:p-8 max-w-[650px] w-full rounded-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white p-6 md:p-8 max-w-[600px] w-full rounded-2xl shadow-xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-1 rounded bg-blue-500/15 text-blue-300">
+                <span className="text-xs font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-700">
                   {selectedPost.category}
                 </span>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-400">
                   {new Date(selectedPost.created_at).toLocaleString()}
                 </span>
               </div>
-              <button onClick={() => setShowViewModal(false)} className="text-slate-400 hover:text-white">
-                <X size={20} />
+              <button onClick={() => setShowViewModal(false)} className="text-slate-400 hover:text-slate-700">
+                <X size={18} />
               </button>
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 leading-snug">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">
               {selectedPost.title}
             </h2>
 
-            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-slate-800/60 text-xs text-slate-400">
-              <span>작성자:</span>
-              <span className="font-bold text-slate-200">
-                {getAuthorDisplay(selectedPost.author_email).name}
-              </span>
+            <div className="text-xs text-slate-500 mb-5 pb-3 border-b border-slate-100">
+              작성자: <span className="font-semibold text-slate-700">{getAuthorDisplay(selectedPost.author_email).name}</span>
             </div>
 
-            <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap min-h-[140px]">
+            <div className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-wrap min-h-[120px]">
               {selectedPost.content}
             </div>
 
-            <div className="flex items-center justify-between mt-8 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-between mt-6 pt-3 border-t border-slate-100">
               <button 
                 onClick={() => handleDeletePost(selectedPost)}
-                className="btn-ghost text-red-400 hover:text-red-300 text-xs flex items-center gap-1.5"
+                className="btn-ghost text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
               >
-                <Trash2 size={15} />
+                <Trash2 size={14} />
                 <span>삭제하기</span>
               </button>
 
               <button 
                 onClick={() => setShowViewModal(false)}
-                className="btn-secondary py-2 px-5 text-xs font-bold"
+                className="btn-secondary py-1.5 px-4 text-xs font-bold"
               >
                 닫기
               </button>
@@ -431,27 +415,27 @@ export default function BoardPage() {
         </div>
       )}
 
-      {/* Write / Edit Modal */}
+      {/* Write Modal */}
       {showWriteModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-950 border border-slate-800 p-6 md:p-8 max-w-[600px] w-full rounded-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-              <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white p-6 md:p-8 max-w-[550px] w-full rounded-2xl shadow-xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h3 className="text-base font-bold text-slate-900">
                 {editingPostId ? '게시글 수정' : `새 글 작성 (${BOARDS.find(b => b.id === activeBoard)?.name})`}
               </h3>
-              <button onClick={() => setShowWriteModal(false)} className="text-slate-400 hover:text-white">
-                <X size={20} />
+              <button onClick={() => setShowWriteModal(false)} className="text-slate-400 hover:text-slate-700">
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitPost} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmitPost} className="flex flex-col gap-3.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-300 mb-1.5 block">분류</label>
+                  <label className="text-xs font-bold text-slate-700 mb-1 block">분류</label>
                   <select 
                     value={newPost.category}
                     onChange={(e) => setNewPost({...newPost, category: e.target.value})}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                   >
                     {CATEGORIES.filter(c => c !== "전체").map(c => (
                       <option key={c} value={c}>{c}</option>
@@ -462,25 +446,25 @@ export default function BoardPage() {
                 {!user && (
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-xs font-bold text-slate-300 mb-1.5 block">닉네임</label>
+                      <label className="text-xs font-bold text-slate-700 mb-1 block">닉네임</label>
                       <input 
                         type="text" 
                         required
                         value={newPost.nickname}
                         onChange={(e) => setNewPost({...newPost, nickname: e.target.value})}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                         placeholder="홍길동"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-slate-300 mb-1.5 block">비밀번호 (4자리)</label>
+                      <label className="text-xs font-bold text-slate-700 mb-1 block">비밀번호 (4자리)</label>
                       <input 
                         type="password" 
                         required
                         maxLength={8}
                         value={newPost.password}
                         onChange={(e) => setNewPost({...newPost, password: e.target.value})}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                         placeholder="****"
                       />
                     </div>
@@ -489,40 +473,40 @@ export default function BoardPage() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">제목</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">제목</label>
                 <input 
                   type="text" 
                   required
                   value={newPost.title}
                   onChange={(e) => setNewPost({...newPost, title: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                   placeholder="제목을 입력하세요"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 mb-1.5 block">내용</label>
+                <label className="text-xs font-bold text-slate-700 mb-1 block">내용</label>
                 <textarea 
-                  rows={6}
+                  rows={5}
                   required
                   value={newPost.content}
                   onChange={(e) => setNewPost({...newPost, content: e.target.value})}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
                   placeholder="내용을 작성하세요..."
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-slate-100">
                 <button 
                   type="button" 
                   onClick={() => setShowWriteModal(false)}
-                  className="btn-secondary py-2 px-4 text-xs"
+                  className="btn-secondary py-1.5 px-3.5 text-xs"
                 >
                   취소
                 </button>
                 <button 
                   type="submit" 
-                  className="btn-primary py-2 px-5 text-xs font-bold"
+                  className="btn-primary py-1.5 px-4 text-xs font-bold"
                 >
                   {editingPostId ? '수정 완료' : '등록하기'}
                 </button>
