@@ -14,7 +14,9 @@ import {
   Fuel, 
   FileCheck2, 
   ArrowRight,
-  MessageSquareShare
+  MessageSquareShare,
+  FolderOpen,
+  Zap
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -61,22 +63,22 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col items-center pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col items-center pb-16 overflow-x-hidden">
       
-      {/* Background Accent - Subtle Light Blue Gradient */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1100px] h-[300px] bg-gradient-to-b from-blue-100/60 to-transparent pointer-events-none -z-10 blur-3xl"></div>
+      {/* Background Accent */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1100px] h-[260px] bg-gradient-to-b from-blue-100/60 to-transparent pointer-events-none -z-10 blur-3xl"></div>
 
-      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col gap-6">
+      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col gap-5">
         
         {/* ========================================================
             FOLD 1: Hero & Clean Wide Search Bar
         ======================================================== */}
-        <section className="w-full pt-8 md:pt-12 pb-2 flex flex-col items-center text-center">
+        <section className="w-full pt-6 md:pt-10 pb-1 flex flex-col items-center text-center">
           
           {/* Status Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600 mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600 mb-3 shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span className="font-medium text-slate-700">v4.9.2 엔진 가동중</span>
+            <span className="font-bold text-slate-800">v4.9.2 엔진 가동중</span>
             <span className="text-slate-300">|</span>
             <Fuel size={13} className="text-amber-500" />
             <span>오피넷 실시간 유가 연동</span>
@@ -87,12 +89,12 @@ export default function HomePage() {
             교육행정의 모든 기준과 계산, <span className="text-blue-600">AI-SEN</span>
           </h1>
           
-          <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-[580px] leading-relaxed">
+          <p className="mt-1.5 text-xs sm:text-sm text-slate-500 max-w-[580px] leading-relaxed">
             102권 공식 지침서 1:1 앵커링 RAG 챗봇과 오피넷 실시간 연동 스마트 여비정산기
           </p>
 
           {/* Wide Omnibar Input */}
-          <div className="w-full max-w-[860px] mt-6">
+          <div className="w-full max-w-[860px] mt-5">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input 
@@ -104,7 +106,7 @@ export default function HomePage() {
               />
               <button 
                 type="submit" 
-                className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-1.5 px-4 text-xs font-semibold"
+                className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-1.5 px-4 text-xs font-bold"
               >
                 <span>검색</span>
                 <ArrowRight size={14} />
@@ -113,139 +115,167 @@ export default function HomePage() {
           </div>
 
           {/* Metrics Ribbon */}
-          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-7 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5 p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs">
             {METRICS.map((metric, idx) => (
               <div key={idx} className="flex flex-col items-center justify-center p-1 text-center border-r border-slate-100 last:border-r-0">
-                <span className="text-[11px] text-slate-400 font-medium">{metric.label}</span>
-                <span className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5">{metric.value}</span>
+                <span className="text-[11px] text-slate-400 font-semibold">{metric.label}</span>
+                <span className="text-xs sm:text-sm font-black text-slate-800 mt-0.5">{metric.value}</span>
               </div>
             ))}
           </div>
         </section>
 
         {/* ========================================================
-            FOLD 2: 4대 핵심 서비스 (Clean White Cards)
+            FOLD 2: 4대 핵심 서비스 (세로 높이 50% 축소 슬림형 카드)
         ======================================================== */}
-        <section className="w-full py-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <section className="w-full py-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             {/* CARD 1: 스마트 여비정산기 & 출장 유류비 계산기 */}
-            <div className="glass-card p-6 flex flex-col justify-between">
+            <div className="glass-card p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[11px] font-bold border border-blue-100">
-                    <Navigation size={12} />
-                    여비정산기 v4.9.2
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                      <Navigation size={13} />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                      스마트 여비정산기 &amp; 유류비 계산기
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 shrink-0">
+                    v4.9.2
                   </span>
-                  <span className="text-[11px] text-slate-400">오피넷 1일 6회 자동 연동</span>
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-900">
-                  공무원 스마트 여비정산기 &amp; 출장 유류비 계산기
-                </h3>
-                
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  카카오 모빌리티 3개 경유지 길찾기와 오피넷 유가를 연동하여 관내/관외 출장비 산출, 19종 법정 감액, A4 1페이지 에코 화이트 공문서 인쇄를 지원합니다.
+                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                  카카오 3개 경유지 길찾기 및 오피넷 1일 6회 유가 연동 관내·외 여비 산출 (A4 1페이지 인쇄)
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
                 <a 
                   href="https://chatbot.aisen.store/travel" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="btn-primary flex-1 py-2 text-xs"
+                  className="btn-primary flex-1 py-1.5 text-xs font-bold"
                 >
                   <span>여비정산기 열기</span>
-                  <ExternalLink size={13} />
+                  <ExternalLink size={12} />
                 </a>
                 <Link 
                   href="/tools" 
-                  className="btn-secondary py-2 text-xs"
+                  className="btn-secondary py-1.5 px-3 text-xs"
                 >
-                  <span>미니툴 목록</span>
-                  <ChevronRight size={14} />
+                  <span>미니툴</span>
+                  <ChevronRight size={13} />
                 </Link>
               </div>
             </div>
 
             {/* CARD 2: 3-Tier AI-SEN 지능형 행정 챗봇 */}
-            <div className="glass-card p-6 flex flex-col justify-between">
+            <div className="glass-card p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 text-indigo-600 text-[11px] font-bold border border-indigo-100">
-                    <Bot size={12} />
-                    3-Tier RAG Engine
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+                      <Bot size={13} />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                      3-Tier AI-SEN 지능형 행정 챗봇
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 shrink-0">
+                    3-Tier RAG
                   </span>
-                  <span className="text-[11px] text-slate-400">102권 지침서 1:1 쪽수 앵커링</span>
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-900">
-                  3-Tier AI-SEN 지능형 행정 챗봇
-                </h3>
-
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  28개 서고 지침서, 법령·조례, 에듀파인을 3-Tier로 격리하여 100% 원본 쪽수 뷰어(#page=N) 및 국가법령정보센터 조문 링크와 함께 답변합니다.
+                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                  28개 서고 지침서, 법령·조례, 에듀파인 3-Tier 격리 및 100% 원본 쪽수 뷰어(#page=N)
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
                 <a 
                   href="https://chatbot.aisen.store" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="btn-primary bg-indigo-600 hover:bg-indigo-700 flex-1 py-2 text-xs"
+                  className="btn-primary bg-indigo-600 hover:bg-indigo-700 flex-1 py-1.5 text-xs font-bold"
                 >
                   <span>AI 챗봇 시작하기</span>
-                  <ExternalLink size={13} />
+                  <ExternalLink size={12} />
                 </a>
                 <Link 
                   href="/archive" 
-                  className="btn-secondary py-2 text-xs"
+                  className="btn-secondary py-1.5 px-3 text-xs"
                 >
-                  <span>지침서 서고 보기</span>
-                  <ChevronRight size={14} />
+                  <span>서고 보기</span>
+                  <ChevronRight size={13} />
                 </Link>
               </div>
             </div>
 
             {/* CARD 3: 행정 자료실 */}
-            <div className="glass-card p-5 flex flex-col justify-between">
+            <div className="glass-card p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-500">자료실 &amp; 서식</span>
-                  <span className="text-[11px] text-slate-400">102권 공식 지침서</span>
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                      <FolderOpen size={13} />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                      행정 자료실 &amp; 공식 지침서
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 shrink-0">
+                    102권 서고
+                  </span>
                 </div>
-                <h3 className="text-base font-bold text-slate-900">행정 자료실 및 지침서 서고</h3>
-                <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
-                  28개 분야 102권 공식 지침서 PDF 원본 뷰어와 학교별 실무 서식을 다운로드하세요.
+
+                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                  28개 분야 102권 공식 지침서 PDF 원본 스트리밍 및 학교별 실무 서식 다운로드
                 </p>
               </div>
-              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">PDF 및 실무 서식 지원</span>
-                <Link href="/archive" className="btn-secondary py-1.5 px-3 text-xs">
-                  <span>자료실 이동</span>
+
+              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
+                <Link 
+                  href="/archive" 
+                  className="btn-secondary w-full py-1.5 text-xs justify-center"
+                >
+                  <span>자료실 바로가기</span>
                   <ChevronRight size={13} />
                 </Link>
               </div>
             </div>
 
             {/* CARD 4: 업무 소통 게시판 */}
-            <div className="glass-card p-5 flex flex-col justify-between">
+            <div className="glass-card p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-emerald-600">열린 소통 광장</span>
-                  <span className="text-[11px] text-slate-400">미가입 자유 작성</span>
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-100">
+                      <MessageSquareShare size={13} />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                      교육행정 업무 소통 게시판
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100 shrink-0">
+                    미가입 작성
+                  </span>
                 </div>
-                <h3 className="text-base font-bold text-slate-900">교육행정 업무 소통 게시판</h3>
-                <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
-                  가입 없이 닉네임과 비밀번호로 자유롭게 실무 질의와 노하우를 공유하는 공간입니다.
+
+                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                  가입 없이 닉네임과 4자리 비밀번호로 자유롭게 실무 질의와 팁을 나누는 열린 광장
                 </p>
               </div>
-              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">공지 · 업무공유 · Q&amp;A</span>
-                <Link href="/board" className="btn-secondary py-1.5 px-3 text-xs">
-                  <span>게시판 이동</span>
+
+              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
+                <Link 
+                  href="/board" 
+                  className="btn-secondary w-full py-1.5 text-xs justify-center"
+                >
+                  <span>게시판 바로가기</span>
                   <ChevronRight size={13} />
                 </Link>
               </div>
@@ -257,14 +287,14 @@ export default function HomePage() {
         {/* ========================================================
             FOLD 3: 실시간 피드
         ======================================================== */}
-        <section className="w-full py-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <section className="w-full py-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             {/* Latest Posts Feed */}
-            <div className="glass-panel p-5">
-              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+            <div className="glass-panel p-4">
+              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                  <MessageSquareShare size={15} className="text-blue-600" />
+                  <MessageSquareShare size={14} className="text-blue-600" />
                   <span>최신 공지 및 업무 공유</span>
                 </div>
                 <Link href="/board" className="text-[11px] text-slate-500 hover:text-blue-600">
@@ -278,7 +308,7 @@ export default function HomePage() {
                     <Link 
                       key={post.id} 
                       href="/board" 
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50/70 hover:bg-slate-100/80 transition-colors border border-slate-100 text-xs"
+                      className="flex items-center justify-between p-2 rounded-lg bg-slate-50/70 hover:bg-slate-100/80 transition-colors border border-slate-100 text-xs"
                     >
                       <div className="flex items-center gap-2 overflow-hidden">
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-medium shrink-0">
@@ -292,16 +322,16 @@ export default function HomePage() {
                     </Link>
                   ))
                 ) : (
-                  <div className="py-4 text-center text-xs text-slate-400">등록된 게시물이 없습니다.</div>
+                  <div className="py-3 text-center text-xs text-slate-400">등록된 게시물이 없습니다.</div>
                 )}
               </div>
             </div>
 
             {/* Latest Docs Feed */}
-            <div className="glass-panel p-5">
-              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+            <div className="glass-panel p-4">
+              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                  <FileCheck2 size={15} className="text-emerald-600" />
+                  <FileCheck2 size={14} className="text-emerald-600" />
                   <span>최신 등록 서식 문서</span>
                 </div>
                 <Link href="/archive" className="text-[11px] text-slate-500 hover:text-emerald-600">
@@ -315,7 +345,7 @@ export default function HomePage() {
                     <Link 
                       key={doc.id} 
                       href="/archive" 
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50/70 hover:bg-slate-100/80 transition-colors border border-slate-100 text-xs"
+                      className="flex items-center justify-between p-2 rounded-lg bg-slate-50/70 hover:bg-slate-100/80 transition-colors border border-slate-100 text-xs"
                     >
                       <div className="flex items-center gap-2 overflow-hidden">
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium shrink-0">
@@ -329,7 +359,7 @@ export default function HomePage() {
                     </Link>
                   ))
                 ) : (
-                  <div className="py-4 text-center text-xs text-slate-400">등록된 서식이 없습니다.</div>
+                  <div className="py-3 text-center text-xs text-slate-400">등록된 서식이 없습니다.</div>
                 )}
               </div>
             </div>
@@ -338,7 +368,7 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="w-full pt-6 pb-4 mt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+        <footer className="w-full pt-5 pb-3 mt-2 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div>
             <span>&copy; 2026 AI-SEN STORE. All rights reserved.</span>
           </div>
