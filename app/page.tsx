@@ -271,7 +271,7 @@ export default function HomePage() {
 
         {/* CARD 6: 수박 게임 */}
         <a 
-          href="https://suikagame.com" 
+          href="https://project-np0t7.vercel.app" 
           target="_blank" 
           rel="noopener noreferrer"
           className="glass-card p-4.5 flex flex-col justify-between min-h-[190px] group hover:border-rose-400 hover:shadow-lg transition-all cursor-pointer bg-white"
@@ -283,7 +283,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">
-                  쉼터
+                  랭킹 게임
                 </span>
                 <ArrowUpRight size={16} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
               </div>
@@ -293,7 +293,7 @@ export default function HomePage() {
               수박 게임
             </h2>
             <p className="text-xs sm:text-[13px] text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
-              업무 중 잠시 쉬어가는 힐링 수박 합치기 미니 게임
+              3D 벡터 과일 합치기 &amp; 실시간 글로벌 랭킹 게임
             </p>
           </div>
 
@@ -317,7 +317,7 @@ export default function HomePage() {
           <Link href="/archive" className="hover:text-blue-600">자료실</Link>
           <a href="https://chatbot.aisen.store?forms=1" target="_blank" rel="noopener noreferrer" className="hover:text-amber-600">행정서식</a>
           <Link href="/board" className="hover:text-blue-600">게시판</Link>
-          <a href="https://suikagame.com" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600">수박게임</a>
+          <a href="https://project-np0t7.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600">수박게임</a>
         </div>
       </footer>
 
