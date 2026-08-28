@@ -14,6 +14,10 @@
   --foreground: #0f172a;
 }
 
+html {
+  font-size: 17.5px; /* 전체 폰트 크기 기본 스케일업 (+25~30% 가독성 향상) */
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -37,14 +41,14 @@ body {
   .glass-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 16px;
+    border-radius: 18px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     transition: all 0.2s ease;
   }
 
   .glass-card:hover {
     border-color: #93c5fd;
-    box-shadow: 0 6px 16px -4px rgba(37, 99, 235, 0.08);
+    box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.1);
     transform: translateY(-2px);
   }
 
@@ -52,7 +56,7 @@ body {
   .glass-panel {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 16px;
+    border-radius: 18px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   }
 
@@ -61,14 +65,14 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 18px;
+    gap: 8px;
+    padding: 10px 20px;
     background: #2563eb;
     color: #ffffff;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
     transition: all 0.15s ease;
   }
 
@@ -80,13 +84,13 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 16px;
+    gap: 8px;
+    padding: 10px 18px;
     background: #ffffff;
     color: #334155;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     transition: all 0.15s ease;
@@ -103,12 +107,12 @@ body {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 6px 12px;
+    padding: 8px 14px;
     background: transparent;
     color: #64748b;
-    font-weight: 500;
-    font-size: 0.82rem;
-    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 10px;
     transition: all 0.15s ease;
   }
 
@@ -123,10 +127,10 @@ body {
     background: #ffffff;
     color: #0f172a;
     border: 1px solid #cbd5e1;
-    border-radius: 14px;
-    padding: 12px 20px 12px 44px;
-    font-size: 0.92rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-radius: 18px;
+    padding: 15px 24px 15px 52px;
+    font-size: 1.05rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease;
   }
 
@@ -134,7 +138,7 @@ body {
     outline: none;
     border-color: #3b82f6;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
   }
 }
 

@@ -19,7 +19,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-[#f8fafc] text-[#0f172a] selection:bg-blue-600 selection:text-white">
         <Sidebar />
-        <main className="md:pl-64 min-h-screen pt-14 md:pt-0">
+        <main className="md:pl-68 min-h-screen pt-16 md:pt-0">
           {children}
         </main>
       </body>
