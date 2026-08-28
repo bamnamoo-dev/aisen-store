@@ -36,12 +36,12 @@ interface GroupedDocument {
 }
 
 const OFFICIAL_GUIDELINE_CATEGORIES = [
-  { name: '계약 업무', count: '18권 (4,656쪽)', desc: '물품·용역·공사 계약집행기준, 수의계약, 낙찰자 결정기준', icon: '📝' },
-  { name: '예산 및 회계', count: '12권 (2,140쪽)', desc: '학교회계 예산편성 기본지침, 세입세출 예산과목, 회계규칙', icon: '💰' },
-  { name: '공무원 인사/복무', count: '15권 (3,210쪽)', desc: '국가공무원 복무·징계 실무, 휴직 및 겸직 지침', icon: '👔' },
-  { name: '출장 및 여비', count: '6권 (890쪽)', desc: '공무원보수 등의 업무지침(여비업무 처리기준), 유류비 기준', icon: '🚗' },
-  { name: '교육공무직원', count: '8권 (1,150쪽)', desc: '교육공무직원 취업규칙, 단체협약, 임금체계 및 복무 기준', icon: '👥' },
-  { name: '급식 및 시설안전', count: '14권 (1,800쪽)', desc: '학교급식 기본방향, 산업안전보건, 시설적립금, 물품·재산 관리', icon: '🍱' },
+  { name: '계약 업무', cat: '계약', count: '18권 (4,656쪽)', desc: '물품·용역·공사 계약집행기준, 수의계약, 낙찰자 결정기준', icon: '📝' },
+  { name: '예산 및 회계', cat: '예산', count: '12권 (2,140쪽)', desc: '학교회계 예산편성 기본지침, 세입세출 예산과목, 회계규칙', icon: '💰' },
+  { name: '공무원 인사/복무', cat: '공무원', count: '15권 (3,210쪽)', desc: '국가공무원 복무·징계 실무, 휴직 및 겸직 지침', icon: '👔' },
+  { name: '출장 및 여비', cat: '여비', count: '6권 (890쪽)', desc: '공무원보수 등의 업무지침(여비업무 처리기준), 유류비 기준', icon: '🚗' },
+  { name: '교육공무직원', cat: '공무직', count: '8권 (1,150쪽)', desc: '교육공무직원 취업규칙, 단체협약, 임금체계 및 복무 기준', icon: '👥' },
+  { name: '급식 및 시설안전', cat: '급식', count: '14권 (1,800쪽)', desc: '학교급식 기본방향, 산업안전보건, 시설적립금, 물품·재산 관리', icon: '🍱' },
 ];
 
 const CATEGORIES = ['전체 자료', '예산지침', '계약', '인사', '급여', '회계', '지출', '매뉴얼', '기타'];
@@ -214,9 +214,12 @@ export default function ArchivePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {OFFICIAL_GUIDELINE_CATEGORIES.map((guide, idx) => (
-              <div 
+              <a 
                 key={idx}
-                className="glass-card p-5 flex flex-col justify-between group"
+                href={`https://chatbot.aisen.store?cat=${encodeURIComponent(guide.cat)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-card p-5 flex flex-col justify-between group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -235,17 +238,14 @@ export default function ArchivePage() {
 
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-[11px] text-slate-400">1:1 쪽수 앵커링</span>
-                  <a 
-                    href={`https://chatbot.aisen.store`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-secondary py-1 px-3 text-xs flex items-center gap-1"
+                  <div 
+                    className="btn-secondary py-1 px-3 text-xs flex items-center gap-1 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors"
                   >
                     <span>서고 열기</span>
                     <ExternalLink size={12} />
-                  </a>
+                  </div>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
