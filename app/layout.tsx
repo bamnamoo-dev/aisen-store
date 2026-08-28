@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "아이센스토어 (AI-SEN STORE) | 스마트 교육행정 AI 포털",
@@ -18,8 +18,8 @@ export default function RootLayout({
         <link rel="stylesheet" as="style" crossOrigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
       </head>
       <body className="antialiased bg-[#f8fafc] text-[#0f172a] selection:bg-blue-600 selection:text-white">
-        <Navbar />
-        <main className="min-h-screen pt-14">
+        <Sidebar />
+        <main className="md:pl-60 min-h-screen pt-14 md:pt-0">
           {children}
         </main>
       </body>

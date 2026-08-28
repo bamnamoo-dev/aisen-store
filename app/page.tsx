@@ -15,8 +15,7 @@ import {
   FileCheck2, 
   ArrowRight,
   MessageSquareShare,
-  FolderOpen,
-  Zap
+  FolderOpen
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -63,20 +62,20 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col items-center pb-16 overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col items-center pb-12 overflow-x-hidden">
       
-      {/* Background Accent */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1100px] h-[260px] bg-gradient-to-b from-blue-100/60 to-transparent pointer-events-none -z-10 blur-3xl"></div>
+      {/* Subtle Background Accent */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[220px] bg-gradient-to-b from-blue-100/60 to-transparent pointer-events-none -z-10 blur-3xl"></div>
 
-      <div className="w-full max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col gap-5">
+      <div className="w-full max-w-[1040px] mx-auto px-4 md:px-8 flex flex-col gap-4">
         
         {/* ========================================================
-            FOLD 1: Hero & Clean Wide Search Bar
+            FOLD 1: Hero & Search Bar (High Up & Tightly Spaced)
         ======================================================== */}
-        <section className="w-full pt-6 md:pt-10 pb-1 flex flex-col items-center text-center">
+        <section className="w-full pt-4 md:pt-6 pb-1 flex flex-col items-center text-center">
           
           {/* Status Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600 mb-3 shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white border border-slate-200 text-xs text-slate-600 mb-2 shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             <span className="font-bold text-slate-800">v4.9.2 엔진 가동중</span>
             <span className="text-slate-300">|</span>
@@ -85,16 +84,16 @@ export default function HomePage() {
           </div>
 
           {/* Hero Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-snug">
+          <h1 className="text-2xl sm:text-3xl md:text-3.5xl font-black text-slate-900 tracking-tight leading-tight">
             교육행정의 모든 기준과 계산, <span className="text-blue-600">AI-SEN</span>
           </h1>
           
-          <p className="mt-1.5 text-xs sm:text-sm text-slate-500 max-w-[580px] leading-relaxed">
+          <p className="mt-1 text-xs sm:text-sm text-slate-500 max-w-[560px] leading-relaxed">
             102권 공식 지침서 1:1 앵커링 RAG 챗봇과 오피넷 실시간 연동 스마트 여비정산기
           </p>
 
           {/* Wide Omnibar Input */}
-          <div className="w-full max-w-[860px] mt-5">
+          <div className="w-full max-w-[820px] mt-4">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input 
@@ -102,7 +101,7 @@ export default function HomePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="궁금한 교육행정 지침이나 출장비 규정, 서식을 검색하세요..."
-                className="omnibar-input pl-11 pr-24"
+                className="omnibar-input pl-11 pr-24 py-2.5 text-sm"
               />
               <button 
                 type="submit" 
@@ -115,7 +114,7 @@ export default function HomePage() {
           </div>
 
           {/* Metrics Ribbon */}
-          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5 p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 p-2 rounded-xl bg-white border border-slate-200 shadow-xs">
             {METRICS.map((metric, idx) => (
               <div key={idx} className="flex flex-col items-center justify-center p-1 text-center border-r border-slate-100 last:border-r-0">
                 <span className="text-[11px] text-slate-400 font-semibold">{metric.label}</span>
@@ -126,10 +125,10 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================
-            FOLD 2: 4대 핵심 서비스 (세로 높이 50% 축소 슬림형 카드)
+            FOLD 2: 4대 핵심 서비스 (슬림 컴팩트 카드)
         ======================================================== */}
         <section className="w-full py-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             
             {/* CARD 1: 스마트 여비정산기 & 출장 유류비 계산기 */}
             <div className="glass-card p-4 flex flex-col justify-between">
@@ -148,12 +147,12 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                <p className="text-xs text-slate-500 line-clamp-1 mb-2.5">
                   카카오 3개 경유지 길찾기 및 오피넷 1일 6회 유가 연동 관내·외 여비 산출 (A4 1페이지 인쇄)
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                 <a 
                   href="https://chatbot.aisen.store/travel" 
                   target="_blank" 
@@ -190,12 +189,12 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                <p className="text-xs text-slate-500 line-clamp-1 mb-2.5">
                   28개 서고 지침서, 법령·조례, 에듀파인 3-Tier 격리 및 100% 원본 쪽수 뷰어(#page=N)
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                 <a 
                   href="https://chatbot.aisen.store" 
                   target="_blank" 
@@ -232,12 +231,12 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                <p className="text-xs text-slate-500 line-clamp-1 mb-2.5">
                   28개 분야 102권 공식 지침서 PDF 원본 스트리밍 및 학교별 실무 서식 다운로드
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                 <Link 
                   href="/archive" 
                   className="btn-secondary w-full py-1.5 text-xs justify-center"
@@ -265,12 +264,12 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-500 line-clamp-1 mb-3">
+                <p className="text-xs text-slate-500 line-clamp-1 mb-2.5">
                   가입 없이 닉네임과 4자리 비밀번호로 자유롭게 실무 질의와 팁을 나누는 열린 광장
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100">
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                 <Link 
                   href="/board" 
                   className="btn-secondary w-full py-1.5 text-xs justify-center"
@@ -288,11 +287,11 @@ export default function HomePage() {
             FOLD 3: 실시간 피드
         ======================================================== */}
         <section className="w-full py-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             
             {/* Latest Posts Feed */}
             <div className="glass-panel p-4">
-              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
+              <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
                   <MessageSquareShare size={14} className="text-blue-600" />
                   <span>최신 공지 및 업무 공유</span>
@@ -329,7 +328,7 @@ export default function HomePage() {
 
             {/* Latest Docs Feed */}
             <div className="glass-panel p-4">
-              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
+              <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
                   <FileCheck2 size={14} className="text-emerald-600" />
                   <span>최신 등록 서식 문서</span>
@@ -368,7 +367,7 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="w-full pt-5 pb-3 mt-2 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+        <footer className="w-full pt-4 pb-2 mt-2 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div>
             <span>&copy; 2026 AI-SEN STORE. All rights reserved.</span>
           </div>
