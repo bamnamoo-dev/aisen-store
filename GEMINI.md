@@ -34,9 +34,9 @@
 | **미니툴 2** | **학교회계 대시보드 (SFD)** | `\서울특별시교육청학교정보대시보드\` | `https://bamnamoo-dev.github.io/SFD/` | 세부사업, 추경, 지출집행 모니터링 시각화 대시보드 |
 | **미니툴 3** | **엑셀시트별 분리저장기** | `\asisen-store\app\tools\sheet-splitter\` (내장) | `/tools/sheet-splitter` | Next.js, SheetJS + JSZip 클라이언트 0초 시트 분리 및 ZIP 압축 |
 | **미니툴 4** | **나이스 임금대장 식대분리기** | `\asisen-store\app\tools\sikdae\` (내장) | `/tools/sikdae` | Next.js, SheetJS 브라우저 메모리 안전 파싱, 성명-식대 추출 & 엑셀 저장 |
-| **미니툴 5** | **교실배치도 제작기** | `\classmap\` | `https://bamnamoo-dev.github.io/classmap/` | Vanilla JS / Canvas, 층별·특별실 평면도 시각화 및 배치도 출력 |
+| **미니툴 5** | **교실배치도 제작기** | `\asisen-store\app\tools\classmap\` (내장) | `/tools/classmap` | Next.js React, 층별·호수별 평면도 시각화, 교실 편집 & A4 도면 출력 |
 | **미니툴 6** | **체육관 사용료 계산기** | `\asisen-store\app\tools\gym-calc\` (내장) | `/tools/gym-calc` | Next.js, 교육청 학교시설개방 조례 기준 대관 시간·냉난방비 자동 산출 및 견적서 출력 |
-| **게임/부가** | **수박 게임** | `\watermelongame\` | `https://project-np0t7.vercel.app/` | Matter.js 물리엔진, 실시간 글로벌 랭킹 연동 과일 합치기 게임 |
+| **게임/부가** | **수박 게임** | `\asisen-store\app\tools\watermelon\` (내장) | `/tools/watermelon` | Next.js + Matter.js 물리엔진, 실시간 글로벌 랭킹 연동 과일 합치기 게임 |
 
 ---
 
