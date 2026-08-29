@@ -560,44 +560,31 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================
-          3. CLIENT-SIDE SECURITY & PRIVACY NOTICE BANNER (가운데 정렬 & 눈에 띄는 하이라이트)
+          3. SLIM SECURITY & PRIVACY NOTICE BANNER (컴팩트 슬림 배너)
       ======================================================== */}
-      <section className="w-full max-w-[1400px] mx-auto mt-1">
-        <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-blue-500/10 border-2 border-emerald-500/30 hover:border-emerald-500/50 rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center text-center gap-2.5 transition-all">
+      <section className="w-full max-w-[1400px] mx-auto mt-0.5">
+        <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-blue-500/10 border border-emerald-500/30 rounded-xl py-2 px-3.5 shadow-2xs flex flex-col sm:flex-row items-center justify-center text-center gap-1.5 sm:gap-2.5 transition-all">
           
-          {/* Top Decorative Line */}
-          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500" />
+          {/* Top Accent Line */}
+          <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500" />
 
-          {/* Title Row (Centered) */}
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
-              <ShieldCheck size={17} />
-            </div>
-            <span className="text-[15px] sm:text-[16px] font-black text-slate-900 tracking-tight">
-              100% 브라우저 로컬 단독 처리 &amp; 개인정보 안심 보안
+          {/* Title & Badge */}
+          <div className="flex items-center justify-center gap-1.5 shrink-0">
+            <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+            <span className="text-[13px] font-bold text-slate-900 tracking-tight">
+              100% 브라우저 로컬 처리 &amp; 개인정보 안심 보안
             </span>
-            <span className="text-[11.5px] font-bold text-emerald-800 bg-emerald-100/90 px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs">
+            <span className="text-[10.5px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.2 rounded-full border border-emerald-300">
               서버 유출 0%
             </span>
           </div>
 
-          {/* Description (Centered) */}
-          <p className="text-[13px] text-slate-600 font-medium max-w-[850px] leading-relaxed">
-            나이스 임금대장, 예산정산, 엑셀 시트분리, 교실배치도 등 모든 행정 실무 데이터는 <strong className="text-slate-900 font-bold">외부 서버로 절대 전송되지 않고</strong> 사용자 본인 PC의 웹브라우저 메모리 안에서만 <strong className="text-emerald-700 font-bold">0초 즉시 연산·안전 보관</strong>됩니다.
-          </p>
+          <span className="hidden sm:inline text-slate-300 text-xs">|</span>
 
-          {/* 3 Core Benefit Badges (Centered) */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mt-0.5">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100/80 px-3 py-1 rounded-xl border border-emerald-200 shadow-2xs">
-              <Lock size={13} className="text-emerald-600" /> 급여·개인정보 완벽 보호
-            </span>
-            <span className="flex items-center gap-1.5 text-xs font-bold text-blue-800 bg-blue-100/80 px-3 py-1 rounded-xl border border-blue-200 shadow-2xs">
-              <Zap size={13} className="text-blue-600" /> 0초 초고속 메모리 처리
-            </span>
-            <span className="flex items-center gap-1.5 text-xs font-bold text-purple-800 bg-purple-100/80 px-3 py-1 rounded-xl border border-purple-200 shadow-2xs">
-              <HardDrive size={13} className="text-purple-600" /> 내 컴퓨터(로컬) 안전 저장
-            </span>
-          </div>
+          {/* Compact Description */}
+          <p className="text-[12px] text-slate-600 font-medium truncate sm:overflow-visible">
+            임금대장·예산정산·엑셀분리 등 모든 실무 데이터는 외부 서버 전송 없이 <strong className="text-emerald-700 font-bold">내 PC 메모리에서 0초 즉시 처리</strong>됩니다.
+          </p>
 
         </div>
       </section>
