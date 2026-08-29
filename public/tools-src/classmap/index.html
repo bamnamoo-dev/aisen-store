@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스마트 교실 배치도 (Smart Classmap)</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Ionicons for icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><ion-icon name="map-outline"></ion-icon> 스마트 교실 배치도</h2>
+                <p>학교 건물을 구성하고 교실을 배치하세요.</p>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="section-title">
+                    <h3>건물 관리</h3>
+                    <button id="addBuildingBtn" class="btn btn-sm btn-primary"><ion-icon name="add-outline"></ion-icon>
+                        추가</button>
+                </div>
+
+                <ul id="buildingList" class="building-list">
+                    <!-- Buildings will be listed here dynamically -->
+                </ul>
+
+                <hr class="divider">
+
+                <div class="section-title">
+                    <h3>데이터 관리</h3>
+                </div>
+                <div class="data-actions">
+                    <button id="exportBtn" class="btn btn-secondary w-100"><ion-icon name="download-outline"></ion-icon>
+                        배치도 내보내기</button>
+                    <button id="importBtn" class="btn btn-secondary w-100 mt-2"><ion-icon
+                            name="upload-outline"></ion-icon> 배치도 불러오기</button>
+                    <input type="file" id="importInput" accept=".json" style="display: none;">
+                    <button id="clearDataBtn" class="btn btn-danger w-100 mt-2"><ion-icon
+                            name="trash-outline"></ion-icon> 전체 초기화</button>
+                    <button id="manualBtn" class="btn btn-secondary w-100 mt-2"
+                        style="color: var(--primary); border-color: var(--primary);"><ion-icon
+                            name="information-circle-outline"></ion-icon> 프로그램 사용 설명서</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1 id="schoolTitle">우리학교 교실 배치도</h1>
+                    <button id="editTitleBtn" class="btn btn-icon"><ion-icon name="pencil-outline"></ion-icon></button>
+                </div>
+                <div class="header-actions">
+                    <button id="printAllBtn" class="btn btn-icon" title="전체 인쇄"><ion-icon
+                            name="print-outline"></ion-icon></button>
+                    <div style="width: 1px; height: 24px; background-color: var(--border); margin: 0 0.5rem;"></div>
+                    <button id="zoomOutBtn" class="btn btn-icon"><ion-icon name="remove-outline"></ion-icon></button>
+                    <span id="zoomLevel">100%</span>
+                    <button id="zoomInBtn" class="btn btn-icon"><ion-icon name="add-outline"></ion-icon></button>
+                </div>
+            </header>
+
+            <div class="canvas-container" id="canvasContainer">
+                <div class="canvas-grid" id="canvasGrid">
+                    <!-- Map will be rendered here -->
+                    <div class="empty-state" id="emptyState">
+                        <ion-icon name="business-outline"></ion-icon>
+                        <p>등록된 건물이 없습니다.</p>
+                        <span>좌측 패널에서 건물을 추가해주세요.</span>
+                    </div>
+                </div>
+                <div class="selection-box" id="selectionBox" style="display: none;"></div>
+            </div>
+
+            <div class="batch-action-bar" id="batchActionBar" style="display: none;">
+                <div class="batch-info">
+                    <ion-icon name="layers-outline"></ion-icon>
+                    <span id="batchCountDisplay">0개 교실 선택됨</span>
+                </div>
+                <div class="batch-actions">
+                    <button class="btn btn-secondary" id="cancelBatchBtn">선택 해제 (Esc)</button>
+                    <button class="btn btn-primary" id="editBatchBtn">일괄 수정</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Manual Modal -->
+    <div class="modal-overlay" id="manualModalOverlay">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><ion-icon name="information-circle-outline"></ion-icon> 프로그램 사용 설명서</h2>
+                <button class="btn btn-icon close-modal"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body" style="line-height: 1.6; color: var(--text-main);">
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">📌 일반적인 사용 방법</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1.5rem;">
+                    <li style="margin-bottom: 0.5rem;"><strong>건물 구성:</strong> 좌측 패널의 '건물 추가' 버튼으로 건물을 생성하고 해당 건물의 층수와
+                        층당 교실 수를 설정합니다.</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>교실 편집:</strong> 캔버스 영역에 생성된 빈 교실을 클릭하여 학급명이나 용도(예: 1-1,
+                        음악실, 교장실) 및 배경 색상을 자유롭게 입력합니다.</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>다중 선택 및 일괄 수정:</strong> Shift 키를 누른 상태로 여러 교실을 클릭하면 다중 선택
+                        모드가 활성화됩니다. 우측 상단 '일괄 수정' 버튼을 눌러 여러 교실의 색상이나 용도를 한 번에 변경할 수 있습니다.</li>
+                    <li><strong>저장 및 출력:</strong> 작업 중인 모든 배치도 정보는 브라우저에 자동 저장됩니다. 우측 상단의 인쇄 버튼을 눌러 전체 학교 배치도를 출력하거나 개별
+                        건물 헤더의 인쇄 버튼으로 특정 건물만 출력할 수 있습니다. 데이터 백업이 필요하다면 '배치도 내보내기'를 사용하세요.</li>
+                </ul>
+
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">📌 교실 고정 좌표를 만든 이유</h4>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">건물의 물리적인 구조(층, 호수)를 기준으로 고유한 고정 좌표(예: 본관 1층
+                    1호)를 먼저 부여하도록 설계했습니다. 매 학년도가 바뀔 때마다 교실의 실제 용도(예: 1학년 1반이 다음 해에 2학년 3반이 되는 경우)나 특별실 위치가 빈번하게 바뀌더라도,
+                    <strong>건물 자체의 뼈대(고정 좌표)가 흔들리지 않아 데이터가 꼬이는 것을 방지</strong>하고 안정적인 유지보수 및 새 학년도 업데이트가 가능해집니다.</p>
+
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">📌 교실을 병합(병기)하는 이유</h4>
+                <p style="margin-bottom: 0; color: var(--text-muted);">학교 내 강당이나 체육관, 대형 교무실, 특별 활동실 등은 보통 일반 교실 2~3개
+                    이상의 넓은 면적을 차지합니다. 시스템의 기본 규격인 '1개 교실' 크기를 여러 개 합쳐서 <strong>직관적이고 실제 학교 도면 비율과 유사하게 넓은 공간을 표현하기
+                        위함</strong>입니다. 교실 편집 창에서 '빈 공간으로 표시'를 활용하거나 인접한 공간을 시각적으로 연결하여 다양한 크기의 시설을 유연하게 구현할 수 있습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary close-modal w-100">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Building Modal -->
+    <div class="modal-overlay" id="buildingModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="buildingModalTitle">건물 추가</h3>
+                <button class="btn btn-icon close-modal"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <form id="buildingForm">
+                    <input type="hidden" id="buildingId">
+                    <div class="form-group">
+                        <label for="buildingName">건물 이름</label>
+                        <input type="text" id="buildingName" placeholder="예: 본관, 신관, A동" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="buildingFloors">층 수</label>
+                            <input type="number" id="buildingFloors" min="1" max="10" value="4" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="roomsPerFloor">한쪽 면당 실 수</label>
+                            <input type="number" id="roomsPerFloor" min="1" max="30" value="5" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>복도 형태</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="corridorStyle" value="single" checked>
+                                <span class="radio-custom"></span>
+                                편복도 (1줄)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="corridorStyle" value="double">
+                                <span class="radio-custom"></span>
+                                중복도 (마주보는 2줄)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>고유번호 형식</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="codeFormat" value="floor-room" checked>
+                                <span class="radio-custom"></span>
+                                층수 포함 (예: 본관-101)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="codeFormat" value="sequential">
+                                <span class="radio-custom"></span>
+                                순차 번호 (예: 본관-1, 본관-2)
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">취소</button>
+                <button class="btn btn-primary" id="saveBuildingBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Room Modal -->
+    <div class="modal-overlay" id="roomModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>교실 정보 수정</h3>
+                <button class="btn btn-icon close-modal"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <form id="roomForm">
+                    <input type="hidden" id="roomBuildingId">
+                    <input type="hidden" id="roomId">
+
+                    <div class="modal-section info-section">
+                        <div class="room-code-display">
+                            <span class="label">고유 번호</span>
+                            <strong id="displayRoomCode">본관-101</strong>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="form-group toggle-group">
+                            <label class="switch-label">
+                                <div class="switch-text">
+                                    <span class="main-text">공간 비우기 (투명 처리)</span>
+                                    <span class="sub-text">체크 시 교실이 투명해져 빈 공간이 됩니다.</span>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="roomIsBlank">
+                                    <span class="slider round"></span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="roomUsage">실제 사용실명</label>
+                            <textarea id="roomUsage" rows="2" placeholder="예: 1-1, 음악실&#10;(Shift + Enter 키로 줄바꿈 가능)"
+                                style="width: 100%; resize: vertical; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.5rem; font-family: inherit; font-size: 1rem; color: var(--text-main);"></textarea>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label>구분 색상 (선택)</label>
+                            <div class="color-picker" id="colorPicker">
+                                <div class="color-option" data-color="#ffffff"
+                                    style="background-color: #ffffff; border: 1px solid #ddd;" title="기본 (흰색)"></div>
+                                <div class="color-option" data-color="#fef08a" style="background-color: #fef08a;"
+                                    title="노랑"></div>
+                                <div class="color-option" data-color="#bbf7d0" style="background-color: #bbf7d0;"
+                                    title="초록"></div>
+                                <div class="color-option" data-color="#bfdbfe" style="background-color: #bfdbfe;"
+                                    title="파랑"></div>
+                                <div class="color-option" data-color="#fbcfe8" style="background-color: #fbcfe8;"
+                                    title="분홍"></div>
+                                <div class="color-option" data-color="#e9d5ff" style="background-color: #e9d5ff;"
+                                    title="보라"></div>
+                                <div class="color-option" data-color="#fed7aa" style="background-color: #fed7aa;"
+                                    title="주황"></div>
+                                <div class="color-option" data-color="#fecaca" style="background-color: #fecaca;"
+                                    title="빨강"></div>
+                                <div class="color-option" data-color="#a7f3d0" style="background-color: #a7f3d0;"
+                                    title="에메랄드"></div>
+                                <div class="color-option" data-color="#99f6e4" style="background-color: #99f6e4;"
+                                    title="청록"></div>
+                                <div class="color-option" data-color="#a5f3fc" style="background-color: #a5f3fc;"
+                                    title="시안"></div>
+                                <div class="color-option" data-color="#c7d2fe" style="background-color: #c7d2fe;"
+                                    title="남색"></div>
+                                <div class="color-option" data-color="#fde047" style="background-color: #fde047;"
+                                    title="진노랑"></div>
+                                <div class="color-option" data-color="#86efac" style="background-color: #86efac;"
+                                    title="진초록"></div>
+                                <div class="color-option" data-color="#93c5fd" style="background-color: #93c5fd;"
+                                    title="진파랑"></div>
+                                <div class="color-option" data-color="#d6d3d1" style="background-color: #d6d3d1;"
+                                    title="회색"></div>
+
+                                <div class="custom-color-wrapper"
+                                    style="position: relative; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; border: 1px dashed #aaa; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                    title="사용자 지정 색상">
+                                    <ion-icon name="color-palette-outline"
+                                        style="font-size: 1.2rem; color: #666; pointer-events: none;"></ion-icon>
+                                    <input type="color" id="customColorInput"
+                                        style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                                </div>
+                            </div>
+                            <input type="hidden" id="roomColor" value="#ffffff">
+                        </div>
+                    </div>
+
+                    <div class="modal-section action-section">
+                        <label class="section-label">크기 조절 (병합)</label>
+                        <div class="grid-4 mb-3">
+                            <button type="button" class="btn btn-outline btn-sm" id="mergeLeftBtn"
+                                title="왼쪽 방과 합치기"><ion-icon name="chevron-back-outline"></ion-icon> 좌</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="mergeRightBtn" title="오른쪽 방과 합치기">우
+                                <ion-icon name="chevron-forward-outline"></ion-icon></button>
+                            <button type="button" class="btn btn-outline btn-sm" id="mergeUpBtn"
+                                title="위층 방과 합치기"><ion-icon name="chevron-up-outline"></ion-icon> 상</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="mergeDownBtn"
+                                title="아래층 방과 합치기"><ion-icon name="chevron-down-outline"></ion-icon> 하</button>
+                        </div>
+
+                        <label class="section-label">축소 및 분할</label>
+                        <div class="grid-2 mb-2">
+                            <button type="button" class="btn btn-outline btn-sm" id="shrinkLeftBtn"><ion-icon
+                                    name="contract-outline"></ion-icon> 왼쪽 줄이기</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="shrinkRightBtn"><ion-icon
+                                    name="contract-outline"></ion-icon> 오른쪽 줄이기</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="shrinkUpBtn"><ion-icon
+                                    name="contract-outline"></ion-icon> 위로 줄이기</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="shrinkDownBtn"><ion-icon
+                                    name="contract-outline"></ion-icon> 아래로 줄이기</button>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline btn-sm w-100" id="splitRoomBtn"
+                                style="width: 100%;"><ion-icon name="git-branch-outline"></ion-icon> 세로로 반 나누기</button>
+                        </div>
+
+                        <label class="section-label text-danger">위험 작업 및 복구</label>
+                        <div class="grid-2">
+                            <button type="button" class="btn btn-danger-outline btn-sm" id="resetRoomBtn"><ion-icon
+                                    name="refresh-outline"></ion-icon> 원래대로</button>
+                            <button type="button" class="btn btn-danger-outline btn-sm" id="deleteRoomBtn"><ion-icon
+                                    name="trash-outline"></ion-icon> 현재 칸 삭제</button>
+                            <button type="button" class="btn btn-danger-outline btn-sm" id="deleteRightRoomBtn"
+                                style="grid-column: span 2;"><ion-icon name="cut-outline"></ion-icon> 우측 유령칸
+                                잘라내기</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">취소</button>
+                <button class="btn btn-primary" id="saveRoomBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Title Edit Modal -->
+    <div class="modal-overlay" id="titleModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>학교 이름 수정</h3>
+                <button class="btn btn-icon close-modal"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="schoolTitleInput">타이틀</label>
+                    <input type="text" id="schoolTitleInput" value="우리학교 교실 배치도">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">취소</button>
+                <button class="btn btn-primary" id="saveTitleBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

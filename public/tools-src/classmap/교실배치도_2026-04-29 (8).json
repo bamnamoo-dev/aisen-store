@@ -1,0 +1,1923 @@
+{
+  "schoolTitle": "우리학교 교실 배치도",
+  "buildings": [
+    {
+      "id": "b_1777350233650",
+      "name": "별관",
+      "floors": 4,
+      "roomsPerFloor": 7,
+      "codeFormat": "floor-room",
+      "corridorStyle": "double",
+      "x": -889.4285714285712,
+      "y": 164.85714285714283
+    },
+    {
+      "id": "b_1777359557592",
+      "name": "신관",
+      "floors": 2,
+      "roomsPerFloor": 4,
+      "codeFormat": "floor-room",
+      "corridorStyle": "single",
+      "x": -1452.75,
+      "y": 929
+    },
+    {
+      "id": "b_1777360027560",
+      "name": "본별통",
+      "floors": 3,
+      "roomsPerFloor": 4,
+      "codeFormat": "floor-room",
+      "corridorStyle": "double",
+      "x": 35.000000000000014,
+      "y": 163.33333333333334
+    },
+    {
+      "id": "b_1777360615887",
+      "name": "본관",
+      "floors": 5,
+      "roomsPerFloor": 10,
+      "codeFormat": "floor-room",
+      "corridorStyle": "double",
+      "x": 597.9166666666667,
+      "y": -138.7499999999999
+    }
+  ],
+  "rooms": {
+    "b_1777350233650_4_1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-401",
+      "isBlank": true
+    },
+    "b_1777350233650_4_8": {
+      "usage": "6-사랑",
+      "color": "#fbcfe8",
+      "code": "별관-408",
+      "isBlank": false
+    },
+    "b_1777350233650_4_2": {
+      "usage": "",
+      "color": "#bfdbfe",
+      "code": "별관-402",
+      "isBlank": true,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777350233650_4_9": {
+      "usage": "6-바론",
+      "color": "#fbcfe8",
+      "code": "별관-409",
+      "isBlank": false
+    },
+    "b_1777350233650_4_3": {
+      "usage": "보일 러실",
+      "color": "#ffffff",
+      "code": "별관-403",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777350233650_4_10": {
+      "usage": "6-마음",
+      "color": "#fbcfe8",
+      "code": "별관-410",
+      "isBlank": false
+    },
+    "b_1777350233650_4_4": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-404",
+      "isBlank": true
+    },
+    "b_1777350233650_4_11": {
+      "usage": "6-라온",
+      "color": "#fbcfe8",
+      "code": "별관-411",
+      "isBlank": false
+    },
+    "b_1777350233650_4_5": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-405",
+      "isBlank": true
+    },
+    "b_1777350233650_4_12": {
+      "usage": "6-다솜",
+      "color": "#fbcfe8",
+      "code": "별관-412",
+      "isBlank": false
+    },
+    "b_1777350233650_4_6": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-406",
+      "isBlank": true
+    },
+    "b_1777350233650_4_13": {
+      "usage": "방과후학교교실3",
+      "color": "#bbf7d0",
+      "code": "별관-413",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777350233650_4_7": {
+      "usage": "희망쉼터",
+      "color": "#fed7aa",
+      "code": "별관-407",
+      "isBlank": false
+    },
+    "b_1777350233650_4_14": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-414",
+      "isBlank": false,
+      "hidden": true,
+      "span": 1,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false
+    },
+    "b_1777350233650_3_1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-301",
+      "isBlank": true
+    },
+    "b_1777350233650_3_8": {
+      "usage": "3-마음",
+      "color": "#fbcfe8",
+      "code": "별관-308",
+      "isBlank": false
+    },
+    "b_1777350233650_3_2": {
+      "usage": "",
+      "color": "#bfdbfe",
+      "code": "별관-302",
+      "isBlank": true,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777350233650_3_9": {
+      "usage": "3-라온",
+      "color": "#fbcfe8",
+      "code": "별관-309",
+      "isBlank": false
+    },
+    "b_1777350233650_3_3": {
+      "usage": "보일 러실",
+      "color": "#ffffff",
+      "code": "별관-303",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777350233650_3_10": {
+      "usage": "3-다솜",
+      "color": "#fbcfe8",
+      "code": "별관-310",
+      "isBlank": false
+    },
+    "b_1777350233650_3_4": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-304",
+      "isBlank": true
+    },
+    "b_1777350233650_3_11": {
+      "usage": "3-나래",
+      "color": "#fbcfe8",
+      "code": "별관-311",
+      "isBlank": false
+    },
+    "b_1777350233650_3_5": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-305",
+      "isBlank": true
+    },
+    "b_1777350233650_3_12": {
+      "usage": "3-가람",
+      "color": "#fbcfe8",
+      "code": "별관-312",
+      "isBlank": false
+    },
+    "b_1777350233650_3_6": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-306",
+      "isBlank": true
+    },
+    "b_1777350233650_3_13": {
+      "usage": "보건실2",
+      "color": "#e9d5ff",
+      "code": "별관-313",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777350233650_3_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-307",
+      "isBlank": true
+    },
+    "b_1777350233650_3_14": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-314",
+      "hidden": true,
+      "span": 1,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false
+    },
+    "b_1777350233650_2_1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-201",
+      "isBlank": true
+    },
+    "b_1777350233650_2_8": {
+      "usage": "1-아람",
+      "color": "#fbcfe8",
+      "code": "별관-208",
+      "isBlank": false
+    },
+    "b_1777350233650_2_2": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-202",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": true
+    },
+    "b_1777350233650_2_9": {
+      "usage": "1-사랑",
+      "color": "#fbcfe8",
+      "code": "별관-209",
+      "isBlank": false
+    },
+    "b_1777350233650_2_3": {
+      "usage": "보일 러실",
+      "color": "#ffffff",
+      "code": "별관-203",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777350233650_2_10": {
+      "usage": "1-바론",
+      "color": "#fbcfe8",
+      "code": "별관-210",
+      "isBlank": false
+    },
+    "b_1777350233650_2_4": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-204",
+      "isBlank": true
+    },
+    "b_1777350233650_2_11": {
+      "usage": "1-마음",
+      "color": "#fbcfe8",
+      "code": "별관-211",
+      "isBlank": false
+    },
+    "b_1777350233650_2_5": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-205",
+      "isBlank": true
+    },
+    "b_1777350233650_2_12": {
+      "usage": "1-라온",
+      "color": "#fbcfe8",
+      "code": "별관-212",
+      "isBlank": false
+    },
+    "b_1777350233650_2_6": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-206",
+      "isBlank": true
+    },
+    "b_1777350233650_2_13": {
+      "usage": "방과후교실",
+      "color": "#e9d5ff",
+      "code": "별관-213",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777350233650_2_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-207",
+      "isBlank": true
+    },
+    "b_1777350233650_2_14": {
+      "usage": "돌봄교실4 (겸용2실)",
+      "color": "#ffffff",
+      "code": "별관-214",
+      "hidden": true,
+      "span": 1,
+      "subRooms": [
+        {},
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777350233650_1_1": {
+      "usage": "유치원",
+      "color": "#fed7aa",
+      "code": "별관-101",
+      "span": 1.5,
+      "isBlank": false,
+      "mergedDown": true,
+      "subRooms": [],
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777350233650_1_8": {
+      "usage": "유치원",
+      "color": "#fbcfe8",
+      "code": "별관-108",
+      "span": 1.5,
+      "isBlank": false,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": "placeholder"
+    },
+    "b_1777350233650_1_2": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-102",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777350233650_1_9": {
+      "usage": "유치원",
+      "color": "#fed7aa",
+      "code": "별관-109",
+      "hidden": false,
+      "span": 3.5,
+      "subRooms": [
+        {}
+      ],
+      "mergedDown": false,
+      "mergedUp": false,
+      "isBlank": false
+    },
+    "b_1777350233650_1_3": {
+      "usage": "유치원",
+      "color": "#fed7aa",
+      "code": "별관-103",
+      "span": 3,
+      "subRooms": [],
+      "isBlank": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777350233650_1_10": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-110",
+      "span": 2,
+      "hidden": true
+    },
+    "b_1777350233650_1_4": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-104",
+      "hidden": true,
+      "span": 1,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false
+    },
+    "b_1777350233650_1_11": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-111",
+      "hidden": true,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777350233650_1_5": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-105",
+      "hidden": true
+    },
+    "b_1777350233650_1_12": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-112",
+      "hidden": true
+    },
+    "b_1777350233650_1_6": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-106",
+      "hidden": false,
+      "isBlank": true
+    },
+    "b_1777350233650_1_13": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-113",
+      "span": 1,
+      "subRooms": [],
+      "hidden": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "isBlank": true
+    },
+    "b_1777350233650_1_7": {
+      "usage": "돌봄교실5",
+      "color": "#bbf7d0",
+      "code": "별관-107",
+      "isBlank": false,
+      "mergedDown": true,
+      "span": 1,
+      "subRooms": [
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777350233650_1_14": {
+      "usage": "돌봄교실5",
+      "color": "#ffffff",
+      "code": "별관-114",
+      "isBlank": false,
+      "hidden": "placeholder",
+      "span": 1,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false
+    },
+    "b_1777350233650_4_3_sub0": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "별관-403-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777350233650_3_3_sub0": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "별관-303-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777350233650_4_2_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "별관-402-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777350233650_3_2_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "별관-302-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777350233650_2_2_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "별관-202-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777350233650_2_3_sub0": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "별관-203-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777350233650_1_2_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "별관-102-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777350233650_1_11_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-111-1",
+      "span": 0.5,
+      "hidden": true
+    },
+    "b_1777350233650_1_9_sub0": {
+      "usage": "유치원",
+      "color": "#fbcfe8",
+      "code": "별관-109-1",
+      "span": 2.5,
+      "isBlank": false,
+      "hidden": true
+    },
+    "b_1777350233650_1_13_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-113-1",
+      "span": 0.5,
+      "hidden": true
+    },
+    "b_1777350233650_1_14_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-114-1",
+      "span": 1,
+      "hidden": true
+    },
+    "b_1777350233650_2_14_sub1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "",
+      "span": 0.5,
+      "isBlank": false,
+      "hidden": true
+    },
+    "b_1777350233650_2_14_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-214-1",
+      "span": 0.5,
+      "hidden": true
+    },
+    "b_1777350233650_1_7_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "",
+      "span": 0.5,
+      "isBlank": true,
+      "hidden": true
+    },
+    "b_1777350233650_1_7_sub1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-107-2",
+      "span": 0,
+      "hidden": true
+    },
+    "b_1777350233650_1_7_sub2": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "별관-107-3",
+      "span": 0,
+      "hidden": true
+    },
+    "b_1777350233650_1_7_sub3": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "",
+      "span": 0,
+      "isBlank": true,
+      "hidden": true
+    },
+    "b_1777350233650_1_7_sub4": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "",
+      "span": 0.5,
+      "isBlank": true,
+      "hidden": true
+    },
+    "b_1777350233650_3_13_sub0": {
+      "usage": "표현활동실",
+      "color": "#bfdbfe",
+      "code": "별관-313-1",
+      "span": 1.5,
+      "isBlank": false
+    },
+    "b_1777350233650_4_13_sub0": {
+      "usage": "6-나래",
+      "color": "#fbcfe8",
+      "code": "별관-413-1",
+      "span": 1.5,
+      "isBlank": false
+    },
+    "b_1777350233650_2_13_sub0": {
+      "usage": "돌봄4실 (겸용2)",
+      "color": "#ffffff",
+      "code": "별관-213-1",
+      "span": 1.5,
+      "isBlank": false
+    },
+    "b_1777359557592_2_1": {
+      "usage": "2-가람",
+      "color": "#fbcfe8",
+      "code": "신관-201",
+      "span": 1,
+      "subRooms": [],
+      "isBlank": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777359557592_2_2": {
+      "usage": "교장실",
+      "color": "#fef08a",
+      "code": "신관-202",
+      "span": 1,
+      "subRooms": [],
+      "hidden": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "isBlank": false
+    },
+    "b_1777359557592_2_3": {
+      "usage": "교무실",
+      "color": "#fef08a",
+      "code": "신관-203",
+      "isBlank": false
+    },
+    "b_1777359557592_2_4": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "신관-204",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777359557592_1_1": {
+      "usage": "2-나래",
+      "color": "#fbcfe8",
+      "code": "신관-101",
+      "span": 1,
+      "subRooms": [],
+      "isBlank": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777359557592_1_2": {
+      "usage": "2-다솜",
+      "color": "#fbcfe8",
+      "code": "신관-102",
+      "span": 1,
+      "subRooms": [],
+      "hidden": false,
+      "mergedDown": false,
+      "mergedUp": false,
+      "isBlank": false
+    },
+    "b_1777359557592_1_3": {
+      "usage": "2-라온",
+      "color": "#fbcfe8",
+      "code": "신관-103",
+      "isBlank": false
+    },
+    "b_1777359557592_1_4": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "신관-104",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777359557592_1_1_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "신관-101-1",
+      "span": 1
+    },
+    "b_1777359557592_1_2_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "신관-102-1",
+      "span": 0.5
+    },
+    "b_1777359557592_2_4_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "신관-204-1",
+      "span": 0.5,
+      "isBlank": true
+    },
+    "b_1777359557592_1_4_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "신관-104-1",
+      "span": 0.5,
+      "isBlank": true
+    },
+    "b_1777360027560_3_1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본별통-301",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": true
+    },
+    "b_1777360027560_3_2": {
+      "usage": "상상마루",
+      "color": "#fed7aa",
+      "code": "본별통-302",
+      "span": 2,
+      "isBlank": false
+    },
+    "b_1777360027560_3_3": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본별통-303",
+      "hidden": true
+    },
+    "b_1777360027560_3_4": {
+      "usage": "화장실",
+      "color": "#bfdbfe",
+      "code": "본별통-304",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360027560_2_1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본별통-201",
+      "mergedDown": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "mergedUp": false,
+      "hidden": false,
+      "isBlank": true
+    },
+    "b_1777360027560_2_2": {
+      "usage": "학년연구실",
+      "color": "#fef08a",
+      "code": "본별통-202",
+      "isBlank": false
+    },
+    "b_1777360027560_2_3": {
+      "usage": "상상마루",
+      "color": "#fed7aa",
+      "code": "본별통-203",
+      "isBlank": false
+    },
+    "b_1777360027560_2_4": {
+      "usage": "화장실",
+      "color": "#bfdbfe",
+      "code": "본별통-204",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360027560_1_1": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본별통-101",
+      "span": 1,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false,
+      "isBlank": false
+    },
+    "b_1777360027560_1_2": {
+      "usage": "돌봄교실 3실",
+      "color": "#bbf7d0",
+      "code": "본별통-102",
+      "hidden": false,
+      "isBlank": false
+    },
+    "b_1777360027560_1_3": {
+      "usage": "돌봄교실2실",
+      "color": "#bbf7d0",
+      "code": "본별통-103",
+      "isBlank": false
+    },
+    "b_1777360027560_1_4": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "본별통-104",
+      "isBlank": false,
+      "subRooms": [
+        {},
+        {}
+      ]
+    },
+    "b_1777360027560_3_5": {
+      "usage": "과학2실",
+      "color": "#bfdbfe",
+      "code": "본별통-305",
+      "isBlank": false,
+      "span": 1.5,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777360027560_3_6": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본별통-306",
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777360027560_3_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본별통-307",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777360027560_3_8": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본별통-308",
+      "hidden": true
+    },
+    "b_1777360027560_2_5": {
+      "usage": "돌봄6(겸용1)",
+      "color": "#bbf7d0",
+      "code": "본별통-205",
+      "hidden": false,
+      "isBlank": false
+    },
+    "b_1777360027560_2_6": {
+      "usage": "꿈샘교실",
+      "color": "#bfdbfe",
+      "code": "본별통-206",
+      "isBlank": false
+    },
+    "b_1777360027560_2_7": {
+      "usage": "교직원심터",
+      "color": "#bbf7d0",
+      "code": "본별통-207",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360027560_2_8": {
+      "usage": "6-가람",
+      "color": "#fbcfe8",
+      "code": "본별통-208",
+      "isBlank": false
+    },
+    "b_1777360027560_1_5": {
+      "usage": "책방",
+      "color": "#ffffff",
+      "code": "본별통-105",
+      "isBlank": false
+    },
+    "b_1777360027560_1_6": {
+      "usage": "도서관",
+      "color": "#bfdbfe",
+      "code": "본별통-106",
+      "span": 1.5,
+      "isBlank": false
+    },
+    "b_1777360027560_1_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본별통-107",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777360027560_1_8": {
+      "usage": "컴퓨터실",
+      "color": "#bfdbfe",
+      "code": "본별통-108",
+      "isBlank": false
+    },
+    "b_1777360027560_1_7_sub0": {
+      "usage": "보호 자실",
+      "color": "#bbf7d0",
+      "code": "본관-별관통로-107-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360027560_1_1_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-별관통로-101-1",
+      "span": 0.5,
+      "hidden": true
+    },
+    "b_1777360615887_5_1": {
+      "usage": "면담실\n&악기방",
+      "color": "#bfdbfe",
+      "code": "본관-501",
+      "isBlank": false
+    },
+    "b_1777360615887_5_2": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-502",
+      "span": 2,
+      "isBlank": true
+    },
+    "b_1777360615887_5_3": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-503",
+      "hidden": true
+    },
+    "b_1777360615887_5_4": {
+      "usage": "승강기",
+      "color": "#ffffff",
+      "code": "본관-504",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_5_5": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "본관-505",
+      "isBlank": false
+    },
+    "b_1777360615887_5_6": {
+      "usage": "보일러실",
+      "color": "#ffffff",
+      "code": "본관-506",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_5_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-507",
+      "hidden": true
+    },
+    "b_1777360615887_5_8": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-508",
+      "hidden": true
+    },
+    "b_1777360615887_5_9": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-509",
+      "hidden": true
+    },
+    "b_1777360615887_5_10": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-510",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777360615887_4_1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-401",
+      "span": 3,
+      "isBlank": true
+    },
+    "b_1777360615887_4_2": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-402",
+      "hidden": true
+    },
+    "b_1777360615887_4_3": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-403",
+      "hidden": true
+    },
+    "b_1777360615887_4_4": {
+      "usage": "승강기",
+      "color": "#ffffff",
+      "code": "본관-404",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_4_5": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "본관-405",
+      "isBlank": false
+    },
+    "b_1777360615887_4_6": {
+      "usage": "보일러실",
+      "color": "#ffffff",
+      "code": "본관-406",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_4_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-407",
+      "hidden": true
+    },
+    "b_1777360615887_4_8": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-408",
+      "hidden": true
+    },
+    "b_1777360615887_4_9": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-409",
+      "hidden": true
+    },
+    "b_1777360615887_4_10": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-410",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777360615887_3_1": {
+      "usage": "체육관",
+      "color": "#bfdbfe",
+      "code": "본관-301",
+      "span": 2,
+      "isBlank": false,
+      "mergedDown": true
+    },
+    "b_1777360615887_3_2": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-302",
+      "hidden": true
+    },
+    "b_1777360615887_3_3": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "본관-303",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_3_4": {
+      "usage": "승강기",
+      "color": "#ffffff",
+      "code": "본관-304",
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777360615887_3_5": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "본관-305",
+      "isBlank": false
+    },
+    "b_1777360615887_3_6": {
+      "usage": "보일러실",
+      "color": "#ffffff",
+      "code": "본관-306",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_3_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-307",
+      "hidden": true
+    },
+    "b_1777360615887_3_8": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-308",
+      "hidden": true
+    },
+    "b_1777360615887_3_9": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-309",
+      "hidden": true
+    },
+    "b_1777360615887_3_10": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-310",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": true,
+      "hidden": true
+    },
+    "b_1777360615887_2_1": {
+      "usage": "식생활관",
+      "color": "#bfdbfe",
+      "code": "본관-201",
+      "span": 2,
+      "isBlank": false,
+      "subRooms": [],
+      "mergedDown": true,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777360615887_2_2": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-202",
+      "hidden": true
+    },
+    "b_1777360615887_2_3": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-203",
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777360615887_2_4": {
+      "usage": "승강기",
+      "color": "#bfdbfe",
+      "code": "본관-204",
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777360615887_2_5": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "본관-205",
+      "isBlank": false
+    },
+    "b_1777360615887_2_6": {
+      "usage": "보일러실",
+      "color": "#ffffff",
+      "code": "본관-206",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_2_7": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-207",
+      "isBlank": true
+    },
+    "b_1777360615887_2_8": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-208",
+      "isBlank": true
+    },
+    "b_1777360615887_2_9": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-209",
+      "isBlank": true
+    },
+    "b_1777360615887_2_10": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-210",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": true
+    },
+    "b_1777360615887_1_1": {
+      "usage": "인쇄실",
+      "color": "#bfdbfe",
+      "code": "본관-101",
+      "span": 1,
+      "isBlank": false,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777360615887_1_2": {
+      "usage": "시설\n관리실",
+      "color": "#bfdbfe",
+      "code": "본관-102",
+      "hidden": false,
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777360615887_1_3": {
+      "usage": "승강기",
+      "color": "#bfdbfe",
+      "code": "본관-103",
+      "isBlank": false,
+      "span": 1,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777360615887_1_4": {
+      "usage": "계단",
+      "color": "#ffffff",
+      "code": "본관-104",
+      "isBlank": false,
+      "span": 1.5,
+      "subRooms": [],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777360615887_1_5": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-105",
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777360615887_1_6": {
+      "usage": "화장실",
+      "color": "#e9d5ff",
+      "code": "본관-106",
+      "isBlank": false
+    },
+    "b_1777360615887_1_7": {
+      "usage": "학습준비물실",
+      "color": "#ffffff",
+      "code": "본관-107",
+      "isBlank": false
+    },
+    "b_1777360615887_1_8": {
+      "usage": "서버실",
+      "color": "#ffffff",
+      "code": "본관-108",
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "mergedDown": false,
+      "mergedUp": false,
+      "hidden": false
+    },
+    "b_1777360615887_1_9": {
+      "usage": "하늘\n(통합지원2)",
+      "color": "#fbcfe8",
+      "code": "본관-109",
+      "isBlank": false,
+      "span": 1,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777360615887_1_10": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-110",
+      "isBlank": false,
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ]
+    },
+    "b_1777360027560_1_4_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "",
+      "span": 0,
+      "isBlank": true,
+      "hidden": true
+    },
+    "b_1777360027560_1_4_sub1": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "",
+      "span": 0,
+      "isBlank": true,
+      "hidden": true
+    },
+    "b_1777360027560_2_7_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-별관통로-207-1",
+      "span": 0.5,
+      "isBlank": true
+    },
+    "b_1777360027560_2_1_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-별관통로-201-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360027560_2_4_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-별관통로-204-1",
+      "span": 0.5,
+      "isBlank": true
+    },
+    "b_1777360027560_3_5_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-별관통로-305-1",
+      "span": 0.5,
+      "hidden": true
+    },
+    "b_1777360027560_3_6_sub0": {
+      "usage": "4-바론",
+      "color": "#fbcfe8",
+      "code": "본관-별관통로-306-1",
+      "span": 1,
+      "isBlank": false
+    },
+    "b_1777360027560_3_7_sub0": {
+      "usage": "과학1실",
+      "color": "#bfdbfe",
+      "code": "본관-별관통로-307-1",
+      "span": 1.5,
+      "isBlank": false
+    },
+    "b_1777360027560_3_1_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-별관통로-301-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360027560_3_4_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-별관통로-304-1",
+      "span": 0.5,
+      "isBlank": true
+    },
+    "b_1777360615887_1_8_sub0": {
+      "usage": "방과후교실1",
+      "color": "#bbf7d0",
+      "code": "본관-108-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_1_9_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-109-1",
+      "span": 0.5,
+      "isBlank": false,
+      "hidden": true
+    },
+    "b_1777360615887_5_11": {
+      "usage": "음악실\n(악기실)",
+      "color": "#bfdbfe",
+      "code": "본관-511",
+      "isBlank": false
+    },
+    "b_1777360615887_5_12": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-512",
+      "span": 3,
+      "isBlank": true
+    },
+    "b_1777360615887_5_13": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-513",
+      "hidden": true
+    },
+    "b_1777360615887_5_14": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-514",
+      "hidden": true
+    },
+    "b_1777360615887_5_15": {
+      "usage": "5-다솜",
+      "color": "#fbcfe8",
+      "code": "본관-515",
+      "isBlank": false
+    },
+    "b_1777360615887_5_16": {
+      "usage": "5-라온",
+      "color": "#fbcfe8",
+      "code": "본관-516",
+      "isBlank": false
+    },
+    "b_1777360615887_5_17": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-517",
+      "span": 2,
+      "isBlank": true
+    },
+    "b_1777360615887_5_18": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-518",
+      "hidden": true
+    },
+    "b_1777360615887_5_19": {
+      "usage": "5-마음",
+      "color": "#fbcfe8",
+      "code": "본관-519",
+      "isBlank": false
+    },
+    "b_1777360615887_5_20": {
+      "usage": "5-바론",
+      "color": "#fbcfe8",
+      "code": "본관-520",
+      "isBlank": false
+    },
+    "b_1777360615887_4_11": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-411",
+      "span": 4.5,
+      "isBlank": true
+    },
+    "b_1777360615887_4_12": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-412",
+      "hidden": true
+    },
+    "b_1777360615887_4_13": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-413",
+      "hidden": true
+    },
+    "b_1777360615887_4_14": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-414",
+      "hidden": true
+    },
+    "b_1777360615887_4_15": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-415",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "hidden": true
+    },
+    "b_1777360615887_4_16": {
+      "usage": "6-아람",
+      "color": "#fbcfe8",
+      "code": "본관-416",
+      "isBlank": false
+    },
+    "b_1777360615887_4_17": {
+      "usage": "6-자람",
+      "color": "#fbcfe8",
+      "code": "본관-417",
+      "isBlank": false
+    },
+    "b_1777360615887_4_18": {
+      "usage": "4-마음",
+      "color": "#fbcfe8",
+      "code": "본관-418",
+      "isBlank": false
+    },
+    "b_1777360615887_4_19": {
+      "usage": "5-가람",
+      "color": "#fbcfe8",
+      "code": "본관-419",
+      "isBlank": false
+    },
+    "b_1777360615887_4_20": {
+      "usage": "5-나래",
+      "color": "#fbcfe8",
+      "code": "본관-420",
+      "isBlank": false
+    },
+    "b_1777360615887_3_11": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-311",
+      "span": 2,
+      "hidden": "placeholder"
+    },
+    "b_1777360615887_3_12": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-312",
+      "hidden": true
+    },
+    "b_1777360615887_3_13": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-313",
+      "span": 2,
+      "isBlank": true
+    },
+    "b_1777360615887_3_14": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-314",
+      "hidden": true
+    },
+    "b_1777360615887_3_15": {
+      "usage": "상상쉼터",
+      "color": "#bfdbfe",
+      "code": "본관-315",
+      "isBlank": false
+    },
+    "b_1777360615887_3_16": {
+      "usage": "연계형 돌봄",
+      "color": "#bbf7d0",
+      "code": "본관-316",
+      "isBlank": false
+    },
+    "b_1777360615887_3_17": {
+      "usage": "4-나래",
+      "color": "#fbcfe8",
+      "code": "본관-317",
+      "isBlank": false
+    },
+    "b_1777360615887_3_18": {
+      "usage": "4-다솜",
+      "color": "#fbcfe8",
+      "code": "본관-318",
+      "isBlank": false
+    },
+    "b_1777360615887_3_19": {
+      "usage": "4-라온",
+      "color": "#fbcfe8",
+      "code": "본관-319",
+      "isBlank": false
+    },
+    "b_1777360615887_3_20": {
+      "usage": "2-바론",
+      "color": "#fbcfe8",
+      "code": "본관-320",
+      "isBlank": false
+    },
+    "b_1777360615887_2_11": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-211",
+      "span": 2,
+      "hidden": "placeholder"
+    },
+    "b_1777360615887_2_12": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-212",
+      "hidden": true
+    },
+    "b_1777360615887_2_13": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-213",
+      "span": 2,
+      "isBlank": true
+    },
+    "b_1777360615887_2_14": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-214",
+      "hidden": true
+    },
+    "b_1777360615887_2_15": {
+      "usage": "상담실",
+      "color": "#bfdbfe",
+      "code": "본관-215",
+      "isBlank": false
+    },
+    "b_1777360615887_2_16": {
+      "usage": "돌봄1실",
+      "color": "#bbf7d0",
+      "code": "본관-216",
+      "isBlank": false
+    },
+    "b_1777360615887_2_17": {
+      "usage": "1-가람",
+      "color": "#fbcfe8",
+      "code": "본관-217",
+      "isBlank": false
+    },
+    "b_1777360615887_2_18": {
+      "usage": "1-나래",
+      "color": "#fbcfe8",
+      "code": "본관-218",
+      "isBlank": false
+    },
+    "b_1777360615887_2_19": {
+      "usage": "1-다솜",
+      "color": "#fbcfe8",
+      "code": "본관-219",
+      "isBlank": false
+    },
+    "b_1777360615887_2_20": {
+      "usage": "2-마음",
+      "color": "#fbcfe8",
+      "code": "본관-220",
+      "isBlank": false
+    },
+    "b_1777360615887_1_11": {
+      "usage": "소강당",
+      "color": "#bfdbfe",
+      "code": "본관-111",
+      "isBlank": false,
+      "span": 2
+    },
+    "b_1777360615887_1_12": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-112",
+      "hidden": true
+    },
+    "b_1777360615887_1_13": {
+      "usage": "출입문",
+      "color": "#ffffff",
+      "code": "본관-113",
+      "isBlank": false,
+      "span": 2
+    },
+    "b_1777360615887_1_14": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-114",
+      "isBlank": true,
+      "hidden": true
+    },
+    "b_1777360615887_1_15": {
+      "usage": "행정실",
+      "color": "#ffffff",
+      "code": "본관-115",
+      "isBlank": false
+    },
+    "b_1777360615887_1_16": {
+      "usage": "영어1 \n늘봄1",
+      "color": "#bfdbfe",
+      "code": "본관-116",
+      "isBlank": false
+    },
+    "b_1777360615887_1_17": {
+      "usage": "영어2 \n늘봄2",
+      "color": "#bfdbfe",
+      "code": "본관-117",
+      "isBlank": false
+    },
+    "b_1777360615887_1_18": {
+      "usage": "방과후활동\n지원실",
+      "color": "#fef08a",
+      "code": "본관-118",
+      "isBlank": false
+    },
+    "b_1777360615887_1_19": {
+      "usage": "방송실 마음쉼터",
+      "color": "#bfdbfe",
+      "code": "본관-119",
+      "span": 0.5,
+      "subRooms": [
+        {}
+      ],
+      "isBlank": false
+    },
+    "b_1777360615887_1_20": {
+      "usage": "푸른\n(통합지원1)",
+      "color": "#fbcfe8",
+      "code": "본관-120",
+      "isBlank": false
+    },
+    "b_1777360615887_1_19_sub0": {
+      "usage": "보건실",
+      "color": "#bfdbfe",
+      "code": "본관-119-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_1_2_sub0": {
+      "usage": "당직실",
+      "color": "#bfdbfe",
+      "code": "본관-102-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_1_5_sub0": {
+      "usage": "문서고",
+      "color": "#ffffff",
+      "code": "본관-105-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_1_10_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-110-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_1_3_sub0": {
+      "usage": "승강기",
+      "color": "#bfdbfe",
+      "code": "본관-103-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_2_6_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-206-1",
+      "span": 0.5,
+      "isBlank": true
+    },
+    "b_1777360615887_2_10_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-210-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_2_4_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-204-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_2_3_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-203-1",
+      "span": 0.5,
+      "isBlank": true
+    },
+    "b_1777360615887_3_3_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-303-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_3_10_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-310-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_3_6_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-306-1",
+      "span": 4,
+      "isBlank": false
+    },
+    "b_1777360615887_3_4_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-304-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_4_15_sub0": {
+      "usage": "교사연구실",
+      "color": "#fef08a",
+      "code": "본관-415-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_4_10_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-410-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_4_6_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-406-1",
+      "span": 4,
+      "isBlank": true
+    },
+    "b_1777360615887_4_4_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-404-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_5_4_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-504-1",
+      "span": 0.5,
+      "isBlank": false
+    },
+    "b_1777360615887_5_6_sub0": {
+      "usage": "",
+      "color": "#ffffff",
+      "code": "본관-506-1",
+      "span": 4,
+      "isBlank": true
+    },
+    "b_1777360615887_5_10_sub0": {
+      "usage": "계단",
+      "color": "#bfdbfe",
+      "code": "본관-510-1",
+      "span": 0.5,
+      "isBlank": false
+    }
+  },
+  "selectedRooms": []
+}
