@@ -512,20 +512,8 @@ export default function HomePage() {
       {/* ========================================================
           3. COMPACT FOOTER
       ======================================================== */}
-      <footer className="w-full pt-2 pb-1 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-400">
-        <div>
-          <span>&copy; 2026 AI-SEN STORE. All rights reserved.</span>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5 text-slate-500 font-semibold">
-          <a href="https://chatbot.aisen.store" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">AI 챗봇</a>
-          <Link href="/chatbot" className="hover:text-blue-600">구글 챗봇</Link>
-          <a href="https://chatbot.aisen.store/travel" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">여비정산기</a>
-          <Link href="/archive" className="hover:text-blue-600">자료실</Link>
-          <Link href="/tools" className="hover:text-blue-600">미니프로그램</Link>
-          <a href="https://chatbot.aisen.store?forms=1" target="_blank" rel="noopener noreferrer" className="hover:text-amber-600">행정서식</a>
-          <Link href="/board" className="hover:text-blue-600">게시판</Link>
-          <a href="https://project-np0t7.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600">수박게임</a>
-        </div>
+      <footer className="w-full pt-2.5 pb-1 border-t border-slate-200 flex items-center justify-center text-[11.5px] sm:text-xs text-slate-400 font-medium">
+        <span>&copy; 2026 AI-SEN STORE. All rights reserved.</span>
       </footer>
 
     </div>
