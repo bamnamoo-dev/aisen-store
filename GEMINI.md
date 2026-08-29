@@ -30,13 +30,13 @@
 | **AI 챗봇** | **AI 행정 챗봇 (3-Tier)** | `\sen-chatbot\`<br/>`\sen-chatbot-v2\`<br/>`\(0610)sen-chatbot\` | `https://chatbot.aisen.store` | FastMCP, LangChain/RAG, 102권 서고 쪽수 1:1 앵커링, 국가법령정보센터 연동 |
 | **특화 정산** | **스마트 여비정산기 v4.9.2** | `\sen-chatbot\travel\` (내장) | `https://chatbot.aisen.store/travel` | 카카오 3개 경유지 길찾기, 오피넷 실시간 유가 1일 6회 자동 고시, 19종 법정 감액, A4 1p 인쇄 |
 | **서식 포털** | **행정·민원 서식 68종** | `\sen-chatbot\` (내장) | `https://chatbot.aisen.store?forms=1` | 인사/복무/계약 서식 실시간 미리보기 및 HWP 다운로드 |
-| **미니툴 1** | **증빙서 측면표지 제작기** | `\asisen-store\app\tools\label-maker\` (내장) | `/tools/label-maker` | Next.js React + Print CSS, A4 바인더 측면 철 라벨 자동 생성 및 인쇄 |
+| **미니툴 1** | **증빙서 측면표지 제작기** | `\증빙서측면표지제작프로그램\` | `https://label-maker-two.vercel.app/` | React, A4 바인더 측면 철 라벨 자동 생성 및 인쇄 |
 | **미니툴 2** | **학교회계 대시보드 (SFD)** | `\서울특별시교육청학교정보대시보드\` | `https://bamnamoo-dev.github.io/SFD/` | 세부사업, 추경, 지출집행 모니터링 시각화 대시보드 |
 | **미니툴 3** | **엑셀시트별 분리저장기** | `\asisen-store\app\tools\sheet-splitter\` (내장) | `/tools/sheet-splitter` | Next.js, SheetJS + JSZip 클라이언트 0초 시트 분리 및 ZIP 압축 |
 | **미니툴 4** | **나이스 임금대장 식대분리기** | `\asisen-store\app\tools\sikdae\` (내장) | `/tools/sikdae` | Next.js, SheetJS 브라우저 메모리 안전 파싱, 성명-식대 추출 & 엑셀 저장 |
-| **미니툴 5** | **교실배치도 제작기** | `\asisen-store\app\tools\classmap\` (내장) | `/tools/classmap` | Next.js React, 층별·호수별 평면도 시각화, 교실 편집 & A4 도면 출력 |
-| **미니툴 6** | **체육관 사용료 계산기** | `\asisen-store\app\tools\gym-calc\` (내장) | `/tools/gym-calc` | Next.js, 교육청 학교시설개방 조례 기준 대관 시간·냉난방비 자동 산출 및 견적서 출력 |
-| **게임/부가** | **수박 게임** | `\asisen-store\app\tools\watermelon\` (내장) | `/tools/watermelon` | Next.js + Matter.js 물리엔진, 실시간 글로벌 랭킹 연동 과일 합치기 게임 |
+| **미니툴 5** | **교실배치도 제작기** | `\classmap\` | `https://bamnamoo-dev.github.io/classmap/` | Vanilla JS / Canvas, 층별·특별실 평면도 시각화 및 배치도 출력 |
+| **미니툴 6** | **체육관 사용료 계산기** | `\체육관사용료계산기\` | `https://bamnamoo-dev.github.io/gym/` | Vanilla JS, 교육청 학교시설개방 조례 기준 대관 시간·냉난방비 자동 산출 |
+| **게임/부가** | **수박 게임** | `\watermelongame\` | `https://project-np0t7.vercel.app/` | Matter.js 물리엔진, 실시간 글로벌 랭킹 연동 과일 합치기 게임 |
 
 ---
 

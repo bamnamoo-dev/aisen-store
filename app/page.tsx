@@ -313,9 +313,11 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 7: 증빙서 측면표지 제작기 (내장형 라우트) */}
-        <Link 
-          href="/tools/label-maker" 
+        {/* CARD 7: 증빙서 측면표지 제작기 (원본 URL 이동) */}
+        <a 
+          href="https://label-maker-two.vercel.app/" 
+          target="_blank" 
+          rel="noopener noreferrer"
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-violet-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -327,7 +329,7 @@ export default function HomePage() {
                 <span className="text-[11.5px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-md border border-violet-100 whitespace-nowrap">
                   라벨출력
                 </span>
-                <ArrowRight size={15} className="text-slate-400 group-hover:text-violet-600 transition-colors" />
+                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-violet-600 transition-colors" />
               </div>
             </div>
 
@@ -343,11 +345,13 @@ export default function HomePage() {
             <span>표지 만들기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </Link>
+        </a>
 
-        {/* CARD 8: 교실배치도 제작기 (내장형 라우트) */}
-        <Link 
-          href="/tools/classmap" 
+        {/* CARD 8: 교실배치도 제작기 (원본 URL 이동) */}
+        <a 
+          href="https://bamnamoo-dev.github.io/classmap/" 
+          target="_blank" 
+          rel="noopener noreferrer"
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-cyan-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -359,7 +363,7 @@ export default function HomePage() {
                 <span className="text-[11.5px] font-bold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-100 whitespace-nowrap">
                   도면제작
                 </span>
-                <ArrowRight size={15} className="text-slate-400 group-hover:text-cyan-600 transition-colors" />
+                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-cyan-600 transition-colors" />
               </div>
             </div>
 
@@ -375,7 +379,7 @@ export default function HomePage() {
             <span>배치도 제작</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </Link>
+        </a>
 
         {/* ROW 3: 데이터 처리 도구 & 계산기 & 엔터테인먼트 */}
 
@@ -443,9 +447,11 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 11: 체육관 사용료 계산기 (내장형 라우트) */}
-        <Link 
-          href="/tools/gym-calc" 
+        {/* CARD 11: 체육관 사용료 계산기 (원본 URL 이동) */}
+        <a 
+          href="https://bamnamoo-dev.github.io/gym/" 
+          target="_blank" 
+          rel="noopener noreferrer"
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-pink-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -457,7 +463,7 @@ export default function HomePage() {
                 <span className="text-[11.5px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100 whitespace-nowrap">
                   조례 자동산출
                 </span>
-                <ArrowRight size={15} className="text-slate-400 group-hover:text-pink-600 transition-colors" />
+                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-pink-600 transition-colors" />
               </div>
             </div>
 
@@ -473,11 +479,13 @@ export default function HomePage() {
             <span>사용료 계산</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </Link>
+        </a>
 
-        {/* CARD 12: 수박 게임 (내장형 라우트) */}
-        <Link 
-          href="/tools/watermelon" 
+        {/* CARD 12: 수박 게임 (원본 URL 이동) */}
+        <a 
+          href="https://project-np0t7.vercel.app/" 
+          target="_blank" 
+          rel="noopener noreferrer"
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -489,7 +497,7 @@ export default function HomePage() {
                 <span className="text-[11.5px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 whitespace-nowrap">
                   랭킹 게임
                 </span>
-                <ArrowRight size={15} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
+                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
               </div>
             </div>
 
@@ -505,7 +513,7 @@ export default function HomePage() {
             <span>게임 시작</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </Link>
+        </a>
 
       </section>
 
