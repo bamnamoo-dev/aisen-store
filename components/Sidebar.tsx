@@ -198,8 +198,11 @@ export default function Sidebar() {
             <div className="pt-3.5 border-t border-slate-200 flex flex-col gap-2 mt-4">
               {user ? (
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                  <span className="text-sm font-bold text-slate-800 truncate">{user.email}</span>
-                  <button onClick={handleLogout} className="text-xs font-bold text-red-600">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span className="text-sm font-bold text-slate-800">관리자</span>
+                  </div>
+                  <button onClick={handleLogout} className="text-xs font-bold text-slate-400 hover:text-red-600">
                     로그아웃
                   </button>
                 </div>
@@ -207,10 +210,10 @@ export default function Sidebar() {
                 <Link 
                   href="/login" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-blue-600 text-white text-sm font-bold shadow-xs"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 text-sm font-bold shadow-2xs"
                 >
                   <LogIn size={16} />
-                  <span>로그인</span>
+                  <span>관리자 로그인</span>
                 </Link>
               )}
             </div>
@@ -318,18 +321,21 @@ export default function Sidebar() {
           <div className="p-3.5 border-t border-slate-100 flex flex-col gap-2.5 shrink-0 bg-slate-50/50">
             {user ? (
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
-                <span className="text-xs sm:text-sm font-bold text-slate-800 truncate max-w-[140px]">{user.email}</span>
-                <button onClick={handleLogout} className="text-xs font-bold text-red-600 hover:underline">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span className="text-xs sm:text-sm font-bold text-slate-800">관리자</span>
+                </div>
+                <button onClick={handleLogout} className="text-xs font-bold text-slate-400 hover:text-red-600 transition-colors cursor-pointer">
                   로그아웃
                 </button>
               </div>
             ) : (
               <Link 
                 href="/login" 
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold shadow-2xs transition-colors"
               >
-                <LogIn size={15} />
-                <span>교직원 로그인</span>
+                <LogIn size={15} className="text-slate-500" />
+                <span>관리자 로그인</span>
               </Link>
             )}
 
