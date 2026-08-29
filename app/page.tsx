@@ -37,12 +37,12 @@ export default function HomePage() {
   };
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-5 sm:py-7 flex flex-col min-h-screen gap-3">
+    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 pt-2 sm:pt-3 pb-4 sm:pb-5 flex flex-col min-h-screen gap-2.5">
       
       {/* ========================================================
           1. TOP HERO: 대형 헤드라인 & 스마트 검색창
       ======================================================== */}
-      <section className="flex flex-col items-center text-center pt-2 sm:pt-4">
+      <section className="flex flex-col items-center text-center pt-0 sm:pt-1">
         
         {/* Headline (대형 44px 폰트 & 그라데이션) */}
         <h1 className="text-3xl sm:text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-tight">
