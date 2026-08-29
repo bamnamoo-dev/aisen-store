@@ -36,13 +36,16 @@ export default function HomePage() {
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-5 sm:py-7 flex flex-col min-h-screen gap-3">
       
       {/* ========================================================
-          1. TOP HERO: 컴팩트 스마트 검색 헤더
+          1. TOP HERO: 컴팩트 스마트 검색 헤더 (카드 디자인과 일체화)
       ======================================================== */}
       <section className="flex flex-col items-center text-center">
         
         {/* Status Pill */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-700 mb-2 shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
           <span className="font-bold text-slate-900">AI-SEN v4.9.2 엔진 가동중</span>
           <span className="text-slate-300">|</span>
           <Fuel size={12} className="text-amber-500" />
@@ -50,27 +53,27 @@ export default function HomePage() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-2xl sm:text-3xl md:text-[36px] font-black text-slate-900 tracking-tight leading-tight">
-          교육행정의 모든 기준과 계산, <span className="text-blue-600">AI-SEN</span>
+        <h1 className="text-2xl sm:text-3xl md:text-[34px] font-black text-slate-900 tracking-tight leading-tight">
+          교육행정의 모든 기준과 계산, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">AI-SEN</span>
         </h1>
-        <p className="text-[15.5px] text-slate-500 mt-1.5 font-medium max-w-[680px]">
+        <p className="text-[13.5px] text-slate-500 mt-1.5 font-medium max-w-[680px]">
           102권 공식 지침서 1:1 쪽수 앵커링 RAG 챗봇과 카카오·오피넷 실시간 연동 스마트 여비정산기
         </p>
 
-        {/* Compact Omnibar Search Box */}
-        <div className="w-full max-w-[760px] mt-2.5">
-          <form onSubmit={handleSearch} className="relative flex items-center">
-            <Search className="absolute left-4 text-slate-400 pointer-events-none" size={18} />
+        {/* Unified Search Omnibar Box */}
+        <div className="w-full max-w-[780px] mt-3">
+          <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-2xl border border-slate-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/80 transition-all shadow-2xs hover:shadow-md">
+            <Search className="absolute left-4 text-blue-500 pointer-events-none" size={19} />
             <input 
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="궁금한 교육행정 지침(수의계약, 강사료, 복무 등)이나 출장비, 서식을 검색하세요..."
-              className="w-full bg-white text-slate-900 border-2 border-slate-300 hover:border-slate-400 focus:border-blue-500 rounded-xl pl-11 pr-24 py-2 text-xs sm:text-[13.5px] focus:outline-none focus:ring-3 focus:ring-blue-100 transition-all shadow-2xs font-medium"
+              className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 pl-11 pr-28 py-2.5 sm:py-2.5 text-xs sm:text-[14px] focus:outline-none font-medium"
             />
             <button 
               type="submit" 
-              className="absolute right-1.5 btn-primary py-1.5 px-3.5 text-xs font-bold shadow-2xs rounded-lg gap-1.5"
+              className="absolute right-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-1.5 px-4 text-xs sm:text-[13px] font-bold shadow-xs hover:shadow-sm rounded-xl flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <span>질의하기</span>
               <ArrowRight size={13} />
