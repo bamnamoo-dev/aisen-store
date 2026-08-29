@@ -86,30 +86,33 @@ export default function HomePage() {
       <section className="w-full max-w-[1400px] mx-auto flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3" style={{gridAutoRows: '1fr'}}>
         
         {/* =========================================================================
-            ROW 1: AI & 스마트 포털 허브 (블루 / 인디고 / 스카이 계열 🔵)
+            ROW 1: AI & 스마트 포털 허브 (Royal Blue Top Accent 🔵)
         ========================================================================= */}
         
-        {/* CARD 1: AI 행정 챗봇 (Indigo) */}
+        {/* CARD 1: AI 행정 챗봇 */}
         <a 
           href="https://chatbot.aisen.store" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
                 <Bot size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
                   3-Tier
                 </span>
-                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
               AI 행정 챗봇
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -117,33 +120,36 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-indigo-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
             <span>AI 질의하기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </a>
 
-        {/* CARD 2: 스마트 여비정산기 (Sky) */}
+        {/* CARD 2: 스마트 여비정산기 */}
         <a 
           href="https://chatbot.aisen.store/travel" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-sky-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
                 <Navigation size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
                   v4.9.2
                 </span>
-                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-sky-600 transition-colors" />
+                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-sky-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
               스마트 여비정산기
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -151,17 +157,20 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-sky-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
             <span>정산기 열기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </a>
 
-        {/* CARD 3: 업무 소통 게시판 (Blue) */}
+        {/* CARD 3: 업무 소통 게시판 */}
         <Link 
           href="/board" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
@@ -189,27 +198,30 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 4: 행정·민원 서식 68종 (Cobalt Blue) */}
+        {/* CARD 4: 행정·민원 서식 68종 */}
         <a 
           href="https://chatbot.aisen.store?forms=1" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
                 <FileCheck size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
                   68종
                 </span>
-                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-blue-700 transition-colors" />
+                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-700 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
               행정·민원 서식
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -217,35 +229,38 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-700 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
             <span>서식 포털</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </a>
 
         {/* =========================================================================
-            ROW 2: 회계 & 예산 & 정산 (에메랄드 / 틸 / 사이언 계열 🟢)
+            ROW 2: 회계 & 예산 & 정산 (Emerald Green Top Accent 🟢)
         ========================================================================= */}
 
-        {/* CARD 5: 학교회계 대시보드 (Teal) */}
+        {/* CARD 5: 학교회계 대시보드 */}
         <Link 
           href="/tools/sfd" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-teal-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
                 <LayoutDashboard size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
                   2026 베타
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-teal-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-teal-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
               학교회계 대시보드
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -253,17 +268,20 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-teal-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
             <span>대시보드 열기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 6: 예산정산 대시보드 (Emerald) */}
+        {/* CARD 6: 예산정산 대시보드 */}
         <Link 
           href="/tools/budget-settle" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
@@ -291,25 +309,28 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 7: 엑셀시트별 분리저장기 (Deep Emerald) */}
+        {/* CARD 7: 엑셀시트별 분리저장기 */}
         <Link 
           href="/tools/sheet-splitter" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
                 <FileSpreadsheet size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
                   초고속 분리
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-700 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
               엑셀시트 분리기
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -317,31 +338,34 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-700 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
             <span>시트 분리하기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 8: 체육관 사용료 계산기 (Cyan) */}
+        {/* CARD 8: 체육관 사용료 계산기 */}
         <Link 
           href="/tools/gym-calc" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-cyan-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center border border-cyan-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
                 <Calculator size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
                   조례 자동산출
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-cyan-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-cyan-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
               체육관 사용료
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -349,35 +373,38 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-cyan-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
             <span>사용료 계산</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
         {/* =========================================================================
-            ROW 3: 행정 실무 & 서식 & 도면 (앰버 / 오렌지 / 바이올렛 / 퍼플 🟣🟠)
+            ROW 3: 행정 실무 & 서식 & 도면 (Purple Top Accent 🟣)
         ========================================================================= */}
 
-        {/* CARD 9: 행정 자료실 (Amber) */}
+        {/* CARD 9: 행정 자료실 */}
         <Link 
           href="/archive" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-amber-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 group-hover:scale-105 transition-transform">
                 <FolderOpen size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200 whitespace-nowrap">
                   102권
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-amber-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-purple-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-amber-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
               행정 자료실
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -385,31 +412,34 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-amber-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
             <span>자료실 보기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 10: 나이스 임금대장 식대 분리기 (Orange) */}
+        {/* CARD 10: 나이스 임금대장 식대 분리기 */}
         <Link 
           href="/tools/sikdae" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-orange-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 group-hover:scale-105 transition-transform">
                 <UtensilsCrossed size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200 whitespace-nowrap">
                   급식비 보안
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-orange-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-purple-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-orange-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
               임금대장 식대분리
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -417,31 +447,34 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-orange-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
             <span>공제내역 추출</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 11: 증빙서 측면표지 제작기 (Violet) */}
+        {/* CARD 11: 증빙서 측면표지 제작기 */}
         <Link 
           href="/tools/label-maker" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-violet-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center border border-violet-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 group-hover:scale-105 transition-transform">
                 <Tag size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-md border border-violet-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200 whitespace-nowrap">
                   라벨출력
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-violet-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-purple-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-violet-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
               증빙서 측면표지
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -449,17 +482,20 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-violet-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
             <span>표지 만들기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 12: 교실배치도 제작기 (Purple) */}
+        {/* CARD 12: 교실배치도 제작기 */}
         <Link 
           href="/tools/classmap" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 group-hover:scale-105 transition-transform">
@@ -488,14 +524,17 @@ export default function HomePage() {
         </Link>
 
         {/* =========================================================================
-            ROW 4: 힐링 포인트 (로즈 / 코랄 🔴)
+            ROW 4: 힐링 포인트 (Rose Coral Top Accent 🔴)
         ========================================================================= */}
 
-        {/* CARD 13: 수박 게임 (Rose) */}
+        {/* CARD 13: 수박 게임 */}
         <Link 
           href="/tools/watermelon" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-rose-500 group-hover:h-[5px] transition-all" />
+
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100 group-hover:scale-105 transition-transform text-lg">
