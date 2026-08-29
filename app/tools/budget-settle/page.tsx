@@ -30,8 +30,9 @@ export default function BudgetSettlePage() {
           src="https://bamnamoo-dev.github.io/budget-dashboard/"
           className="w-full h-full border-0"
           title="예산정산 대시보드"
-          allow="clipboard-write"
-          loading="lazy"
+          allow="clipboard-write; clipboard-read; downloads"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups allow-modals"
+          loading="eager"
         />
       </div>
     </div>
