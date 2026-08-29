@@ -163,9 +163,9 @@ export default function Sidebar() {
       )}
 
       {/* ──────────────────────────────────────────────────────────
-          3. DESKTOP FLOATING OPEN BUTTON (접혔을 때 열기 버튼 >>)
+          3. DESKTOP FLOATING OPEN BUTTON (홈 화면에서 접혔을 때만 표시)
       ────────────────────────────────────────────────────────── */}
-      {isCollapsed && (
+      {isCollapsed && pathname === '/' && (
         <button
           onClick={toggleSidebar}
           className="hidden md:flex fixed top-3.5 left-3.5 z-40 items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-md border border-slate-300 rounded-xl shadow-md text-xs font-bold text-slate-700 hover:text-blue-600 hover:border-blue-400 hover:shadow-lg transition-all animate-in fade-in zoom-in-95 group"
