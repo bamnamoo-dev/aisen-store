@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -83,7 +83,7 @@ export default function HomePage() {
       {/* ========================================================
           2. CORE 12 SERVICES & MINI PROGRAMS GRID (4 x 3 그리드)
       ======================================================== */}
-      <section className="w-full max-w-[1400px] mx-auto grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-2.5">
+      <section className="w-full max-w-[1400px] mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-2.5">
         
         {/* ROW 1: AI 핵심 솔루션 & 핵심 플랫폼 */}
         
