@@ -383,11 +383,9 @@ export default function HomePage() {
 
         {/* ROW 3: 데이터 처리 도구 & 계산기 & 엔터테인먼트 */}
 
-        {/* CARD 9: 엑셀시트별 분리저장기 */}
-        <a 
-          href="https://sen-excel-splitter.streamlit.app/" 
-          target="_blank" 
-          rel="noopener noreferrer"
+        {/* CARD 9: 엑셀시트별 분리저장기 (내장형 라우트) */}
+        <Link 
+          href="/tools/sheet-splitter" 
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -397,9 +395,9 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 whitespace-nowrap">
-                  엑셀분리
+                  초고속 분리
                 </span>
-                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-emerald-700 transition-colors" />
+                <ArrowRight size={15} className="text-slate-400 group-hover:text-emerald-700 transition-colors" />
               </div>
             </div>
 
@@ -415,13 +413,11 @@ export default function HomePage() {
             <span>시트 분리하기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </a>
+        </Link>
 
-        {/* CARD 10: 나이스 임금대장 식대 분리기 */}
-        <a 
-          href="https://sikdae.streamlit.app/" 
-          target="_blank" 
-          rel="noopener noreferrer"
+        {/* CARD 10: 나이스 임금대장 식대 분리기 (내장형 라우트) */}
+        <Link 
+          href="/tools/sikdae" 
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-orange-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -431,9 +427,9 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100 whitespace-nowrap">
-                  급식비
+                  급식비 보안
                 </span>
-                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-orange-600 transition-colors" />
+                <ArrowRight size={15} className="text-slate-400 group-hover:text-orange-600 transition-colors" />
               </div>
             </div>
 
@@ -449,7 +445,7 @@ export default function HomePage() {
             <span>공제내역 추출</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </a>
+        </Link>
 
         {/* CARD 11: 체육관 사용료 계산기 */}
         <a 

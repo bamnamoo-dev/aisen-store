@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { 
   Search, 
@@ -269,15 +270,36 @@ export default function ToolsPage() {
                     </div>
                   )}
 
-                  <a 
-                    href={tool.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="btn-secondary py-1 px-3 text-xs ml-auto flex items-center gap-1"
-                  >
-                    <span>실행</span>
-                    <ArrowUpRight size={13} />
-                  </a>
+                  {(() => {
+                    let finalUrl = tool.url;
+                    if (finalUrl?.includes('sikdae.streamlit.app')) finalUrl = '/tools/sikdae';
+                    if (finalUrl?.includes('sen-excel-splitter.streamlit.app')) finalUrl = '/tools/sheet-splitter';
+                    const isInternal = finalUrl?.startsWith('/');
+
+                    if (isInternal) {
+                      return (
+                        <Link 
+                          href={finalUrl} 
+                          className="btn-primary py-1 px-3 text-xs ml-auto flex items-center gap-1 bg-blue-600"
+                        >
+                          <span>실행 (내장)</span>
+                          <ChevronRight size={13} />
+                        </Link>
+                      );
+                    }
+
+                    return (
+                      <a 
+                        href={finalUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn-secondary py-1 px-3 text-xs ml-auto flex items-center gap-1"
+                      >
+                        <span>실행</span>
+                        <ArrowUpRight size={13} />
+                      </a>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
