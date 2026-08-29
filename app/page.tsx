@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -33,7 +33,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-2 sm:py-3 flex flex-col justify-between min-h-screen gap-2 sm:gap-3">
+    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col min-h-screen gap-3">
       
       {/* ========================================================
           1. TOP HERO: 컴팩트 스마트 검색 헤더
@@ -83,7 +83,7 @@ export default function HomePage() {
       {/* ========================================================
           2. CORE 12 SERVICES & MINI PROGRAMS GRID (4 x 3 그리드)
       ======================================================== */}
-      <section className="w-full max-w-[1400px] mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-2.5">
+      <section className="w-full max-w-[1400px] mx-auto flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-3.5" style={{gridAutoRows: '1fr'}}>
         
         {/* ROW 1: AI 핵심 솔루션 & 핵심 플랫폼 */}
         
@@ -92,7 +92,7 @@ export default function HomePage() {
           href="https://chatbot.aisen.store" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -126,7 +126,7 @@ export default function HomePage() {
           href="https://chatbot.aisen.store/travel" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -160,7 +160,7 @@ export default function HomePage() {
           href="https://chatbot.aisen.store?forms=1" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-amber-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-amber-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -192,7 +192,7 @@ export default function HomePage() {
         {/* CARD 4: 학교회계 통합 대시보드 (포털 주소 유지 & 원본 로드) */}
         <Link 
           href="/tools/sfd" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-teal-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-teal-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -226,7 +226,7 @@ export default function HomePage() {
         {/* CARD 5: 행정 자료실 */}
         <Link 
           href="/archive" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -258,7 +258,7 @@ export default function HomePage() {
         {/* CARD 6: 소통 게시판 */}
         <Link 
           href="/board" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-sky-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-sky-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -290,7 +290,7 @@ export default function HomePage() {
         {/* CARD 7: 증빙서 측면표지 제작기 (포털 주소 유지 & 원본 로드) */}
         <Link 
           href="/tools/label-maker" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-violet-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-violet-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -322,7 +322,7 @@ export default function HomePage() {
         {/* CARD 8: 교실배치도 제작기 (포털 주소 유지 & 원본 로드) */}
         <Link 
           href="/tools/classmap" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-cyan-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-cyan-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -356,7 +356,7 @@ export default function HomePage() {
         {/* CARD 9: 엑셀시트별 분리저장기 (내장형 라우트) */}
         <Link 
           href="/tools/sheet-splitter" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -388,7 +388,7 @@ export default function HomePage() {
         {/* CARD 10: 나이스 임금대장 식대 분리기 (내장형 라우트) */}
         <Link 
           href="/tools/sikdae" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-orange-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-orange-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -420,7 +420,7 @@ export default function HomePage() {
         {/* CARD 11: 체육관 사용료 계산기 (포털 주소 유지 & 원본 로드) */}
         <Link 
           href="/tools/gym-calc" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-pink-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-pink-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -452,7 +452,7 @@ export default function HomePage() {
         {/* CARD 12: 수박 게임 (포털 주소 유지 & 원본 로드) */}
         <Link 
           href="/tools/watermelon" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -484,7 +484,7 @@ export default function HomePage() {
         {/* CARD 13: 예산정산 대시보드 */}
         <Link 
           href="/tools/budget-settle" 
-          className="glass-card p-3 flex flex-col justify-between h-[120px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="glass-card p-3 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
