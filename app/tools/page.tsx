@@ -277,6 +277,7 @@ export default function ToolsPage() {
                     if (finalUrl?.includes('label-maker-two.vercel.app')) finalUrl = '/tools/label-maker';
                     if (finalUrl?.includes('bamnamoo-dev.github.io/gym')) finalUrl = '/tools/gym-calc';
                     if (finalUrl?.includes('bamnamoo-dev.github.io/classmap')) finalUrl = '/tools/classmap';
+                    if (finalUrl?.includes('bamnamoo-dev.github.io/SFD')) finalUrl = '/tools/sfd';
                     if (finalUrl?.includes('project-np0t7.vercel.app')) finalUrl = '/tools/watermelon';
                     const isInternal = finalUrl?.startsWith('/');
 

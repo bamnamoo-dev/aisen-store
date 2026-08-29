@@ -213,11 +213,9 @@ export default function HomePage() {
           </div>
         </a>
 
-        {/* CARD 4: 학교회계 통합 대시보드 */}
-        <a 
-          href="https://bamnamoo-dev.github.io/SFD/" 
-          target="_blank" 
-          rel="noopener noreferrer"
+        {/* CARD 4: 학교회계 통합 대시보드 (포털 주소 유지 & 원본 로드) */}
+        <Link 
+          href="/tools/sfd" 
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-teal-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -229,7 +227,7 @@ export default function HomePage() {
                 <span className="text-[11.5px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 whitespace-nowrap">
                   2026 베타
                 </span>
-                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-teal-600 transition-colors" />
+                <ArrowRight size={15} className="text-slate-400 group-hover:text-teal-600 transition-colors" />
               </div>
             </div>
 
@@ -245,7 +243,7 @@ export default function HomePage() {
             <span>대시보드 열기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </a>
+        </Link>
 
         {/* ROW 2: 자료 서고, 소통, 서식 제작 도구 */}
 

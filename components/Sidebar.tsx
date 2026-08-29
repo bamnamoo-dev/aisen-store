@@ -36,7 +36,7 @@ const AI_NAV_ITEMS = [
   { name: '구글 챗봇 모음', href: '/chatbot', icon: <MessageSquare size={21} className="text-indigo-600" />, isExternal: false, badge: 'Gemini' },
   { name: '스마트 여비정산기', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={21} className="text-sky-600" />, isExternal: true, badge: 'v4.9.2' },
   { name: '행정·민원 서식 68종', href: 'https://chatbot.aisen.store?forms=1', icon: <FileText size={21} className="text-amber-600" />, isExternal: true, badge: '68종' },
-  { name: '학교회계 대시보드', href: 'https://bamnamoo-dev.github.io/SFD/', icon: <PieChart size={21} className="text-teal-600" />, isExternal: true, badge: 'SFD' },
+  { name: '학교회계 대시보드', href: '/tools/sfd', icon: <PieChart size={21} className="text-teal-600" />, isExternal: false, badge: 'SFD' },
 ];
 
 // 2. 공식 지침서 & 소통 공간 그룹
