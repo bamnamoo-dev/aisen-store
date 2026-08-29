@@ -93,7 +93,10 @@ export default function Sidebar() {
             href={item.href}
             target={item.isExternal ? '_blank' : undefined}
             rel={item.isExternal ? 'noopener noreferrer' : undefined}
-            onClick={() => { if (isMobile) setMobileMenuOpen(false); }}
+            onClick={() => { 
+              if (isMobile) setMobileMenuOpen(false); 
+              if (!item.isExternal) setIsCollapsed(true);
+            }}
             className={`flex items-center justify-between px-3.5 py-2 rounded-xl text-sm sm:text-[15px] font-bold transition-all ${
               isActive
                 ? 'bg-blue-600 text-white shadow-xs'

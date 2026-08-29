@@ -13,6 +13,7 @@ import {
   BookOpen,
   Layers
 } from 'lucide-react';
+import ToolHeader from '@/components/ToolHeader';
 import FileUpload from '@/components/features/FileUpload';
 import { supabase } from '@/lib/supabase';
 
@@ -179,11 +180,17 @@ export default function ArchivePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 px-4 md:px-6 py-10 flex flex-col items-center">
-      <div className="w-full max-w-[1100px] flex flex-col gap-10">
+    <div className="w-full flex flex-col min-h-screen">
+      {/* 겹침 없는 통합 스마트 헤더 */}
+      <ToolHeader 
+        title="행정 자료실 & 102권 공식 지침서"
+        icon={<BookOpen size={15} className="text-emerald-600" />}
+      />
+
+      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 py-6 flex flex-col gap-8">
         
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-xs font-bold text-blue-600 mb-2">
               <FolderOpen size={13} className="text-blue-600" />

@@ -19,11 +19,11 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // 링크/도구 페이지(/tools/..., /archive, /board 등)에 들어가면 화면을 넓게 쓰기 위해 자동 접기!
+  // 메인 홈('/')이 아닌 모든 서브페이지(/tools/..., /archive, /board, /chatbot 등)로 이동하면 자동으로 사이드바 쏙 접기!
   useEffect(() => {
-    if (pathname.startsWith('/tools/')) {
+    if (pathname !== '/') {
       setIsCollapsed(true);
-    } else if (pathname === '/') {
+    } else {
       setIsCollapsed(false);
     }
   }, [pathname]);

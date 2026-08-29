@@ -15,6 +15,7 @@ import {
   Share2
 } from 'lucide-react';
 import Link from 'next/link';
+import ToolHeader from '@/components/ToolHeader';
 import { supabase } from '@/lib/supabase';
 
 interface Post {
@@ -232,11 +233,17 @@ export default function BoardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 px-4 md:px-6 py-10 flex flex-col items-center">
-      <div className="w-full max-w-[1100px] flex flex-col gap-8">
+    <div className="w-full flex flex-col min-h-screen">
+      {/* 겹침 없는 통합 스마트 헤더 */}
+      <ToolHeader 
+        title="업무 소통 게시판"
+        icon={<LayoutDashboard size={15} className="text-sky-600" />}
+      />
+
+      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 py-6 flex flex-col gap-6">
         
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        {/* Header Title */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-xs font-bold text-emerald-600 mb-2">
               <LayoutDashboard size={13} className="text-emerald-600" />

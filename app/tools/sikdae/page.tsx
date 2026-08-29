@@ -17,6 +17,7 @@ import {
   Sparkles,
   RefreshCw
 } from 'lucide-react';
+import ToolHeader from '@/components/ToolHeader';
 
 interface ExtractedItem {
   name: string;
@@ -218,19 +219,18 @@ export default function SikdaePage() {
   const totalAmount = extractedData.reduce((acc, cur) => acc + cur.amount, 0);
 
   return (
-    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6">
-      
-      {/* 상단 네비게이션 & 헤더 */}
-      <div className="flex flex-col gap-3">
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors w-fit"
-        >
-          <ArrowLeft size={14} />
-          <span>메인 포털로 돌아가기</span>
-        </Link>
+    <div className="w-full flex flex-col min-h-screen">
+      {/* 겹침 없는 통합 스마트 헤더 */}
+      <ToolHeader 
+        title="나이스 임금대장 식대분리기"
+        icon={<UtensilsCrossed size={15} className="text-orange-600" />}
+      />
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 py-6 flex flex-col gap-6">
+        
+        {/* 상단 네비게이션 & 헤더 */}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-xs font-bold text-orange-600 mb-2">
               <UtensilsCrossed size={14} />
