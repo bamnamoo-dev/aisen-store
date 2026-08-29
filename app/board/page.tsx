@@ -9,7 +9,7 @@ import {
   X, 
   User, 
   MessageSquare, 
-  HelpCircle, 
+  CircleQuestionMark, 
   Megaphone, 
   ChevronRight, 
   Share2
@@ -32,7 +32,7 @@ const BOARDS = [
   { id: 'notice', name: '공지사항', icon: <Megaphone size={16} />, color: 'text-blue-600' },
   { id: 'work_share', name: '업무공유', icon: <Share2 size={16} />, color: 'text-emerald-600' },
   { id: 'free', name: '자유게시판', icon: <MessageSquare size={16} />, color: 'text-sky-600' },
-  { id: 'qna', name: '질의응답', icon: <HelpCircle size={16} />, color: 'text-purple-600' },
+  { id: 'qna', name: '질의응답', icon: <CircleQuestionMark size={16} />, color: 'text-purple-600' },
 ];
 
 const CATEGORIES = ["전체", "공지", "협조", "긴급", "질문", "정보", "일반"];
@@ -523,7 +523,6 @@ export default function BoardPage() {
         </div>
       )}
 
-      </div>
     </div>
   );
 }

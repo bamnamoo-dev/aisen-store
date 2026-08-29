@@ -17,14 +17,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  PieChart,
+  ChartPie,
   Tag,
-  Grid,
+  LayoutGrid,
   FileSpreadsheet,
   UtensilsCrossed,
   Calculator,
   Flame,
-  Home
+  House
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -36,7 +36,7 @@ const AI_NAV_ITEMS = [
   { name: '구글 챗봇 모음', href: '/chatbot', icon: <MessageSquare size={21} className="text-indigo-600" />, isExternal: false, badge: 'Gemini' },
   { name: '스마트 여비정산기', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={21} className="text-sky-600" />, isExternal: true, badge: 'v4.9.2' },
   { name: '행정·민원 서식 68종', href: 'https://chatbot.aisen.store?forms=1', icon: <FileText size={21} className="text-amber-600" />, isExternal: true, badge: '68종' },
-  { name: '학교회계 대시보드', href: '/tools/sfd', icon: <PieChart size={21} className="text-teal-600" />, isExternal: false, badge: 'SFD' },
+  { name: '학교회계 대시보드', href: '/tools/sfd', icon: <ChartPie size={21} className="text-teal-600" />, isExternal: false, badge: 'SFD' },
 ];
 
 // 2. 공식 지침서 & 소통 공간 그룹
@@ -48,7 +48,7 @@ const ARCHIVE_NAV_ITEMS = [
 // 3. 6대 초고속 행정 실무 툴킷 그룹
 const TOOLKIT_NAV_ITEMS = [
   { name: '증빙서 측면표지', href: '/tools/label-maker', icon: <Tag size={21} className="text-violet-600" />, isExternal: false, badge: '라벨' },
-  { name: '스마트 교실배치도', href: '/tools/classmap', icon: <Grid size={21} className="text-cyan-600" />, isExternal: false, badge: '도면' },
+  { name: '스마트 교실배치도', href: '/tools/classmap', icon: <LayoutGrid size={21} className="text-cyan-600" />, isExternal: false, badge: '도면' },
   { name: '엑셀시트 분리기', href: '/tools/sheet-splitter', icon: <FileSpreadsheet size={21} className="text-emerald-700" />, isExternal: false, badge: '분리' },
   { name: '임금대장 식대분리', href: '/tools/sikdae', icon: <UtensilsCrossed size={21} className="text-orange-600" />, isExternal: false, badge: '식대' },
   { name: '체육관 사용료', href: '/tools/gym-calc', icon: <Calculator size={21} className="text-pink-600" />, isExternal: false, badge: '조례' },
@@ -164,7 +164,7 @@ export default function Sidebar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-blue-50 text-blue-700 font-black text-sm border border-blue-100"
               >
-                <Home size={17} />
+                <House size={17} />
                 <span>메인 포털 홈으로</span>
               </Link>
 
@@ -283,7 +283,7 @@ export default function Sidebar() {
                   : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50'
               }`}
             >
-              <Home size={17} className={pathname === '/' ? 'text-blue-600' : 'text-slate-500'} />
+              <House size={17} className={pathname === '/' ? 'text-blue-600' : 'text-slate-500'} />
               <span>포털 메인 홈</span>
             </Link>
 

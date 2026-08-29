@@ -1,6 +1,6 @@
 'use client';
 
-import { PieChart } from 'lucide-react';
+import { ChartPie } from 'lucide-react';
 import { useRef } from 'react';
 import ToolHeader from '@/components/ToolHeader';
 
@@ -19,7 +19,7 @@ export default function SFDDashboardPage() {
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
         title="학교회계 통합 정보 대시보드 (SFD)"
-        icon={<PieChart size={15} className="text-teal-600" />}
+        icon={<ChartPie size={15} className="text-teal-600" />}
         onReload={handleReload}
       />
 

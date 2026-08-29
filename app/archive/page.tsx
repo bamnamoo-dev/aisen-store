@@ -8,7 +8,7 @@ import {
   Trash2, 
   ExternalLink,
   FolderOpen, 
-  Edit3, 
+  FilePenLine, 
   X, 
   BookOpen,
   Layers
@@ -352,7 +352,7 @@ export default function ArchivePage() {
                           className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100"
                           title="제목 수정"
                         >
-                          <Edit3 size={14} />
+                          <FilePenLine size={13} />
                         </button>
                         <button
                           onClick={() => {
@@ -435,7 +435,6 @@ export default function ArchivePage() {
         </div>
       )}
 
-      </div>
     </div>
   );
 }

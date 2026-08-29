@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { LogIn, Loader2, UserPlus, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { LogIn, LoaderCircle, UserPlus, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -124,7 +124,7 @@ export default function LoginPage() {
           >
             {loading ? (
               <>
-                <Loader2 size={16} className="animate-spin" />
+                <LoaderCircle className="animate-spin" size={18} />
                 <span>처리 중...</span>
               </>
             ) : isSignUp ? (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Plus, Trash2, ExternalLink, Bot, MessageSquare, ChevronRight, ArrowUpRight, Edit3, X } from 'lucide-react';
+import { Search, Plus, Trash2, ExternalLink, Bot, MessageSquare, ChevronRight, ArrowUpRight, FilePenLine, X } from 'lucide-react';
 import ToolHeader from '@/components/ToolHeader';
 import { supabase } from '@/lib/supabase';
 
@@ -217,7 +217,7 @@ export default function ChatbotPage() {
                         className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100"
                         title="수정"
                       >
-                        <Edit3 size={14} />
+                        <FilePenLine size={13} />
                       </button>
                       <button 
                         onClick={() => handleDeleteBot(bot.id)} 
@@ -332,7 +332,6 @@ export default function ChatbotPage() {
         </div>
       )}
 
-      </div>
     </div>
   );
 }

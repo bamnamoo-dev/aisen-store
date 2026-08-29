@@ -15,7 +15,7 @@ import {
   ArrowUpRight, 
   Wrench, 
   X, 
-  Edit3
+  FilePenLine
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -258,7 +258,7 @@ export default function ToolsPage() {
                         className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100"
                         title="수정"
                       >
-                        <Edit3 size={14} />
+                        <FilePenLine size={13} />
                       </button>
                       <button 
                         onClick={() => handleDeleteTool(tool.id)} 

@@ -4,13 +4,13 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   UtensilsCrossed, 
-  UploadCloud, 
+  CloudUpload, 
   FileSpreadsheet, 
   Download, 
   Trash2, 
   ArrowLeft, 
-  CheckCircle2, 
-  AlertCircle,
+  CircleCheck, 
+  CircleAlert,
   Users,
   CreditCard,
   Layers,
@@ -245,7 +245,7 @@ export default function SikdaePage() {
           </div>
 
           <div className="flex items-center gap-2 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3.5 py-2 rounded-xl font-semibold shrink-0">
-            <CheckCircle2 size={16} className="text-emerald-600" />
+            <CircleCheck size={16} className="text-emerald-600" />
             <span>100% 브라우저 메모리 안전 처리 (서버 유출 0%)</span>
           </div>
         </div>
@@ -280,7 +280,7 @@ export default function SikdaePage() {
               {isProcessing ? (
                 <RefreshCw size={28} className="animate-spin text-orange-600" />
               ) : (
-                <UploadCloud size={28} />
+                <CloudUpload size={28} />
               )}
             </div>
 
@@ -309,7 +309,7 @@ export default function SikdaePage() {
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
                 : 'bg-amber-50 text-amber-800 border-amber-200'
             }`}>
-              {extractedData.length > 0 ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
+              {extractedData.length > 0 ? <CircleCheck size={15} /> : <CircleAlert size={15} />}
               <span>{statusMessage}</span>
             </div>
           )}

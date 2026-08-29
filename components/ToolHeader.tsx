@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Menu, RefreshCw, Home } from 'lucide-react';
+import { ArrowLeft, Menu, RefreshCw, House } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 
 interface ToolHeaderProps {
@@ -36,7 +36,7 @@ export default function ToolHeader({ title, icon, themeColor = 'blue', onReload 
           className="inline-flex items-center gap-1 text-xs font-bold text-slate-600 hover:text-blue-600 bg-slate-100/90 hover:bg-blue-50 px-2.5 py-1 rounded-lg border border-slate-200 transition-colors"
           title="메인 포털 홈으로 가기"
         >
-          <Home size={13} />
+          <House size={13} />
           <span>홈으로</span>
         </Link>
 

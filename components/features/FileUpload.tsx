@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Upload, Loader2, CheckCircle2, X } from 'lucide-react';
+import { Upload, LoaderCircle, CircleCheck, X } from 'lucide-react';
 
 const CATEGORIES = ['예산지침', '계약', '인사', '급여', '회계', '지출', '매뉴얼', '기타'];
 
@@ -206,12 +206,12 @@ export default function FileUpload({ onUploadSuccess, defaultCategory = '기타'
                 >
                   {uploading ? (
                     <>
-                      <Loader2 size={14} className="animate-spin" />
+                      <LoaderCircle size={14} className="animate-spin" />
                       <span>업로드 중...</span>
                     </>
                   ) : status === 'success' ? (
                     <>
-                      <CheckCircle2 size={14} className="text-emerald-400" />
+                      <CircleCheck size={14} className="text-emerald-400" />
                       <span>완료!</span>
                     </>
                   ) : (

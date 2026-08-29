@@ -4,15 +4,15 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { 
   FileSpreadsheet, 
-  UploadCloud, 
+  CloudUpload, 
   Download, 
   Trash2, 
   ArrowLeft, 
-  CheckCircle2, 
+  CircleCheck, 
   Archive,
   Layers,
   Sparkles,
-  CheckSquare,
+  SquareCheck,
   FileCheck
 } from 'lucide-react';
 import Script from 'next/script';
@@ -200,7 +200,7 @@ export default function SheetSplitterPage() {
             </div>
 
             <div className="flex items-center gap-2 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3.5 py-2 rounded-xl font-semibold shrink-0">
-              <CheckCircle2 size={16} className="text-emerald-600" />
+              <CircleCheck size={16} className="text-emerald-600" />
               <span>대용량 엑셀도 0.5초 초고속 분리</span>
             </div>
           </div>
@@ -227,7 +227,7 @@ export default function SheetSplitterPage() {
           />
 
           <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-2xs">
-            <UploadCloud size={28} />
+            <CloudUpload size={28} />
           </div>
 
           <div className="flex flex-col gap-1">
@@ -268,7 +268,7 @@ export default function SheetSplitterPage() {
                   onClick={toggleSelectAll}
                   className="btn-secondary py-2 px-3 text-xs font-semibold"
                 >
-                  <CheckSquare size={14} />
+                  <SquareCheck size={14} />
                   <span>{sheetList.every(s => s.selected) ? '선택 해제' : '전체 선택'}</span>
                 </button>
 
@@ -344,7 +344,6 @@ export default function SheetSplitterPage() {
           </div>
         )}
 
-        </div>
       </div>
     </>
   );

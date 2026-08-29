@@ -8,17 +8,18 @@ import {
   Search, 
   ChevronRight, 
   Fuel, 
-  FileCheck2, 
   ArrowRight,
   ArrowUpRight,
   MessageSquareShare,
   FolderOpen,
-  FileSpreadsheet,
   LayoutDashboard,
   Tag,
+  LayoutGrid,
+  FileSpreadsheet,
+  UtensilsCrossed,
   Calculator,
-  Grid,
-  UtensilsCrossed
+  Flame,
+  FileCheck
 } from 'lucide-react';
 
 const QUICK_SEARCH_CHIPS = [
@@ -189,7 +190,7 @@ export default function HomePage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-105 transition-transform">
-                <FileCheck2 size={19} />
+                <FileCheck size={19} />
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 whitespace-nowrap">
@@ -351,7 +352,7 @@ export default function HomePage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center border border-cyan-100 group-hover:scale-105 transition-transform">
-                <Grid size={19} />
+                <LayoutGrid size={19} />
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-100 whitespace-nowrap">
