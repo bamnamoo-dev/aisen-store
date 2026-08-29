@@ -36,32 +36,20 @@ export default function HomePage() {
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-5 sm:py-7 flex flex-col min-h-screen gap-3">
       
       {/* ========================================================
-          1. TOP HERO: 컴팩트 스마트 검색 헤더 (카드 디자인과 일체화)
+          1. TOP HERO: 대형 헤드라인 & 스마트 검색창
       ======================================================== */}
-      <section className="flex flex-col items-center text-center">
+      <section className="flex flex-col items-center text-center pt-2 sm:pt-4">
         
-        {/* Status Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-700 mb-2 shadow-2xs">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span className="font-bold text-slate-900">AI-SEN v4.9.2 엔진 가동중</span>
-          <span className="text-slate-300">|</span>
-          <Fuel size={12} className="text-amber-500" />
-          <span className="text-slate-600 font-medium">오피넷 실시간 유가 1일 6회 자동 연동</span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="text-2xl sm:text-3xl md:text-[34px] font-black text-slate-900 tracking-tight leading-tight">
+        {/* Headline (대형 44px 폰트 & 그라데이션) */}
+        <h1 className="text-3xl sm:text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-tight">
           교육행정의 모든 기준과 계산, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">AI-SEN</span>
         </h1>
-        <p className="text-[13.5px] text-slate-500 mt-1.5 font-medium max-w-[680px]">
+        <p className="text-[14.5px] sm:text-[15.5px] text-slate-500 mt-2.5 font-medium max-w-[720px]">
           102권 공식 지침서 1:1 쪽수 앵커링 RAG 챗봇과 카카오·오피넷 실시간 연동 스마트 여비정산기
         </p>
 
         {/* Unified Search Omnibar Box */}
-        <div className="w-full max-w-[780px] mt-3">
+        <div className="w-full max-w-[800px] mt-4">
           <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-2xl border border-slate-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/80 transition-all shadow-2xs hover:shadow-md">
             <Search className="absolute left-4 text-blue-500 pointer-events-none" size={19} />
             <input 
