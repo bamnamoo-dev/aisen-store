@@ -20,7 +20,11 @@ import {
   Calculator,
   Flame,
   FileCheck,
-  ChartPie
+  ChartPie,
+  ShieldCheck,
+  Lock,
+  Zap,
+  HardDrive
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -556,9 +560,41 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================
-          3. COMPACT FOOTER
+          3. CLIENT-SIDE SECURITY & PRIVACY NOTICE BANNER
       ======================================================== */}
-      <footer className="w-full pt-2.5 pb-1 border-t border-slate-200 flex items-center justify-center text-[10.5px] sm:text-xs text-slate-400 font-medium">
+      <section className="w-full max-w-[1400px] mx-auto mt-0.5">
+        <div className="bg-white/95 border border-slate-200/90 rounded-2xl p-3 sm:p-3.5 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3 text-slate-700">
+          
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center flex-shrink-0">
+              <ShieldCheck size={20} />
+            </div>
+            <div className="text-left">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[13.5px] font-bold text-slate-900">100% 브라우저 로컬 처리 &amp; 개인정보 안심 보안</span>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">서버 유출 0%</span>
+              </div>
+              <p className="text-[12px] text-slate-500 mt-0.5 font-medium">
+                임금대장, 예산정산, 엑셀 분리, 교실배치도 등 실무 데이터는 외부 서버로 전송되지 않고 사용자 PC 메모리(로컬)에서만 안전하게 연산·보관됩니다.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 whitespace-nowrap bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/70">
+            <span className="flex items-center gap-1 text-emerald-700"><Lock size={12} /> 급여·개인정보 보호</span>
+            <span className="text-slate-300">|</span>
+            <span className="flex items-center gap-1 text-blue-700"><Zap size={12} /> 0초 즉시 처리</span>
+            <span className="text-slate-300">|</span>
+            <span className="flex items-center gap-1 text-purple-700"><HardDrive size={12} /> 내 PC 안전 저장</span>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================
+          4. COMPACT FOOTER
+      ======================================================== */}
+      <footer className="w-full pt-1.5 pb-1 border-t border-slate-200 flex items-center justify-center text-[10.5px] sm:text-xs text-slate-400 font-medium">
         <span>&copy; 2026 AI-SEN STORE. All rights reserved.</span>
       </footer>
 
