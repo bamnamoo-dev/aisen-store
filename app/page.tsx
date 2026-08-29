@@ -19,7 +19,8 @@ import {
   UtensilsCrossed,
   Calculator,
   Flame,
-  FileCheck
+  FileCheck,
+  ChartPie
 } from 'lucide-react';
 
 const QUICK_SEARCH_CHIPS = [
@@ -502,6 +503,38 @@ export default function HomePage() {
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12.5px] text-rose-600 font-bold">
             <span>게임 시작</span>
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </Link>
+
+        {/* CARD 13: 예산정산 대시보드 */}
+        <Link 
+          href="/tools/budget-settle" 
+          className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100 group-hover:scale-105 transition-transform">
+                <ChartPie size={19} />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[11.5px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 whitespace-nowrap">
+                  세입세출 정산
+                </span>
+                <ArrowRight size={15} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
+              </div>
+            </div>
+
+            <h2 className="text-[16px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
+              예산정산 대시보드
+            </h2>
+            <p className="text-[12.5px] text-slate-600 mt-1 line-clamp-1 font-medium">
+              수익자부담·목적사업비 세입세출 정산 및 잔액 분석
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12.5px] text-rose-600 font-bold">
+            <span>정산 분석</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>

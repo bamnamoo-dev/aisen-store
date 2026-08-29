@@ -45,13 +45,14 @@ const ARCHIVE_NAV_ITEMS = [
   { name: '업무 소통 게시판', href: '/board', icon: <LayoutDashboard size={21} className="text-sky-600" />, isExternal: false, badge: '소통' },
 ];
 
-// 3. 6대 초고속 행정 실무 툴킷 그룹
+// 3. 행정 실무 툴킷 그룹
 const TOOLKIT_NAV_ITEMS = [
   { name: '증빙서 측면표지', href: '/tools/label-maker', icon: <Tag size={21} className="text-violet-600" />, isExternal: false, badge: '라벨' },
   { name: '스마트 교실배치도', href: '/tools/classmap', icon: <LayoutGrid size={21} className="text-cyan-600" />, isExternal: false, badge: '도면' },
   { name: '엑셀시트 분리기', href: '/tools/sheet-splitter', icon: <FileSpreadsheet size={21} className="text-emerald-700" />, isExternal: false, badge: '분리' },
   { name: '임금대장 식대분리', href: '/tools/sikdae', icon: <UtensilsCrossed size={21} className="text-orange-600" />, isExternal: false, badge: '식대' },
   { name: '체육관 사용료', href: '/tools/gym-calc', icon: <Calculator size={21} className="text-pink-600" />, isExternal: false, badge: '조례' },
+  { name: '예산정산 대시보드', href: '/tools/budget-settle', icon: <ChartPie size={21} className="text-rose-600" />, isExternal: false, badge: '정산' },
   { name: '행정 힐링 수박게임', href: '/tools/watermelon', icon: <span className="text-base">🍉</span>, isExternal: false, badge: '게임' },
 ];
 
