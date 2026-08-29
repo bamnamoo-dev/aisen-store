@@ -481,6 +481,7 @@ export default function SikdaePage() {
         </div>
       )}
 
+      </div>
     </div>
   );
 }

@@ -332,6 +332,7 @@ export default function ChatbotPage() {
         </div>
       )}
 
+      </div>
     </div>
   );
 }

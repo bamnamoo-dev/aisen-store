@@ -344,6 +344,7 @@ export default function SheetSplitterPage() {
           </div>
         )}
 
+        </div>
       </div>
     </>
   );
