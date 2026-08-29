@@ -274,6 +274,8 @@ export default function ToolsPage() {
                     let finalUrl = tool.url;
                     if (finalUrl?.includes('sikdae.streamlit.app')) finalUrl = '/tools/sikdae';
                     if (finalUrl?.includes('sen-excel-splitter.streamlit.app')) finalUrl = '/tools/sheet-splitter';
+                    if (finalUrl?.includes('label-maker-two.vercel.app')) finalUrl = '/tools/label-maker';
+                    if (finalUrl?.includes('bamnamoo-dev.github.io/gym')) finalUrl = '/tools/gym-calc';
                     const isInternal = finalUrl?.startsWith('/');
 
                     if (isInternal) {

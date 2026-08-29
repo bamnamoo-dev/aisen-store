@@ -313,11 +313,9 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 7: 증빙서 측면표지 제작기 */}
-        <a 
-          href="https://label-maker-two.vercel.app/" 
-          target="_blank" 
-          rel="noopener noreferrer"
+        {/* CARD 7: 증빙서 측면표지 제작기 (내장형 라우트) */}
+        <Link 
+          href="/tools/label-maker" 
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-violet-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -329,7 +327,7 @@ export default function HomePage() {
                 <span className="text-[11.5px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-md border border-violet-100 whitespace-nowrap">
                   라벨출력
                 </span>
-                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-violet-600 transition-colors" />
+                <ArrowRight size={15} className="text-slate-400 group-hover:text-violet-600 transition-colors" />
               </div>
             </div>
 
@@ -345,7 +343,7 @@ export default function HomePage() {
             <span>표지 만들기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </a>
+        </Link>
 
         {/* CARD 8: 교실배치도 제작기 */}
         <a 
@@ -447,11 +445,9 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 11: 체육관 사용료 계산기 */}
-        <a 
-          href="https://bamnamoo-dev.github.io/gym/" 
-          target="_blank" 
-          rel="noopener noreferrer"
+        {/* CARD 11: 체육관 사용료 계산기 (내장형 라우트) */}
+        <Link 
+          href="/tools/gym-calc" 
           className="glass-card p-4 flex flex-col justify-between h-[150px] group hover:border-pink-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
@@ -461,9 +457,9 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100 whitespace-nowrap">
-                  사용료
+                  조례 자동산출
                 </span>
-                <ArrowUpRight size={15} className="text-slate-400 group-hover:text-pink-600 transition-colors" />
+                <ArrowRight size={15} className="text-slate-400 group-hover:text-pink-600 transition-colors" />
               </div>
             </div>
 
@@ -479,7 +475,7 @@ export default function HomePage() {
             <span>사용료 계산</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </a>
+        </Link>
 
         {/* CARD 12: 수박 게임 */}
         <a 
