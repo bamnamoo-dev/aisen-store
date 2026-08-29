@@ -33,7 +33,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col min-h-screen gap-3">
+    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-5 sm:py-7 flex flex-col min-h-screen gap-3">
       
       {/* ========================================================
           1. TOP HERO: 컴팩트 스마트 검색 헤더
@@ -50,10 +50,10 @@ export default function HomePage() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-xl sm:text-2xl md:text-[28px] font-black text-slate-900 tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-[36px] font-black text-slate-900 tracking-tight leading-tight">
           교육행정의 모든 기준과 계산, <span className="text-blue-600">AI-SEN</span>
         </h1>
-        <p className="text-xs text-slate-500 mt-1 font-medium max-w-[680px]">
+        <p className="text-[15.5px] text-slate-500 mt-1.5 font-medium max-w-[680px]">
           102권 공식 지침서 1:1 쪽수 앵커링 RAG 챗봇과 카카오·오피넷 실시간 연동 스마트 여비정산기
         </p>
 
@@ -83,7 +83,7 @@ export default function HomePage() {
       {/* ========================================================
           2. CORE 12 SERVICES & MINI PROGRAMS GRID (4 x 3 그리드)
       ======================================================== */}
-      <section className="w-full max-w-[1400px] mx-auto flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-3.5" style={{gridAutoRows: '1fr'}}>
+      <section className="w-full max-w-[1400px] mx-auto flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-2.5" style={{gridAutoRows: '1fr'}}>
         
         {/* ROW 1: AI 핵심 솔루션 & 핵심 플랫폼 */}
         
@@ -100,17 +100,17 @@ export default function HomePage() {
                 <Bot size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100 whitespace-nowrap">
                   3-Tier
                 </span>
                 <ArrowUpRight size={15} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
               AI 행정 챗봇
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               102권 서고 지침서 1:1 쪽수 뷰어 및 국가법령 연동
             </p>
           </div>
@@ -134,17 +134,17 @@ export default function HomePage() {
                 <Navigation size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 whitespace-nowrap">
                   v4.9.2
                 </span>
                 <ArrowUpRight size={15} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
               스마트 여비정산기
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               카카오 3개 경유지 및 오피넷 실시간 유가 연동 산출
             </p>
           </div>
@@ -168,17 +168,17 @@ export default function HomePage() {
                 <FileCheck size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 whitespace-nowrap">
                   68종
                 </span>
                 <ArrowUpRight size={15} className="text-slate-400 group-hover:text-amber-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-amber-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-amber-600 transition-colors truncate">
               행정·민원 서식
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               인사·복무 및 제증명 서식 실시간 미리보기 및 HWP 다운
             </p>
           </div>
@@ -200,17 +200,17 @@ export default function HomePage() {
                 <LayoutDashboard size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 whitespace-nowrap">
                   2026 베타
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-teal-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-teal-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-teal-600 transition-colors truncate">
               학교회계 대시보드
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               세부사업·추경·지출집행 실시간 모니터링 분석
             </p>
           </div>
@@ -234,17 +234,17 @@ export default function HomePage() {
                 <FolderOpen size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 whitespace-nowrap">
                   102권
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
               행정 자료실
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               28개 분야 102권 공식 지침서 스트리밍 서고
             </p>
           </div>
@@ -266,17 +266,17 @@ export default function HomePage() {
                 <MessageSquareShare size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100 whitespace-nowrap">
                   미가입
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-sky-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-sky-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-sky-600 transition-colors truncate">
               소통 게시판
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               가입 없이 4자리 암호로 자유로운 실무 질의 및 공유
             </p>
           </div>
@@ -298,17 +298,17 @@ export default function HomePage() {
                 <Tag size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-md border border-violet-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-md border border-violet-100 whitespace-nowrap">
                   라벨출력
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-violet-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-violet-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-violet-600 transition-colors truncate">
               증빙서 측면표지
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               지출증빙서 측면 라벨 양식 자동 생성 및 규격 인쇄
             </p>
           </div>
@@ -330,17 +330,17 @@ export default function HomePage() {
                 <LayoutGrid size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-100 whitespace-nowrap">
                   도면제작
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-cyan-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-cyan-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-cyan-600 transition-colors truncate">
               교실배치도 제작기
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               층별·특별실 교실배치도 시각화 및 직관적 도면 생성
             </p>
           </div>
@@ -364,17 +364,17 @@ export default function HomePage() {
                 <FileSpreadsheet size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 whitespace-nowrap">
                   초고속 분리
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-emerald-700 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
               엑셀시트 분리기
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장
             </p>
           </div>
@@ -396,17 +396,17 @@ export default function HomePage() {
                 <UtensilsCrossed size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100 whitespace-nowrap">
                   급식비 보안
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-orange-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-orange-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-orange-600 transition-colors truncate">
               임금대장 식대분리
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               나이스 임금대장 (이름-식대) 공제내역 간편 추출
             </p>
           </div>
@@ -428,17 +428,17 @@ export default function HomePage() {
                 <Calculator size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100 whitespace-nowrap">
                   조례 자동산출
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-pink-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-pink-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-pink-600 transition-colors truncate">
               체육관 사용료
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               시설개방 조례 기준 대관료 및 냉난방비 자동 산출
             </p>
           </div>
@@ -460,17 +460,17 @@ export default function HomePage() {
                 🍉
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 whitespace-nowrap">
                   랭킹 게임
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
               수박 게임
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               3D 벡터 과일 합치기 &amp; 실시간 글로벌 랭킹 게임
             </p>
           </div>
@@ -492,17 +492,17 @@ export default function HomePage() {
                 <ChartPie size={19} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10.5px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 whitespace-nowrap">
+                <span className="text-[12.5px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 whitespace-nowrap">
                   세입세출 정산
                 </span>
                 <ArrowRight size={15} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[13px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
               예산정산 대시보드
             </h2>
-            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
+            <p className="text-[15.5px] text-slate-600 mt-0.5 line-clamp-1 font-medium">
               수익자부담·목적사업비 세입세출 정산 및 잔액 분석
             </p>
           </div>
