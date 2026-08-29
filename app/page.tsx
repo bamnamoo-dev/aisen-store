@@ -86,7 +86,7 @@ export default function HomePage() {
       <section className="w-full max-w-[1400px] mx-auto flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3" style={{gridAutoRows: '1fr'}}>
         
         {/* =========================================================================
-            GROUP 1: AI & 스마트 포털 (인디고 / 스카이 / 블루)
+            ROW 1: AI & 스마트 포털 허브 (블루 / 인디고 / 스카이 계열 🔵)
         ========================================================================= */}
         
         {/* CARD 1: AI 행정 챗봇 (Indigo) */}
@@ -189,11 +189,45 @@ export default function HomePage() {
           </div>
         </Link>
 
+        {/* CARD 4: 행정·민원 서식 68종 (Cobalt Blue) */}
+        <a 
+          href="https://chatbot.aisen.store?forms=1" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
+                <FileCheck size={18} />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[11.5px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
+                  68종
+                </span>
+                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-blue-700 transition-colors" />
+              </div>
+            </div>
+
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-700 transition-colors truncate">
+              행정·민원 서식
+            </h2>
+            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
+              인사·복무 및 제증명 서식 실시간 미리보기 및 HWP 다운
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-700 font-bold">
+            <span>서식 포털</span>
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </a>
+
         {/* =========================================================================
-            GROUP 2: 회계 & 예산 정산 (틸 / 에메랄드 / 사이언)
+            ROW 2: 회계 & 예산 & 정산 (에메랄드 / 틸 / 사이언 계열 🟢)
         ========================================================================= */}
 
-        {/* CARD 4: 학교회계 대시보드 (Teal) */}
+        {/* CARD 5: 학교회계 대시보드 (Teal) */}
         <Link 
           href="/tools/sfd" 
           className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-teal-400 hover:shadow-md transition-all cursor-pointer bg-white"
@@ -225,7 +259,7 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 5: 예산정산 대시보드 (Emerald) */}
+        {/* CARD 6: 예산정산 대시보드 (Emerald) */}
         <Link 
           href="/tools/budget-settle" 
           className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
@@ -257,7 +291,39 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 6: 체육관 사용료 계산기 (Cyan) */}
+        {/* CARD 7: 엑셀시트별 분리저장기 (Deep Emerald) */}
+        <Link 
+          href="/tools/sheet-splitter" 
+          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer bg-white"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
+                <FileSpreadsheet size={18} />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[11.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
+                  초고속 분리
+                </span>
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-700 transition-colors" />
+              </div>
+            </div>
+
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
+              엑셀시트 분리기
+            </h2>
+            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
+              엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-700 font-bold">
+            <span>시트 분리하기</span>
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </Link>
+
+        {/* CARD 8: 체육관 사용료 계산기 (Cyan) */}
         <Link 
           href="/tools/gym-calc" 
           className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-cyan-400 hover:shadow-md transition-all cursor-pointer bg-white"
@@ -290,62 +356,28 @@ export default function HomePage() {
         </Link>
 
         {/* =========================================================================
-            GROUP 3: 인사 / 서식 / 엑셀 실무 (앰버 / 그린 / 에메랄드 / 오렌지)
+            ROW 3: 행정 실무 & 서식 & 도면 (앰버 / 오렌지 / 바이올렛 / 퍼플 🟣🟠)
         ========================================================================= */}
 
-        {/* CARD 7: 행정·민원 서식 68종 (Amber) */}
-        <a 
-          href="https://chatbot.aisen.store?forms=1" 
-          target="_blank" 
-          rel="noopener noreferrer"
+        {/* CARD 9: 행정 자료실 (Amber) */}
+        <Link 
+          href="/archive" 
           className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-amber-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-105 transition-transform">
-                <FileCheck size={18} />
+                <FolderOpen size={18} />
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 whitespace-nowrap">
-                  68종
+                  102권
                 </span>
-                <ArrowUpRight size={14} className="text-slate-400 group-hover:text-amber-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-amber-600 transition-colors" />
               </div>
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-amber-600 transition-colors truncate">
-              행정·민원 서식
-            </h2>
-            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              인사·복무 및 제증명 서식 실시간 미리보기 및 HWP 다운
-            </p>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-amber-600 font-bold">
-            <span>서식 포털</span>
-            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-          </div>
-        </a>
-
-        {/* CARD 8: 행정 자료실 (Green) */}
-        <Link 
-          href="/archive" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-green-400 hover:shadow-md transition-all cursor-pointer bg-white"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-green-50 text-green-600 flex items-center justify-center border border-green-100 group-hover:scale-105 transition-transform">
-                <FolderOpen size={18} />
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-md border border-green-200 whitespace-nowrap">
-                  102권
-                </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-green-600 transition-colors" />
-              </div>
-            </div>
-
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-green-600 transition-colors truncate">
               행정 자료실
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
@@ -353,40 +385,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-green-600 font-bold">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-amber-600 font-bold">
             <span>자료실 보기</span>
-            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-          </div>
-        </Link>
-
-        {/* CARD 9: 엑셀시트별 분리저장기 (Emerald) */}
-        <Link 
-          href="/tools/sheet-splitter" 
-          className="glass-card p-3.5 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
-                <FileSpreadsheet size={18} />
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
-                  초고속 분리
-                </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-700 transition-colors" />
-              </div>
-            </div>
-
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
-              엑셀시트 분리기
-            </h2>
-            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장
-            </p>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-700 font-bold">
-            <span>시트 분리하기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
@@ -422,10 +422,6 @@ export default function HomePage() {
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
-
-        {/* =========================================================================
-            GROUP 4: 시설 관리 & 힐링 (바이올렛 / 퍼플 / 로즈)
-        ========================================================================= */}
 
         {/* CARD 11: 증빙서 측면표지 제작기 (Violet) */}
         <Link 
@@ -490,6 +486,10 @@ export default function HomePage() {
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
+
+        {/* =========================================================================
+            ROW 4: 힐링 포인트 (로즈 / 코랄 🔴)
+        ========================================================================= */}
 
         {/* CARD 13: 수박 게임 (Rose) */}
         <Link 
