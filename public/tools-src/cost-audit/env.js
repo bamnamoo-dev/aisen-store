@@ -2,5 +2,5 @@
 // 클라이언트에 API 키를 하드코딩하지 않습니다.
 window.ENV = {
     GOOGLE_API_KEY: "",
-    GEMINI_MODEL: "gemini-2.5-flash"
+    GEMINI_MODEL: "gemini-3.5-flash-lite"
 };
