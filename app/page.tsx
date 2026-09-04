@@ -557,7 +557,7 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 14: 스마트 공사원가 감사관 */}
+        {/* CARD 14: 스마트 원가계산서 검증기 */}
         <Link 
           href="/tools/cost-audit" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
@@ -579,7 +579,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              스마트 공사원가 감사관
+              스마트 원가계산서 검증기
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               조달청 법정 제비율 역산 대차대조 &amp; Gemini AI 서류 판독
@@ -587,7 +587,7 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
-            <span>감사관 열기</span>
+            <span>검증기 열기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
