@@ -9,9 +9,10 @@ interface ToolHeaderProps {
   icon: React.ReactNode;
   themeColor?: string; // e.g. 'rose', 'pink', 'cyan', 'violet', 'emerald', 'orange'
   onReload?: () => void;
+  extraAction?: React.ReactNode;
 }
 
-export default function ToolHeader({ title, icon, themeColor = 'blue', onReload }: ToolHeaderProps) {
+export default function ToolHeader({ title, icon, themeColor = 'blue', onReload, extraAction }: ToolHeaderProps) {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -54,17 +55,20 @@ export default function ToolHeader({ title, icon, themeColor = 'blue', onReload 
 
       </div>
 
-      {/* 우측: 새로고침 버튼 */}
-      {onReload && (
+      {/* 우측: 추가 액션(소통게시판 등) 및 새로고침 버튼 */}
+      {(extraAction || onReload) && (
         <div className="flex items-center gap-2">
-          <button
-            onClick={onReload}
-            className="btn-secondary py-1 px-2 text-xs font-bold text-slate-600 flex items-center gap-1 hover:bg-slate-50"
-            title="새로고침"
-          >
-            <RefreshCw size={12} />
-            <span className="hidden sm:inline">새로고침</span>
-          </button>
+          {extraAction}
+          {onReload && (
+            <button
+              onClick={onReload}
+              className="btn-secondary py-1 px-2 text-xs font-bold text-slate-600 flex items-center gap-1 hover:bg-slate-50"
+              title="새로고침"
+            >
+              <RefreshCw size={12} />
+              <span className="hidden sm:inline">새로고침</span>
+            </button>
+          )}
         </div>
       )}
 

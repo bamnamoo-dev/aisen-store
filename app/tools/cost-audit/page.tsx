@@ -1,6 +1,7 @@
 'use client';
 
-import { Calculator } from 'lucide-react';
+import { Calculator, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
 import { useRef, useState, useEffect } from 'react';
 import ToolHeader from '@/components/ToolHeader';
 import { supabase } from '@/lib/supabase';
@@ -35,6 +36,16 @@ export default function CostAuditPage() {
         icon={<Calculator size={15} className="text-blue-500" />}
         themeColor="blue"
         onReload={handleReload}
+        extraAction={
+          <Link
+            href="/board"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-blue-50 px-2.5 py-1 rounded-lg border border-slate-200 transition-colors shadow-2xs"
+            title="실무 질의응답 및 서식 제보 소통 게시판"
+          >
+            <MessageSquare size={13} className="text-blue-500" />
+            <span>소통 게시판</span>
+          </Link>
+        }
       />
 
       {/* 원본 웹앱 100% 풀스크린 뷰어 */}
