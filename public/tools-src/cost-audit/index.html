@@ -1838,16 +1838,9 @@ function rotatePasteCanvas(deltaAngle) {
     renderCanvasImage();
 }
 
-// Google Gemini 멀티모달 비전 AI 분석 엔진 (3.5 Lite -> 3.1 Lite 자동 롤링 백업)
+// Google Gemini 멀티모달 비전 AI 분석 엔진 (Next.js 보안 서버 라우트 연동)
 async function analyzeImageWithGemini(base64Data, mimeType = "image/jpeg", fileName = "스캔본 서류") {
-    const apiKey = getGeminiApiKey();
-    if (!apiKey) {
-        throw new Error("프로젝트 루트의 .env 파일에 GOOGLE_API_KEY를 설정해 주세요.");
-    }
-
-    const preferredModel = (window.ENV && window.ENV.GEMINI_MODEL) || "gemini-3.5-flash-lite";
-    const rawList = [preferredModel, ...DEFAULT_GEMINI_MODELS];
-    const modelCandidates = [...new Set(rawList)]; // 중복 제거 순서 유지 (3.5 lite -> 3.1 lite)
+    showOcrProgress(`🤖 보안 AI 서버로 정밀 서류 분석 중...`);
 
     const prompt = `당신은 대한민국 교육행정 시설공사 원가계산서 전문 감사관입니다.
 첨부된 공사원가계산서/집계표/견적서 이미지를 1원 단위까지 정밀 판독하여 반드시 아래 JSON 규격으로만 응답하세요.
@@ -1900,72 +1893,56 @@ async function analyzeImageWithGemini(base64Data, mimeType = "image/jpeg", fileN
   "vendorTotal": 0
 }`;
 
-    const cleanBase64 = base64Data.replace(/^data:[^;]+;base64,/, '');
-    let lastError = null;
+    // 1. Next.js 보안 서버 라우트(/api/cost-audit/gemini) 우선 호출 (API 키 100% 은닉)
+    try {
+        const response = await fetch("/api/cost-audit/gemini", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ base64Data, mimeType, prompt })
+        });
 
-    for (let i = 0; i < modelCandidates.length; i++) {
-        const currentModel = modelCandidates[i];
-        if (i === 0) {
-            showOcrProgress(`🤖 Google Gemini (${currentModel}) AI로 정밀 분석 중...`);
-        } else {
-            showOcrProgress(`🔄 이전 모델 지연/오류로 (${currentModel})로 자동 백업 전환하여 분석 중...`);
+        if (response.ok) {
+            const resData = await response.json();
+            if (resData.data) {
+                hideOcrProgress();
+                applyGeminiResult(resData.data, fileName);
+                return;
+            }
         }
-
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
-
-        const payload = {
-            contents: [
-                {
-                    parts: [
-                        { text: prompt },
-                        {
-                            inline_data: {
-                                mime_type: mimeType,
-                                data: cleanBase64
-                            }
-                        }
-                    ]
-                }
-            ],
-            generationConfig: {
-                temperature: 0.1,
-                response_mime_type: "application/json"
-            }
-        };
-
-        try {
-            const response = await fetch(endpoint, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errText = await response.text();
-                console.warn(`[Gemini Model ${currentModel} Failed with status ${response.status}]:`, errText);
-                lastError = new Error(`(${response.status}): ${errText}`);
-                continue; // 다음 롤링 백업 모델로 즉시 자동 전환!
-            }
-
-            const data = await response.json();
-            const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!candidateText) {
-                throw new Error("Gemini AI로부터 응답 데이터를 받지 못했습니다.");
-            }
-
-            console.log(`[Gemini (${currentModel}) Raw JSON Response]:\n`, candidateText);
-            const parsed = JSON.parse(candidateText);
-
-            hideOcrProgress();
-            applyGeminiResult(parsed, fileName);
-            return; // 성공 시 종료
-        } catch (fetchErr) {
-            console.warn(`[Gemini Model ${currentModel} Exception]:`, fetchErr);
-            lastError = fetchErr;
-        }
+        console.warn("[Server Route Fallback] 서버 라우트 응답 상태:", response.status);
+    } catch (serverErr) {
+        console.warn("[Server Route Offline/Local File] 클라이언트 직접 모드로 폴백:", serverErr);
     }
 
-    throw lastError || new Error("모든 Gemini 모델 시도에 실패했습니다.");
+    // 2. 서버 라우트 부재 시 (단독 file:// 실행 등) 클라이언트 로컬스토리지 키로 폴백
+    const fallbackKey = getGeminiApiKey();
+    if (!fallbackKey) {
+        hideOcrProgress();
+        throw new Error("보안 서버 연결에 실패했습니다. (단독 실행 시 로컬스토리지에 Gemini API Key를 설정해 주세요.)");
+    }
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${fallbackKey}`;
+    const cleanBase64 = base64Data.replace(/^data:[^;]+;base64,/, '');
+    const clientRes = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: cleanBase64 } }] }],
+            generationConfig: { temperature: 0.1, response_mime_type: "application/json" }
+        })
+    });
+
+    if (!clientRes.ok) {
+        const errText = await clientRes.text();
+        hideOcrProgress();
+        throw new Error(`AI 분석 실패 (${clientRes.status}): ${errText}`);
+    }
+
+    const data = await clientRes.json();
+    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const parsed = JSON.parse(candidateText);
+    hideOcrProgress();
+    applyGeminiResult(parsed, fileName);
 }
 
 // Google Gemini AI 분석 결과 자동 적용 (메인 대시보드 직접 반영)
