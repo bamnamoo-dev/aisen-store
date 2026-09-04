@@ -11,10 +11,11 @@
 
 ---
 
-## 🌟 주요 서비스 및 툴킷 구성 (13개 핵심 서비스)
+## 🌟 주요 서비스 및 툴킷 구성 (14개 핵심 서비스)
 
 ### 1. 🤖 AI & 특화 정산 솔루션
 - **AI 행정 챗봇 (3-Tier)**: 102권 공식 지침서 1:1 쪽수 앵커링 뷰어 및 국가법령정보센터 실시간 연동
+- **스마트 공사원가 감사관 (`/tools/cost-audit`)**: 조달청 2026 간접공사비 100% 역산 감사, 30일 미만 건강/연금 부당계상 0원 강제 차단, 3중 파서(엑셀/PDF/Gemini 3.5 Flash-Lite 비전) 지원
 - **스마트 여비정산기 v4.9.2**: 카카오 3개 경유지 길찾기 및 오피넷 실시간 유가 1일 6회 자동 고시 연동 산출
 - **행정·민원 서식 68종**: 인사/복무/계약 서식 실시간 미리보기 및 HWP 다운로드
 - **학교회계 대시보드 (SFD)**: 세부사업, 추경, 지출집행 모니터링 시각화
@@ -38,7 +39,7 @@
 
 - **Framework**: Next.js 14/15 (App Router), React 18/19, TypeScript
 - **Styling**: Tailwind CSS, Glassmorphism UI
-- **Libraries**: `SheetJS (xlsx)`, `JSZip`, `Matter.js`, `Lucide React`
+- **AI & Libraries**: `Gemini 3.5 Flash-Lite`, `SheetJS (xlsx)`, `PDF.js`, `Tesseract.js`, `JSZip`, `Matter.js`, `Lucide React`
 - **Database & Auth**: Supabase (PostgreSQL)
 - **Hosting & CI/CD**: Vercel (Edge Network, 서울 ICN1 리전)
 
