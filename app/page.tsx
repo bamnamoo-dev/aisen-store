@@ -329,7 +329,7 @@ export default function HomePage() {
               스마트 원가계산서 검증기
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              조달청 법정 제비율 역산 대차대조 &amp; Gemini AI 서류 판독
+              조달청 법정 제비율 역산 대차대조 &amp; AI 서류판단 기능
             </p>
           </div>
 

@@ -1252,7 +1252,7 @@
                                         2단계: 검증기 화면에서 붙여넣기
                                     </div>
                                     <div style="font-size:12px;">
-                                        검증기 화면 아무 곳이나 클릭한 후 <kbd>Ctrl</kbd> + <kbd>V</kbd> 를 누르면 Gemini AI가 3초 만에 7대 변수와 비목을 자동 추출합니다!
+                                        검증기 화면 아무 곳이나 클릭한 후 <kbd>Ctrl</kbd> + <kbd>V</kbd> 를 누르면 AI 서류판단 기능이 3초 만에 7대 변수와 비목을 자동 추출합니다!
                                     </div>
                                 </div>
                             </div>
@@ -2684,7 +2684,7 @@ async function handlePdfFile(file) {
 
         // 텍스트가 40자 이하인 경우 = 복합기 스캔본 이미지 PDF
         if (allText.trim().length < 40) {
-            showOcrProgress("📑 스캔본 이미지 PDF 감지! Google Gemini AI 고해상도 비전 분석으로 전환합니다...");
+            showOcrProgress("📑 스캔본 이미지 PDF 감지! AI 서류판단 고해상도 비전 분석으로 전환합니다...");
             const page = await pdf.getPage(1);
             const viewport = page.getViewport({ scale: 2.0 }); // 고화질 2배율 렌더링
             const canvas = document.createElement('canvas');
