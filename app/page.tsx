@@ -557,6 +557,41 @@ export default function HomePage() {
           </div>
         </Link>
 
+        {/* CARD 14: 스마트 공사원가 감사관 */}
+        <Link 
+          href="/tools/cost-audit" 
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
+        >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
+                <Calculator size={18} />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[11.5px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
+                  2026 고시
+                </span>
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+              </div>
+            </div>
+
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+              스마트 공사원가 감사관
+            </h2>
+            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
+              조달청 법정 제비율 역산 대차대조 &amp; Gemini AI 서류 판독
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
+            <span>감사관 열기</span>
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </Link>
+
       </section>
 
       {/* ========================================================

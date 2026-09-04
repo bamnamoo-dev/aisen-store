@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스마트 공사원가계산서 전문 감사관 | AI-SEN Audit Master</title>
+    <!-- CDN SheetJS (XLSX 파싱용) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- CDN PDF.js (PDF 파싱용) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
+    <!-- CDN Tesseract.js (브라우저 로컬 이미지 OCR용) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- CDN html2canvas (화면 이미지 복사 캡처용) -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <!-- .env 환경설정 자동 로더 -->
+    <script src="env.js"></script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        :root {
+            --bg-base: #0b132b;
+            --card-bg: rgba(26, 35, 60, 0.85);
+            --card-border: rgba(255, 255, 255, 0.09);
+            --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.85);
+            --input-border: rgba(255, 255, 255, 0.12);
+            --th-bg: rgba(15, 23, 42, 0.7);
+            --tr-border: rgba(255, 255, 255, 0.06);
+            --tr-hover: rgba(59, 130, 246, 0.07);
+            --notice-bg: #090e1a;
+            --notice-border: rgba(255, 255, 255, 0.08);
+            --notice-text: #cbd5e1;
+            --drop-bg: rgba(30, 41, 59, 0.5);
+            --drop-border: #475569;
+            --accent-blue: #3b82f6;
+            --accent-blue-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --accent-amber: #f59e0b;
+        }
+
+        /* ☀️ 화이트 (라이트) 모드 테마 - 고대비 전문 관공서 톤앤매너 */
+        html[data-theme="light"] {
+            --bg-base: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 2px 8px -1px rgba(15, 23, 42, 0.06);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --th-bg: #f8fafc;
+            --tr-border: #f1f5f9;
+            --tr-hover: #f8fafc;
+            --notice-bg: #f8fafc;
+            --notice-border: #cbd5e1;
+            --notice-text: #1e293b;
+            --drop-bg: #f8fafc;
+            --drop-border: #cbd5e1;
+            --accent-blue: #1d4ed8;
+            --accent-blue-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --accent-emerald: #059669;
+            --accent-rose: #dc2626;
+            --accent-amber: #b45309;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-base);
+            color: var(--text-main);
+            font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
+            min-height: 100vh;
+            padding: 10px 18px 14px;
+            transition: background 0.25s ease, color 0.25s ease;
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.015em;
+        }
+
+        /* 커스텀 스크롤바 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* 헤더 바 (골든 레시오 & 3분할 밸런스) */
+        .header-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 8px 18px;
+            backdrop-filter: blur(16px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--card-shadow);
+            min-height: 52px;
+        }
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            flex-shrink: 0;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 19px;
+            color: white;
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+            flex-shrink: 0;
+        }
+        h1 {
+            font-size: 17.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+        }
+        .subtitle {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.25;
+            font-weight: 500;
+        }
+        
+        /* 헤더 중앙 고시/공종 제어 컨트롤 (우아한 캡슐 바) */
+        .header-center-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            padding: 3px 8px;
+            border-radius: 9999px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .tool-select-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 6px;
+            height: 30px;
+            font-size: 12.5px;
+            white-space: nowrap;
+        }
+        .tool-select-group select {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 12.5px;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+            height: 100%;
+            font-family: inherit;
+            padding-right: 4px;
+        }
+        html[data-theme="dark"] .tool-select-group select option { background: #1e293b; color: #f8fafc; }
+        html[data-theme="light"] .tool-select-group select option { background: #ffffff; color: #0f172a; }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
+        .btn {
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            white-space: nowrap;
+            line-height: 1;
+            font-family: inherit;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-primary {
+            background: var(--accent-blue-gradient);
+            color: white;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+        }
+        .btn-primary:hover {
+            opacity: 0.95;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
+        }
+        .btn-secondary {
+            background: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+        .btn-secondary:hover {
+            background: var(--th-bg);
+            border-color: var(--drop-border);
+        }
+        .btn-theme {
+            background: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+        .btn-theme:hover {
+            background: var(--th-bg);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+        }
+        .btn-success:hover {
+            opacity: 0.95;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+        }
+
+        /* 신호등 요약 카드 (하단 460px 1fr 레이아웃과 수직선 100% 칼정렬) */
+        .summary-layout {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 12px;
+            align-items: stretch;
+        }
+        .summary-audit-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 84px;
+            border-left: 3.5px solid var(--accent-blue);
+        }
+        .summary-amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 1180px) {
+            .summary-layout { grid-template-columns: 1fr; }
+            .summary-amount-grid { grid-template-columns: 1fr; }
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 11px 18px;
+            backdrop-filter: blur(14px);
+            box-shadow: var(--card-shadow);
+            transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+        }
+        .card-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 3px;
+            letter-spacing: -0.01em;
+        }
+        .card-value {
+            font-size: 25px;
+            font-weight: 900;
+            color: var(--text-main);
+            font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.15;
+            letter-spacing: -0.025em;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 13px;
+            border-radius: 9999px;
+            font-weight: 800;
+            font-size: 13.5px;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+        .badge-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        html[data-theme="light"] .badge-green {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+        .badge-yellow {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        html[data-theme="light"] .badge-yellow {
+            background: #fffbeb;
+            color: #92400e;
+            border-color: #fde68a;
+        }
+        .badge-red {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.4);
+        }
+        .badge-idle {
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--text-muted);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+        html[data-theme="light"] .badge-idle {
+            background: #f1f5f9;
+            color: #475569;
+            border-color: #cbd5e1;
+        }
+        .status-cell .badge {
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* 2단 메인 레이아웃 (좌우 끝단 100% 일치) */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 12px;
+            align-items: stretch;
+        }
+        @media (max-width: 1180px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+        .left-form-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 콤팩트 2열 입력 폼 그리드 */
+        .form-grid-2col {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px 10px;
+            margin-bottom: 6px;
+            width: 100%;
+        }
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+        .form-group {
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+        .form-group label {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .form-control {
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            height: 34px;
+            padding: 0 10px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            outline: none;
+            transition: border 0.18s, background 0.18s, box-shadow 0.18s;
+            font-family: inherit;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .form-control:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+        }
+        .form-control.highlight {
+            font-weight: 800;
+            color: #d97706;
+            font-size: 15px;
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.04);
+        }
+        html[data-theme="dark"] .form-control.highlight {
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.08);
+        }
+        html[data-theme="light"] .form-control {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        .drop-zone {
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--input-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.08);
+            transform: translateY(-1px);
+        }
+
+        /* 테이블 (폰트 및 간격 최적화) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+        th {
+            text-align: left;
+            padding: 7px 9px;
+            background: var(--th-bg);
+            color: var(--text-muted);
+            border-bottom: 1.5px solid var(--card-border);
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+        }
+        td {
+            padding: 4.5px 9px;
+            border-bottom: 1px solid var(--tr-border);
+            vertical-align: middle;
+            line-height: 1.25;
+        }
+        tr:hover td {
+            background: var(--tr-hover);
+        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-mono {
+            font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        .diff-input {
+            width: 118px;
+            height: 28px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            padding: 0 8px;
+            color: var(--text-main);
+            text-align: right;
+            font-family: inherit;
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+            font-size: 13px;
+            outline: none;
+            transition: border 0.18s, box-shadow 0.18s, background 0.18s;
+        }
+        .diff-input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2.5px rgba(59, 130, 246, 0.18);
+        }
+        .diff-input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+            font-weight: 500;
+        }
+        html[data-theme="light"] .diff-input {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        /* 공문 상자 (에디터 스타일 & 우측 대차대조표와 바닥 끝단 완벽 일치) */
+        .notice-box {
+            background: var(--notice-bg);
+            border: 1px solid var(--notice-border);
+            border-left: 3px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-family: "Pretendard", -apple-system, BlinkMacSystemFont, monospace;
+            font-size: 12px;
+            color: var(--notice-text);
+            white-space: pre-wrap;
+            line-height: 1.5;
+            flex: 1;
+            min-height: 85px;
+            overflow-y: auto;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        /* 안내 팁 박스 콤팩트 */
+        .tip-box {
+            margin-top: 6px;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #fde68a;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px 14px;
+        }
+        html[data-theme="light"] .tip-box {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .tip-box code {
+            background: rgba(0,0,0,0.25);
+            padding: 1px 5px;
+            border-radius: 4px;
+            color: #fde68a;
+            font-size: 11px;
+        }
+        html[data-theme="light"] .tip-box code {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* A4 결재 보고용 표준 가로(Landscape) 인쇄 스타일 (1-Page 완벽 수납) */
+        @page {
+            size: A4 landscape;
+            margin: 7mm 9mm;
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                font-size: 9pt !important;
+                line-height: 1.25 !important;
+            }
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+                gap: 5px !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+
+            /* 헤더 바: 가로형 공문서 결재 보고서 헤더 */
+            .header-bar {
+                background: none !important;
+                border: none !important;
+                border-bottom: 2px solid #1e293b !important;
+                border-radius: 0 !important;
+                padding: 0 0 5px 0 !important;
+                box-shadow: none !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: flex-end !important;
+                min-height: auto !important;
+                margin-bottom: 3px !important;
+            }
+            .logo-icon { display: none !important; }
+            .header-bar h1 {
+                font-size: 15pt !important;
+                color: #0f172a !important;
+                font-weight: 900 !important;
+                letter-spacing: -0.5px !important;
+            }
+            .header-bar .subtitle {
+                font-size: 8.5pt !important;
+                color: #475569 !important;
+            }
+
+            /* 상단 4대 신호등 요약 카드: 가로 4분할 균등 칼정렬 */
+            .summary-layout {
+                display: grid !important;
+                grid-template-columns: 1.15fr 1fr 1fr 1fr !important;
+                gap: 6px !important;
+                margin-bottom: 3px !important;
+            }
+            .summary-audit-card {
+                border-left: 3.5px solid #2563eb !important;
+                min-height: auto !important;
+                padding: 5px 8px !important;
+            }
+            .summary-amount-grid {
+                display: contents !important;
+            }
+            .summary-layout .card {
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 6px !important;
+                padding: 5px 8px !important;
+                box-shadow: none !important;
+            }
+            .summary-layout .card-title {
+                font-size: 7.8pt !important;
+                color: #475569 !important;
+                margin-bottom: 2px !important;
+                font-weight: bold !important;
+            }
+            .summary-layout .card-value {
+                font-size: 12.5pt !important;
+                font-weight: 900 !important;
+                color: #0f172a !important;
+                line-height: 1.1 !important;
+            }
+            .summary-layout .subtitle {
+                font-size: 7pt !important;
+                color: #64748b !important;
+                margin-top: 1px !important;
+            }
+
+            /* 메인 레이아웃: 가로 모드 최적화 좌측 핵심정보(300px) + 우측 대차대조표(1fr) 나란히 배치 */
+            .main-layout {
+                display: grid !important;
+                grid-template-columns: 295px 1fr !important;
+                gap: 8px !important;
+                align-items: stretch !important;
+            }
+
+            /* 좌측 카드: 공사 변수 요약 및 공문 */
+            .left-form-card {
+                border: 1px solid #cbd5e1 !important;
+                background: #ffffff !important;
+                border-radius: 6px !important;
+                padding: 6px 8px !important;
+                box-shadow: none !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                gap: 4px !important;
+                height: 100% !important;
+            }
+            .left-form-card .card-title {
+                font-size: 8pt !important;
+                font-weight: bold !important;
+                margin-bottom: 3px !important;
+            }
+            .form-grid-2col {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 3px 6px !important;
+                margin-bottom: 3px !important;
+            }
+            .form-group label {
+                font-size: 7pt !important;
+                color: #475569 !important;
+                margin-bottom: 0 !important;
+            }
+            .form-control {
+                border: none !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                background: transparent !important;
+                font-size: 8.5pt !important;
+                font-weight: bold !important;
+                color: #0f172a !important;
+                padding: 1px 0 !important;
+                height: auto !important;
+                border-radius: 0 !important;
+            }
+
+            /* 우측 대차대조표 카드 */
+            .main-layout > section:last-child {
+                border: 1px solid #94a3b8 !important;
+                background: #ffffff !important;
+                border-radius: 6px !important;
+                padding: 6px 8px !important;
+                box-shadow: none !important;
+                height: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+            }
+            .main-layout > section:last-child .card-title {
+                font-size: 8.5pt !important;
+                font-weight: bold !important;
+                margin-bottom: 3px !important;
+            }
+
+            /* 대차대조표 테이블 정갈한 공문서 실선 */
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: 1px solid #475569 !important;
+                font-size: 7.8pt !important;
+            }
+            thead th {
+                background: #f1f5f9 !important;
+                color: #0f172a !important;
+                border: 1px solid #94a3b8 !important;
+                padding: 2.5px 4px !important;
+                font-weight: 800 !important;
+                font-size: 7.5pt !important;
+            }
+            tbody td {
+                color: #0f172a !important;
+                border: 1px solid #cbd5e1 !important;
+                padding: 2px 4px !important;
+                line-height: 1.15 !important;
+            }
+            tr {
+                page-break-inside: avoid !important;
+            }
+            .diff-input {
+                border: none !important;
+                background: transparent !important;
+                color: #0f172a !important;
+                font-size: 7.8pt !important;
+                font-weight: bold !important;
+                text-align: right !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            /* 배지 인쇄 서식 */
+            .badge {
+                border-radius: 3px !important;
+                padding: 1px 4px !important;
+                font-size: 7pt !important;
+                font-weight: bold !important;
+            }
+            .badge-red {
+                background: #fee2e2 !important;
+                color: #991b1b !important;
+                border: 1px solid #f87171 !important;
+            }
+            .badge-green {
+                background: #dcfce7 !important;
+                color: #166534 !important;
+                border: 1px solid #4ade80 !important;
+            }
+            .badge-yellow {
+                background: #fef3c7 !important;
+                color: #92400e !important;
+                border: 1px solid #facc15 !important;
+            }
+
+            /* 공문 수정요청 박스 인쇄 최적화 */
+            .notice-box {
+                background: #f8fafc !important;
+                color: #1e293b !important;
+                border: 1px solid #94a3b8 !important;
+                border-left: 3px solid #2563eb !important;
+                border-radius: 5px !important;
+                padding: 5px 7px !important;
+                font-size: 7.2pt !important;
+                line-height: 1.3 !important;
+                page-break-inside: avoid !important;
+                max-height: 145px !important;
+                overflow: hidden !important;
+            }
+
+            /* 감사관 핵심 팁 바 (인쇄 시 하단 1줄 요약) */
+            .tip-box {
+                background: #fffbeb !important;
+                border: 1px solid #fde68a !important;
+                color: #92400e !important;
+                padding: 2.5px 6px !important;
+                font-size: 7pt !important;
+                margin-top: 3px !important;
+                border-radius: 4px !important;
+                display: flex !important;
+                gap: 6px !important;
+            }
+        }
+
+        /* 스마트 붙여넣기 모달 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 620px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="printableAuditArea">
+    <!-- 헤더 (좌/중/우 황금비율 밀도감 있는 프로페셔널 상단 바) -->
+    <header class="header-bar">
+        <div class="logo-title">
+            <div class="logo-icon">⚖</div>
+            <div>
+                <h1>스마트 공사원가계산서 전문 감사관</h1>
+                <div class="subtitle">조달청 제비율 기준 정밀 역산 & 법정 4대보험·산안비·일반관리비 대차대조</div>
+            </div>
+        </div>
+
+        <!-- 헤더 중앙: 기준 선택 캡슐 (화면 중심을 잡아 휑한 느낌 완전 제거) -->
+        <div class="header-center-controls no-print">
+            <div class="tool-select-group">
+                <span style="color:var(--text-muted); font-size:12px;">🏛️ 고시:</span>
+                <select id="selVersion" onchange="runCalculation()">
+                    <option value="2026.04.13" selected>2026.04.13 (최신 고시)</option>
+                    <option value="2026.03.01">2026.03.01 (이전 고시)</option>
+                    <option value="2025.07.01">2025.07.01 (하반기)</option>
+                    <option value="2024.07.01">2024.07.01 (과거감사)</option>
+                </select>
+            </div>
+            <div style="width:1px; height:18px; background:var(--card-border);"></div>
+            <div class="tool-select-group">
+                <span style="color:var(--text-muted); font-size:12px;">🏗️ 공종:</span>
+                <select id="selTrade" onchange="runCalculation()">
+                    <option value="building">건축공사</option>
+                    <option value="civil">토목공사</option>
+                    <option value="electrical">전기공사 (분리발주)</option>
+                    <option value="telecom">정보통신공사 (분리발주)</option>
+                    <option value="fire">소방시설공사 (분리발주)</option>
+                    <option value="asbestos">석면해체제거공사</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 헤더 우측: 실행 및 출력 도구 버튼 모음 -->
+        <div class="toolbar no-print">
+            <button id="btnThemeToggle" class="btn btn-theme" onclick="toggleTheme()" title="화면 테마 변경">
+                <span id="themeIcon">☀️</span> <span id="themeText">화이트 모드</span>
+            </button>
+            <button class="btn btn-secondary" onclick="openManualModal()">📖 사용설명서</button>
+            <button class="btn btn-secondary" onclick="copyNotice()">📋 공문 복사</button>
+            <button class="btn btn-success" id="btnCopyImage" onclick="copyAuditDashboardImage()">📸 화면 이미지 복사</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨 A4 인쇄/PDF</button>
+        </div>
+    </header>
+
+    <!-- 종합 신호등 요약 카드 (하단 460px 1fr 레이아웃과 수직선 100% 칼정렬) -->
+    <section class="summary-layout">
+        <!-- 좌측: 감사관 종합 판정 (460px 폭, 하단 입력폼과 수직선 완벽 일치) -->
+        <div class="card summary-audit-card">
+            <div class="card-title">감사관 종합 판정</div>
+            <div id="badgeContainer"><span class="badge badge-idle" id="badgeStatus">⚪ 대기 (견적서 입력 대기)</span></div>
+            <div class="subtitle" style="margin-top:6px;">총도급액 및 세부 비목 법정상한 이원화 판정</div>
+        </div>
+
+        <!-- 우측: 3대 핵심 금액 비교 (우측 대차대조표 상단에 3분할 칼정렬) -->
+        <div class="summary-amount-grid">
+            <div class="card" style="border-top: 3px solid var(--accent-amber);">
+                <div class="card-title">업체 제출 총도급액</div>
+                <div class="card-value" id="dispVendorTotal">0원</div>
+                <div class="subtitle">부가가치세 포함 (공급가액 + VAT)</div>
+            </div>
+            <div class="card" style="border-top: 3px solid var(--accent-blue);">
+                <div class="card-title" style="color:var(--accent-blue);">조달청 법정 상한액</div>
+                <div class="card-value" id="dispStandardTotal" style="color:var(--accent-blue);">0원</div>
+                <div class="subtitle">국고금관리법 10원 미만 절사 반영</div>
+            </div>
+            <div class="card" style="border-top: 3px solid #10b981;">
+                <div class="card-title">차액 (조정 대상액)</div>
+                <div class="card-value" id="dispDiffTotal" style="color:var(--text-muted);">0원</div>
+                <div class="subtitle" id="dispDiffSub">견적서 파일(엑셀, PDF, 캡처)을 업로드하세요</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2단 레이아웃 -->
+    <div class="main-layout">
+        <!-- 좌측: 변수 입력 폼 (콤팩트 2열 그리드 & 바닥 끝단 일치) -->
+        <section class="card left-form-card" style="padding:12px 16px;">
+            <div>
+                <div class="card-title" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>핵심 원가 변수 입력</span>
+                    <span style="font-size:11px; background:rgba(59, 130, 246, 0.1); color:var(--accent-blue); padding:3px 8px; border-radius:6px; font-weight:700;">⚡ Ctrl + V 자동 판독</span>
+                </div>
+
+                <!-- 파일 업로드 및 붙여넣기 1행 통합 바 -->
+                <div class="no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+                    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" style="margin-bottom:0; padding:6px 10px; height:34px;">
+                        <span style="font-size:14px;">📂</span>
+                        <span style="font-size:12px; font-weight:700; color:var(--text-main);">견적서 파일 첨부</span>
+                        <input type="file" id="fileInput" accept=".xlsx, .xls, .pdf, image/*" style="display:none;" onchange="handleFile(this.files[0])">
+                    </div>
+                    <button type="button" class="btn btn-secondary" style="height:34px; font-size:12px; justify-content:center;" onclick="openPasteModal()">
+                        📋 캡처/텍스트 OCR
+                    </button>
+                </div>
+
+                <!-- OCR 진행 상태 바 -->
+                <div id="ocrProgressBox" class="no-print" style="display:none; margin-bottom:8px; background:rgba(59, 130, 246, 0.12); border:1px solid var(--accent-blue); border-radius:8px; padding:6px 10px; font-size:11.5px; color:var(--text-main); align-items:center; gap:6px;">
+                    <span style="font-size:13px;">🔍</span>
+                    <span id="ocrProgressText" style="font-weight:700;">이미지 OCR 텍스트 판독 중...</span>
+                </div>
+
+                <div class="form-grid-2col">
+                    <div class="form-group form-grid-full">
+                        <label>공사명</label>
+                        <input type="text" id="inProjectTitle" class="form-control" value="" placeholder="공사명 입력 (예: 본관동 보수공사)" oninput="runCalculation()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>공사기간 (일)</label>
+                        <div style="display:flex; gap:6px; align-items:center; min-width:0;">
+                            <input type="number" id="inPeriodDays" class="form-control" value="0" style="width:64px; flex-shrink:0; text-align:center;" oninput="runCalculation()">
+                            <span id="periodTag" style="font-size:11px; font-weight:700; color:var(--accent-blue); background:var(--th-bg); border:1px solid var(--card-border); padding:3px 6px; border-radius:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; text-align:center;">공기 0일</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="color:var(--accent-amber); font-weight:bold;">6. 업체 총도급액 (원)</label>
+                        <input type="text" id="inVendorTotal" class="form-control highlight font-mono" value="0" oninput="handleFormattedInput(this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>1. 직접재료비 (원)</label>
+                        <input type="text" id="inDirectMat" class="form-control font-mono" value="0" oninput="handleFormattedInput(this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. 직접노무비 (원)</label>
+                        <input type="text" id="inDirectLab" class="form-control font-mono" value="0" oninput="handleFormattedInput(this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>3. 산출경비 (원)</label>
+                        <input type="text" id="inOutputExp" class="form-control font-mono" value="0" oninput="handleFormattedInput(this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>4. 관급자재대 (원)</label>
+                        <input type="text" id="inClientMat" class="form-control font-mono" value="0" placeholder="0" oninput="handleFormattedInput(this)">
+                    </div>
+
+                    <div class="form-group form-grid-full">
+                        <label>5. 폐기물처리비 (원)</label>
+                        <input type="text" id="inWasteCost" class="form-control font-mono" value="0" oninput="handleFormattedInput(this)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 공문 미리보기 (남는 세로 공간을 자연스럽게 채워 바닥 끝단 완벽 일치) -->
+            <div style="margin-top:8px; border-top:1px solid var(--card-border); padding-top:6px; flex:1; display:flex; flex-direction:column; min-height:100px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
+                        <span>📄</span> 수정요청 공문 문구
+                    </span>
+                    <button class="btn btn-secondary no-print" style="height:25px; padding:0 9px; font-size:11px;" onclick="copyNotice()">📋 복사</button>
+                </div>
+                <div class="notice-box" id="officialNoticeBox"></div>
+            </div>
+        </section>
+
+        <!-- 우측: 대차대조 비교표 (바닥 끝단 동기화) -->
+        <section class="card" style="padding:12px 16px; display:flex; flex-direction:column; justify-content:space-between; height:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div class="card-title" style="margin:0;">세부 비목별 조달청 법정상한 vs 업체 제출액 대차대조표 (Diff)</div>
+                <span class="subtitle">단위: 원</span>
+            </div>
+
+            <!-- 메인 대시보드 실시간 산술 정합성 배너 -->
+            <div id="mainArithmeticAlert" class="no-print" style="display:none; margin-bottom:10px; border-radius:8px; padding:7px 12px; font-size:11.5px; line-height:1.4;"></div>
+
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>비목명</th>
+                            <th class="text-right">조달청 법정상한</th>
+                            <th class="text-right">업체 제출액</th>
+                            <th class="text-right">차액</th>
+                            <th class="text-center">판정</th>
+                            <th>적용 요율 및 법적 근거</th>
+                        </tr>
+                    </thead>
+                    <tbody id="diffTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- 감사관 핵심 팁 (콤팩트 인라인 바) -->
+            <div class="tip-box">
+                <span style="font-weight:bold; font-size:11px; white-space:nowrap;">⚠️ 핵심 체크:</span>
+                <span>• <strong>30일 미만 공사</strong>: 건강·연금·요양 0원 제외</span>
+                <span>• <strong>환경보전비</strong>: 실내보수 준공시 0원 감액</span>
+                <span>• <strong>일반관리비 상한</strong>: 5억 미만 8.0%</span>
+                <span>• <strong>이윤</strong>: 재료비 제외 15.0%</span>
+                <span>• <strong>산안비 캡</strong>: 관급자재 포함 시 120% 한도</span>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- 스마트 복사·붙여넣기 모달 (한 화면 좌우 1:1 대조 분할 워크스페이스) -->
+<!-- 스마트 복사·붙여넣기 모달 (텍스트 및 이미지 90도 회전 OCR 지원) -->
+<div class="modal-overlay" id="pasteModal" onclick="if(event.target===this) closePasteModal()">
+    <div class="modal-content" style="max-width: 820px; max-height: 92vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="font-size:15px; font-weight:bold; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                📋 견적서 스마트 판독 (OCR)
+            </h3>
+            <button onclick="closePasteModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+        </div>
+
+        <!-- 탭 버튼 -->
+        <div style="display:flex; gap:8px; border-bottom:1px solid var(--card-border); padding-bottom:8px;">
+            <button id="tabBtnImage" class="btn btn-primary" style="font-size:11.5px; padding:5px 12px;" onclick="switchPasteTab('image')">🖼️ 캡처 이미지 OCR (회전보정 지원)</button>
+            <button id="tabBtnText" class="btn btn-secondary" style="font-size:11.5px; padding:5px 12px;" onclick="switchPasteTab('text')">📝 텍스트 붙여넣기</button>
+        </div>
+
+        <!-- 이미지 OCR 영역 -->
+        <div id="pasteImageSection">
+            <div style="background:rgba(59, 130, 246, 0.09); border:1px solid rgba(59, 130, 246, 0.3); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--accent-blue); margin-bottom:10px; line-height:1.5;">
+                ⚡ <strong>스마트 회전 지원</strong>: 스캔본/캡처 견적서가 90° 누워있어도 <strong>시스템이 자동으로 회전하여 최적 각도로 판독</strong>합니다! 필요시 [🔄 90° 회전] 버튼으로 수동 회전도 가능합니다.
+            </div>
+            
+            <div id="canvasContainer" style="max-height:360px; min-height:180px; overflow:auto; border:1px solid var(--card-border); border-radius:10px; background:rgba(0,0,0,0.18); display:flex; justify-content:center; align-items:center; padding:12px;">
+                <canvas id="pasteCanvas" style="max-width:100%; height:auto; box-shadow:0 4px 14px rgba(0,0,0,0.2); border-radius:4px;"></canvas>
+                <div id="canvasEmptyMsg" style="color:var(--text-muted); font-size:12.5px; text-align:center;">
+                    화면 캡처(Win+Shift+S) 후 여기서 <strong>Ctrl + V</strong>를 누르거나<br>견적서 이미지 파일을 끌어다 놓으세요.
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">서류 방향 조정:</span>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn btn-secondary" style="font-size:12px; font-weight:600;" onclick="rotatePasteCanvas(90)">🔄 90° 시계방향 회전</button>
+                        <button type="button" class="btn btn-secondary" style="font-size:12px;" onclick="rotatePasteCanvas(-90)">↺ 반시계 회전</button>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:4px;">
+                    <button type="button" class="btn btn-secondary" style="min-width:80px; padding:10px 16px; font-size:13px;" onclick="closePasteModal()">취소</button>
+                    <button type="button" class="btn" id="btnStartOcr" style="flex:1; font-size:14px; font-weight:bold; padding:11px 20px; background:#047857; color:#ffffff; border:none; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(4,120,87,0.35); white-space:nowrap;" onclick="startOcrFromCanvas()">
+                        ✨ 스마트 OCR 판독 시작 (정밀 분석)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 텍스트 영역 -->
+        <div id="pasteTextSection" style="display:none;">
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.5; margin-bottom:8px;">
+                원가계산서 표 전체나 텍스트를 복사(Ctrl+C)한 뒤 아래 상자에 붙여넣기(Ctrl+V)하세요.
+            </p>
+            <textarea id="pasteInputText" style="width:100%; height:180px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:10px; color:var(--text-main); font-size:12px; font-family:monospace; padding:12px; resize:vertical; outline:none;" placeholder="여기에 복사한 원가계산서 텍스트를 붙여넣으세요..."></textarea>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+                <button type="button" class="btn btn-secondary" onclick="closePasteModal()">취소</button>
+                <button type="button" class="btn btn-primary" onclick="applyPastedText()">✨ 자동 분석 및 적용</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 📖 사용설명서 모달 -->
+<div class="modal-overlay" id="manualModal" onclick="if(event.target===this) closeManualModal()">
+    <div class="modal-content" style="max-width: 860px; max-height: 90vh; overflow-y: auto; padding: 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--card-border); padding-bottom: 14px; margin-bottom: 16px;">
+            <h3 style="font-size:18px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                📖 스마트 공사원가계산서 전문 감사관 사용설명서
+            </h3>
+            <button onclick="closeManualModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer; line-height:1;">✕</button>
+        </div>
+
+        <div style="font-size:13.5px; line-height:1.7; color:var(--text-main);">
+            <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:10px; padding:12px 16px; margin-bottom:16px;">
+                💡 <strong>시스템 개요</strong>: 시공업체가 제출한 공사원가계산서에서 <strong>7대 핵심 변수만 추출하여 조달청 법정 제비율 및 관련 회계 법령에 따라 1원 단위까지 정밀 역산·대차대조</strong>하는 전문 감사 시스템입니다.
+            </div>
+
+            <h4 style="font-size:15px; font-weight:700; color:var(--accent-blue); margin:18px 0 8px 0;">🚀 빠른 사용 3단계</h4>
+            <ol style="margin-left: 20px; margin-bottom: 16px;">
+                <li><strong>고시 버전 및 공종 선택</strong>: 상단 툴바에서 계약 시점에 맞는 조달청 고시(최신 `2026.04.13` 등) 및 공종(건축/토목/전기/통신/소방/석면)을 확인합니다.</li>
+                <li><strong>견적서 입력 (Ctrl+V 자동 판독 추천 ⚡)</strong>: 견적서 화면 캡처 후 대시보드에서 <strong>`Ctrl + V`</strong>를 누르면 AI OCR이 7대 변수와 비목별 금액을 자동 추출하여 채웁니다. (엑셀·PDF 파일 드롭도 지원)</li>
+                <li><strong>감사 결과 및 신호등 확인</strong>:
+                    <ul style="margin-left: 18px; margin-top: 4px;">
+                        <li>🟢 <strong>적합 (정상 견적)</strong>: 총도급액 예산 이내 + 모든 세부 비목 법정 기준 준수</li>
+                        <li>🟡 <strong>주의 (세부 비목 위반)</strong>: 총액은 예산 이내이나 위법/과다 비목(30일 미만 건강보험 등) 존재 (보완 요청 대상)</li>
+                        <li>🔴 <strong>부적합 (예산 초과)</strong>: 총도급액 자체가 조달청 법정 상한을 초과하여 계약 불가</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h4 style="font-size:15px; font-weight:700; color:var(--accent-blue); margin:18px 0 8px 0;">⚖️ 핵심 법적 감사 기준 (치트시트)</h4>
+            <table style="width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12.5px;">
+                <thead>
+                    <tr style="background:var(--th-bg); border-bottom:2px solid var(--card-border);">
+                        <th style="padding:8px; text-align:left;">비목명</th>
+                        <th style="padding:8px; text-align:left;">법정 요율 및 산식</th>
+                        <th style="padding:8px; text-align:left;">감사 적발 및 검토 포인트</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid var(--card-border);">
+                        <td style="padding:8px; font-weight:bold;">건강·연금·요양보험</td>
+                        <td style="padding:8px;">건강 3.595%, 연금 4.75%, 요양(건강의 13.14%)</td>
+                        <td style="padding:8px; color:var(--accent-rose); font-weight:bold;">공기 30일 미만(1개월 미만) 전액 0원 강제 제외 (적발 시 전액 환수)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--card-border);">
+                        <td style="padding:8px; font-weight:bold;">산재·고용보험</td>
+                        <td style="padding:8px;">산재 3.56%, 고용 1.01% (노무비 합계 기준)</td>
+                        <td style="padding:8px;">공사기간 무관 단 하루(1일)라도 100% 의무 계상</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--card-border);">
+                        <td style="padding:8px; font-weight:bold;">산업안전보건관리비</td>
+                        <td style="padding:8px;">건축 3.11%, 토목 3.15%, 전기·통신·소방 2.07% (5억 미만)</td>
+                        <td style="padding:8px;">2천만 원 미만 0원 제외 / 관급자재 포함 시 <strong>120% 한도 캡</strong> 초과액 삭감</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--card-border);">
+                        <td style="padding:8px; font-weight:bold;">퇴직공제부금비</td>
+                        <td style="padding:8px;">직접노무비의 2.3%</td>
+                        <td style="padding:8px;">건축·토목 1억 원 미만 / 전기·통신·소방 3억 원 미만 0원</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--card-border);">
+                        <td style="padding:8px; font-weight:bold;">일반관리비 & 이윤</td>
+                        <td style="padding:8px;">일반관리비 8.0% (5억 미만) / 이윤 15.0% 상한</td>
+                        <td style="padding:8px; color:var(--accent-rose); font-weight:bold;">이윤 계산 시 [재료비]는 법적 완전 배제 (재료비 가산 시 위법)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--card-border);">
+                        <td style="padding:8px; font-weight:bold;">환경보전비·기계보증</td>
+                        <td style="padding:8px;">직접공사비 기준 산정</td>
+                        <td style="padding:8px;">비산먼지 미신고 실내공사 / 중장비 미투입 공사는 준공 시 0원 감액 안내</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="font-size:15px; font-weight:700; color:var(--accent-blue); margin:18px 0 8px 0;">📋 행정 편의 기능</h4>
+            <ul style="margin-left: 20px; margin-bottom: 12px;">
+                <li><strong>📋 공문 복사</strong>: 위반 사항과 관련 법 조항이 각주로 기재된 <strong>[원가계산서 수정·보완 요청서]</strong> 원클릭 클립보드 복사.</li>
+                <li><strong>📸 화면 이미지 복사</strong>: 대시보드 전체를 고화질 이미지로 캡처하여 한글(HWP) 보고서나 메신저에 즉시 붙여넣기(`Ctrl + V`).</li>
+                <li><strong>🖨 A4 인쇄 / PDF</strong>: 불필요한 버튼을 배제하고 결재 보고용 <strong>고대비 흑백 실선 표 양식</strong>으로 자동 최적화 출력.</li>
+            </ul>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:20px; border-top:1px solid var(--card-border); padding-top:14px;">
+            <button type="button" class="btn btn-primary" onclick="closeManualModal()">닫기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 조달청 제비율 DB
+const RATES_DATABASE = {
+    "2026.04.13": {
+        building: {
+            tiers: [
+                { max: 50000000, indirectLabor: 0.175, otherExp: 0.050 },
+                { max: 300000000, indirectLabor: 0.160, otherExp: 0.045 },
+                { max: Infinity, indirectLabor: 0.150, otherExp: 0.040 }
+            ],
+            fixed: {
+                indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314,
+                safety: 0.0311, retire: 0.023, env: 0.003, subGuar: 0.00081, machGuar: 0.0007,
+                asbestos: 0.00006, adminCap: 0.080, profitCap: 0.150
+            }
+        },
+        civil: {
+            tiers: [
+                { max: 1000000000, indirectLabor: 0.191, otherExp: 0.055 },
+                { max: 5000000000, indirectLabor: 0.189, otherExp: 0.058 },
+                { max: Infinity, indirectLabor: 0.190, otherExp: 0.064 }
+            ],
+            fixed: {
+                indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314,
+                safety: 0.0315, retire: 0.023, env: 0.005, subGuar: 0.00081, machGuar: 0.0040,
+                asbestos: 0.00006, adminCap: 0.080, profitCap: 0.150
+            }
+        },
+        electrical: {
+            tiers: [
+                { max: 50000000, indirectLabor: 0.125, otherExp: 0.060 },
+                { max: Infinity, indirectLabor: 0.115, otherExp: 0.055 }
+            ],
+            fixed: {
+                indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314,
+                safety: 0.0207, retire: 0.023, liabilityRate: 0.0026477, liabilityMin: 20000,
+                adminCap: 0.080, profitCap: 0.150
+            }
+        },
+        telecom: {
+            tiers: [{ max: Infinity, indirectLabor: 0.115, otherExp: 0.050 }],
+            fixed: { indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314, safety: 0.0207, retire: 0.023, adminCap: 0.080, profitCap: 0.150 }
+        },
+        fire: {
+            tiers: [{ max: Infinity, indirectLabor: 0.115, otherExp: 0.055 }],
+            fixed: { indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314, safety: 0.0207, retire: 0.023, adminCap: 0.080, profitCap: 0.150 }
+        },
+        asbestos: {
+            tiers: [{ max: Infinity, indirectLabor: 0.175, otherExp: 0.050 }],
+            fixed: { indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314, safety: 0.0311, retire: 0.023, asbestos: 0.00006, adminCap: 0.080, profitCap: 0.150 }
+        }
+    },
+    "2026.03.01": {
+        building: {
+            tiers: [
+                { max: 50000000, indirectLabor: 0.175, otherExp: 0.050 },
+                { max: 300000000, indirectLabor: 0.160, otherExp: 0.045 },
+                { max: Infinity, indirectLabor: 0.150, otherExp: 0.040 }
+            ],
+            fixed: {
+                indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314,
+                safety: 0.0311, retire: 0.023, env: 0.003, subGuar: 0.00081, machGuar: 0.0007,
+                asbestos: 0.00006, adminCap: 0.080, profitCap: 0.150
+            }
+        },
+        civil: {
+            tiers: [
+                { max: 1000000000, indirectLabor: 0.191, otherExp: 0.055 },
+                { max: 5000000000, indirectLabor: 0.189, otherExp: 0.058 },
+                { max: Infinity, indirectLabor: 0.190, otherExp: 0.064 }
+            ],
+            fixed: {
+                indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314,
+                safety: 0.0315, retire: 0.023, env: 0.005, subGuar: 0.00081, machGuar: 0.0040,
+                asbestos: 0.00006, adminCap: 0.080, profitCap: 0.150
+            }
+        },
+        electrical: {
+            tiers: [
+                { max: 50000000, indirectLabor: 0.125, otherExp: 0.060 },
+                { max: Infinity, indirectLabor: 0.115, otherExp: 0.055 }
+            ],
+            fixed: {
+                indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314,
+                safety: 0.0207, retire: 0.023, liabilityRate: 0.0026477, liabilityMin: 20000,
+                adminCap: 0.080, profitCap: 0.150
+            }
+        },
+        telecom: {
+            tiers: [{ max: Infinity, indirectLabor: 0.115, otherExp: 0.050 }],
+            fixed: { indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314, safety: 0.0207, retire: 0.023, adminCap: 0.080, profitCap: 0.150 }
+        },
+        fire: {
+            tiers: [{ max: Infinity, indirectLabor: 0.115, otherExp: 0.055 }],
+            fixed: { indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314, safety: 0.0207, retire: 0.023, adminCap: 0.080, profitCap: 0.150 }
+        },
+        asbestos: {
+            tiers: [{ max: Infinity, indirectLabor: 0.175, otherExp: 0.050 }],
+            fixed: { indAcc: 0.0356, empIns: 0.0101, health: 0.03595, pension: 0.0475, care: 0.1314, safety: 0.0311, retire: 0.023, asbestos: 0.00006, adminCap: 0.080, profitCap: 0.150 }
+        }
+    },
+    "2025.07.01": {
+        building: {
+            tiers: [{ max: Infinity, indirectLabor: 0.155, otherExp: 0.045 }],
+            fixed: { indAcc: 0.037, empIns: 0.0098, health: 0.03545, pension: 0.045, care: 0.1295, safety: 0.0293, retire: 0.023, adminCap: 0.060, profitCap: 0.150 }
+        }
+    },
+    "2024.07.01": {
+        building: {
+            tiers: [{ max: Infinity, indirectLabor: 0.145, otherExp: 0.040 }],
+            fixed: { indAcc: 0.037, empIns: 0.009, health: 0.03545, pension: 0.045, care: 0.1295, safety: 0.0293, retire: 0.023, adminCap: 0.060, profitCap: 0.150 }
+        }
+    }
+};
+
+let vendorBreakdown = {};
+
+// 숫자 쉼표(,) 파싱 및 자동 포맷팅 헬퍼
+function getCleanNumber(val) {
+    if (val === null || val === undefined) return 0;
+    const clean = String(val).replace(/[,\s원₩]/g, '');
+    const n = parseInt(clean, 10);
+    return isNaN(n) ? 0 : n;
+}
+
+function formatWithComma(n) {
+    if (n === null || n === undefined || isNaN(n) || n === "") return "0";
+    return Number(n).toLocaleString('ko-KR');
+}
+
+// 실시간 쉼표 포맷팅 및 커서 위치 완벽 복원 함수
+function formatInputWithCursor(inputElem) {
+    const rawVal = inputElem.value;
+    const oldCursor = inputElem.selectionStart || 0;
+    
+    // 이전 커서 앞에 있던 숫자 개수 카운트
+    const digitsBeforeCursor = (rawVal.slice(0, oldCursor).match(/\d/g) || []).length;
+    
+    // 순수 숫자 추출
+    const cleanDigits = rawVal.replace(/\D/g, '');
+    if (cleanDigits === "") {
+        inputElem.value = "";
+        return 0;
+    }
+    
+    const num = parseInt(cleanDigits, 10);
+    const formatted = num.toLocaleString('ko-KR');
+    inputElem.value = formatted;
+    
+    // 커서 위치 복원: 동일한 개수의 숫자가 나오는 위치로 이동
+    let newCursor = formatted.length;
+    let seenDigits = 0;
+    for (let i = 0; i < formatted.length; i++) {
+        if (/\d/.test(formatted[i])) {
+            seenDigits++;
+        }
+        if (seenDigits >= digitsBeforeCursor) {
+            newCursor = i + 1;
+            break;
+        }
+    }
+    if (digitsBeforeCursor === 0) newCursor = 0;
+    inputElem.setSelectionRange(newCursor, newCursor);
+    
+    return num;
+}
+
+// 좌측 주요 원가 변수 입력 이벤트 핸들러
+function handleFormattedInput(inputElem) {
+    formatInputWithCursor(inputElem);
+    runCalculation();
+}
+
+// 우측 대차대조표 비목별 입력 이벤트 핸들러
+function handleDiffInput(inputElem, itemId) {
+    const rawVal = inputElem.value.trim();
+    if (rawVal === "") {
+        delete vendorBreakdown[itemId];
+    } else {
+        const num = formatInputWithCursor(inputElem);
+        vendorBreakdown[itemId] = num;
+    }
+    runCalculation(true); // isFromDiffInput = true (테이블 리빌드 방지)
+}
+
+function runCalculation(isFromDiffInput = false) {
+    const version = document.getElementById("selVersion").value;
+    const trade = document.getElementById("selTrade").value;
+    const title = document.getElementById("inProjectTitle").value || "공사명 미지정";
+    const periodInput = document.getElementById("inPeriodDays").value;
+    const period = periodInput === "" ? 0 : (parseInt(periodInput, 10) || 0);
+
+    const directMat = getCleanNumber(document.getElementById("inDirectMat").value);
+    const directLab = getCleanNumber(document.getElementById("inDirectLab").value);
+    const outputExp = getCleanNumber(document.getElementById("inOutputExp").value);
+    const clientMat = getCleanNumber(document.getElementById("inClientMat").value);
+    const wasteCost = getCleanNumber(document.getElementById("inWasteCost").value);
+    const vendorTotal = getCleanNumber(document.getElementById("inVendorTotal").value);
+
+    // 기간 태그
+    const pTag = document.getElementById("periodTag");
+    if (period === 0) {
+        pTag.innerText = "공기 미지정 (0일)";
+        pTag.style.color = "var(--text-muted)";
+    } else if (period < 30) {
+        pTag.innerText = "30일 미만 (건강·연금 0원)";
+        pTag.style.color = "var(--accent-amber)";
+    } else {
+        pTag.innerText = "30일 이상 (의무 계상)";
+        pTag.style.color = "var(--accent-blue)";
+    }
+
+    const vData = RATES_DATABASE[version] || RATES_DATABASE["2026.03.01"];
+    const tData = vData[trade] || vData["building"] || RATES_DATABASE["2026.03.01"]["building"];
+    const fixed = tData.fixed || {};
+
+    const directBase = directMat + directLab + outputExp;
+
+    let indirectLaborRate = 0.160;
+    let otherExpRate = 0.045;
+    for (const tier of (tData.tiers || [])) {
+        if (directBase <= tier.max) {
+            indirectLaborRate = tier.indirectLabor;
+            otherExpRate = tier.otherExp;
+            break;
+        }
+    }
+
+    const floor = Math.floor;
+    const cut10 = n => Math.floor(n / 10) * 10;
+
+    const indirectLabCap = floor(directLab * indirectLaborRate);
+    const laborTotal = directLab + indirectLabCap;
+
+    let healthCap = 0, pensionCap = 0, careCap = 0;
+    if (period >= 30) {
+        healthCap = floor(directLab * (fixed.health || 0.03595));
+        pensionCap = floor(directLab * (fixed.pension || 0.0475));
+        careCap = floor(healthCap * (fixed.care || 0.1314));
+    }
+
+    const indAccCap = floor(laborTotal * (fixed.indAcc || 0.0356));
+    const empInsCap = floor(laborTotal * (fixed.empIns || 0.0101));
+
+    let safetyCap = 0, safetyNote = "2천만 원 미만 의무제외";
+    const safetyBase = directMat + directLab + clientMat;
+    if (safetyBase >= 20000000) {
+        const rawSafety = floor(safetyBase * (fixed.safety || 0.0311));
+        if (clientMat > 0) {
+            const cap120 = floor((directMat + directLab) * (fixed.safety || 0.0311) * 1.2);
+            safetyCap = Math.min(rawSafety, cap120);
+            safetyNote = "관급자재 120% 캡 적용";
+        } else {
+            safetyCap = rawSafety;
+            safetyNote = `법정 요율(${((fixed.safety || 0.0311) * 100).toFixed(2)}%)`;
+        }
+    }
+
+    const retireThreshold = ["electrical", "telecom", "fire"].includes(trade) ? 300000000 : 100000000;
+    let retireCap = directBase >= retireThreshold ? floor(directLab * (fixed.retire || 0.023)) : 0;
+
+    const otherExpCap = floor((directMat + laborTotal) * otherExpRate);
+    // 조달청 기준: 환경보전비 및 보증수수료 대상액은 직접공사비(directBase)
+    const envCap = floor(directBase * (fixed.env || 0.003));
+    const subGuarCap = floor(directBase * (fixed.subGuar || 0.00081));
+    const machGuarCap = floor(directBase * (fixed.machGuar || 0.0018));
+    const asbestosCap = floor(indAccCap * (fixed.asbestos || 0.00006));
+
+    const wageClaimCap = floor(laborTotal * (fixed.wageClaim || 0.0009));
+    const asbestosReliefCap = floor(laborTotal * (fixed.asbestosRelief || 0.00006));
+
+    const expenseTotal = outputExp + indAccCap + empInsCap + healthCap + pensionCap + careCap + 
+        safetyCap + retireCap + otherExpCap + envCap + subGuarCap + machGuarCap + asbestosCap +
+        wageClaimCap + asbestosReliefCap;
+
+    const netCost = directMat + laborTotal + expenseTotal;
+    // 기재부 계약예규 [예정가격작성기준] 별표3 및 조달청 간접공사비 적용기준 (5억 미만 8.0%, 5억~30억 6.5%, 30억 이상 5.0%)
+    const adminRate = netCost < 500000000 ? (fixed.adminCap || 0.080) : (netCost < 3000000000 ? 0.065 : 0.050);
+    const adminCap = floor(netCost * adminRate);
+    const profitCap = floor((laborTotal + expenseTotal + adminCap) * (fixed.profitCap || 0.150));
+    const totalCost = netCost + adminCap + profitCap + wasteCost;
+    const vat = floor(totalCost * 0.10);
+    const standardTotal = cut10(totalCost + vat);
+
+    // 테이블 렌더링 데이터
+    const items = [
+        { id: 'indirect_labor', name: '간접노무비', std: indirectLabCap, desc: `상한 ${(indirectLaborRate*100).toFixed(1)}%` },
+        { id: 'industrial_accident', name: '산재보험료', std: indAccCap, desc: `요율 ${((fixed.indAcc||0.0356)*100).toFixed(2)}%` },
+        { id: 'employment_insurance', name: '고용보험료', std: empInsCap, desc: `요율 ${((fixed.empIns||0.0101)*100).toFixed(2)}%` },
+        { id: 'health_insurance', name: '국민건강보험료', std: healthCap, desc: period < 30 ? '30일 미만 제외(0원)' : '의무 계상' },
+        { id: 'pension', name: '국민연금보험료', std: pensionCap, desc: period < 30 ? '30일 미만 제외(0원)' : '의무 계상' },
+        { id: 'elderly_care', name: '노인장기요양보험', std: careCap, desc: period < 30 ? '30일 미만 제외(0원)' : '의무 계상' },
+        { id: 'safety_management', name: '산업안전보건관리비', std: safetyCap, desc: safetyNote },
+        { id: 'retirement_deduction', name: '퇴직공제부금비', std: retireCap, desc: directBase < retireThreshold ? '의무금액 미달(0원)' : '의무 계상' },
+        { id: 'environment_preservation', name: '환경보전비', std: envCap, desc: `상한 ${((fixed.env||0.003)*100).toFixed(1)}% (실내보수 준공시 0원 감액)` },
+        { id: 'other_expense', name: '기타경비', std: otherExpCap, desc: `상한 ${(otherExpRate*100).toFixed(1)}%` },
+        { id: 'wage_claim', name: '임금채권부담금', std: wageClaimCap, desc: '요율 0.09% (노무비 합계)' },
+        { id: 'asbestos_relief', name: '석면분담금', std: asbestosReliefCap, desc: '요율 0.006% (노무비 합계)' },
+        { id: 'general_admin', name: '일반관리비', std: adminCap, desc: `법정 상한 ${(adminRate*100).toFixed(1)}% (5억 미만)` },
+        { id: 'profit', name: '이윤', std: profitCap, desc: '법정 상한 15.0% (재료비 제외)' }
+    ];
+
+    let violations = [];
+
+    // 대차대조표 DOM 렌더링 또는 값 갱신
+    const tbody = document.getElementById("diffTableBody");
+    const existingRows = tbody.querySelectorAll("tr");
+
+    if (!isFromDiffInput || existingRows.length !== items.length) {
+        // 완전 재렌더링
+        let tbodyHtml = "";
+        items.forEach(item => {
+            const vVal = vendorBreakdown[item.id] !== undefined ? vendorBreakdown[item.id] : "";
+            const hasV = vVal !== "";
+            const diff = hasV ? Number(vVal) - item.std : null;
+            const isOver = diff !== null && diff > 1; // 1원 이하 반올림/절사 차이는 단수 오차 인정
+            if (isOver) violations.push({ name: item.name, std: item.std, vVal: Number(vVal), diff });
+
+            tbodyHtml += `
+            <tr data-item-id="${item.id}">
+                <td style="font-weight:600; color:var(--text-main);">${item.name}</td>
+                <td class="text-right font-mono std-cell" style="color:var(--accent-blue); font-weight:bold;">${formatWithComma(item.std)}원</td>
+                <td class="text-right font-mono">
+                    <input type="text" class="diff-input" value="${hasV ? formatWithComma(vVal) : ''}" placeholder="미입력" oninput="handleDiffInput(this, '${item.id}')">
+                </td>
+                <td class="text-right font-mono diff-cell" style="font-weight:bold; color:${isOver ? 'var(--accent-rose)' : 'var(--text-muted)'};">
+                    ${diff !== null ? (diff > 0 ? `+${formatWithComma(diff)}` : formatWithComma(diff)) : '-'}
+                </td>
+                <td class="text-center status-cell">
+                    ${diff !== null ? (isOver ? '<span class="badge badge-red" style="font-size:11px;">🔴 초과</span>' : (diff === 1 ? '<span class="badge badge-green" style="font-size:11px;" title="1원 단수오차 인정">🟢 적합</span>' : '<span class="badge badge-green" style="font-size:11px;">🟢 적합</span>')) : '-'}
+                </td>
+                <td class="desc-cell" style="color:var(--text-muted); font-size:11px;">${item.desc}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = tbodyHtml;
+    } else {
+        // 타이핑 중 포커스 유지를 위해 특정 셀들만 부분 업데이트
+        existingRows.forEach((tr, idx) => {
+            const item = items[idx];
+            const vVal = vendorBreakdown[item.id] !== undefined ? vendorBreakdown[item.id] : "";
+            const hasV = vVal !== "";
+            const diff = hasV ? Number(vVal) - item.std : null;
+            const isOver = diff !== null && diff > 1; // 1원 이하 반올림/절사 차이는 단수 오차 인정
+            if (isOver) violations.push({ name: item.name, std: item.std, vVal: Number(vVal), diff });
+
+            const stdCell = tr.querySelector(".std-cell");
+            if (stdCell) stdCell.innerText = `${formatWithComma(item.std)}원`;
+
+            const diffCell = tr.querySelector(".diff-cell");
+            if (diffCell) {
+                diffCell.innerText = diff !== null ? (diff > 0 ? `+${formatWithComma(diff)}` : formatWithComma(diff)) : '-';
+                diffCell.style.color = isOver ? 'var(--accent-rose)' : 'var(--text-muted)';
+            }
+
+            const statusCell = tr.querySelector(".status-cell");
+            if (statusCell) {
+                statusCell.innerHTML = diff !== null ? (isOver ? '<span class="badge badge-red" style="font-size:11px;">🔴 초과</span>' : (diff === 1 ? '<span class="badge badge-green" style="font-size:11px;" title="1원 단수오차 인정">🟢 적합</span>' : '<span class="badge badge-green" style="font-size:11px;">🟢 적합</span>')) : '-';
+            }
+
+            const descCell = tr.querySelector(".desc-cell");
+            if (descCell) descCell.innerText = item.desc;
+        });
+    }
+
+    // 상단 4대 대시보드 수치 반영 (100% 천 단위 콤마)
+    document.getElementById("dispVendorTotal").innerText = formatWithComma(vendorTotal) + "원";
+    document.getElementById("dispStandardTotal").innerText = formatWithComma(standardTotal) + "원";
+    
+    const totalDiff = vendorTotal - standardTotal;
+    const isTotalExcess = totalDiff > 0;
+    const dispDiff = document.getElementById("dispDiffTotal");
+    const diffSub = document.getElementById("dispDiffSub");
+    const badgeContainer = document.getElementById("badgeContainer");
+
+    if (vendorTotal === 0 && standardTotal === 0) {
+        dispDiff.innerText = "0원";
+        dispDiff.style.color = "var(--text-muted)";
+        diffSub.innerText = "견적서 파일(엑셀, PDF, 캡처)을 업로드하세요";
+        badgeContainer.innerHTML = `<span class="badge badge-idle">⚪ 대기 (견적서 입력 대기)</span>`;
+        document.getElementById("officialNoticeBox").innerText = "견적서 파일(엑셀, PDF, 캡처)을 드래그하여 첨부하거나 좌측 핵심 원가 변수를 입력하시면 조달청 제비율 대차대조 감사 결과 및 시공사 통보용 수정요청 공문이 자동으로 생성됩니다.";
+        return;
+    }
+
+    dispDiff.innerText = (totalDiff > 0 ? `+${formatWithComma(totalDiff)}` : formatWithComma(totalDiff)) + "원";
+    dispDiff.style.color = isTotalExcess ? "var(--accent-rose)" : "var(--accent-emerald)";
+    diffSub.innerText = isTotalExcess ? "🔴 법정 상한 초과 (감액 요구)" : "🟢 정상 (예산 이내)";
+
+
+    // 신호등
+    if (isTotalExcess) {
+        badgeContainer.innerHTML = `<span class="badge badge-red">🔴 부적합 (예산 초과 반려)</span>`;
+    } else if (violations.length > 0) {
+        badgeContainer.innerHTML = `<span class="badge badge-yellow">🟡 주의 (세부 비목 위반 보완필요)</span>`;
+    } else {
+        badgeContainer.innerHTML = `<span class="badge badge-green">🟢 적합 (정상 견적)</span>`;
+    }
+
+    // 시공사 통보용 공문 문구 작성
+    const excessAmt = Math.max(0, totalDiff);
+    let notice = [
+        `【원가계산서 수정·보완 요청서】`,
+        `■ 공사명 : ${title}`,
+        `■ 수  신 : 해당 공사 시공업체(계약상대자)`,
+        `■ 내  용 : 조달청 제비율 및 관련 회계 법령 기준에 따른 원가계산서 재작성 요청`,
+        ``,
+        `1. 귀 사의 무궁한 발전을 기원합니다.`,
+        `2. 귀 사에서 제출한 위 공사의 공사원가계산서를 검토한 결과, 조달청 제비율 기준에 따른 법정 상한을 초과하거나 법령상 계상 제외 항목이 포함되어 있어 수정을 요청하오니 보완하여 재제출하여 주시기 바랍니다.`,
+        ``,
+        `  가. 업체 제출 도급액 : 금 ${formatWithComma(vendorTotal)}원 (VAT 포함)`,
+        `  나. 조달청 기준 상한액 : 금 ${formatWithComma(standardTotal)}원 (국고금관리법 10원 미만 절사)`,
+        `  다. 조정(감액) 대상액 : 금 ${formatWithComma(excessAmt)}원`,
+        ``,
+        `  라. 주요 세부 지적 사항:`
+    ];
+
+    if (violations.length > 0) {
+        violations.forEach((v, idx) => {
+            notice.push(`    ${idx+1}) ${v.name}: 법정 상한(${formatWithComma(v.std)}원) 대비 ${formatWithComma(v.diff)}원 과다 계상 -> 감액 요망`);
+        });
+    } else {
+        notice.push(`    - 비목별 법정 상한 초과 항목 없음`);
+    }
+
+    if (period < 30) {
+        notice.push(`    ※ 유의: 본 공사는 공사기간 ${period}일(30일 미만) 건으로 국민건강·연금·노인장기요양보험료는 전액 제외(0원) 대상입니다.`);
+    }
+
+    notice.push(
+        ``,
+        `3. 위 지적 사항을 반영한 수정 원가계산서를 기한 내 제출하여 주시기 바랍니다. 끝.`
+    );
+
+    document.getElementById("officialNoticeBox").innerText = notice.join("\n");
+}
+
+function updateVendorBreakdown(id, val) {
+    if (val === "" || isNaN(val)) {
+        delete vendorBreakdown[id];
+    } else {
+        vendorBreakdown[id] = parseInt(val);
+    }
+    runCalculation();
+}
+
+function copyNotice() {
+    const text = document.getElementById("officialNoticeBox").innerText;
+    navigator.clipboard.writeText(text);
+    alert("공문 문구가 클립보드에 복사되었습니다. K-에듀파인 기안문이나 메일에 바로 붙여넣으세요!");
+}
+
+// 화면에 보이는 감사 결과 내역을 고해상도 이미지(PNG)로 클립보드에 원클릭 복사
+async function copyAuditDashboardImage() {
+    if (typeof html2canvas === 'undefined') {
+        alert("이미지 캡처 라이브러리가 로드되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+        return;
+    }
+
+    const btn = document.getElementById("btnCopyImage");
+    const originalText = btn ? btn.innerHTML : "";
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "⏳ 캡처 중...";
+    }
+
+    const target = document.getElementById("printableAuditArea") || document.body;
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+
+    try {
+        // html2canvas 실행: 레티나 2배 고해상도로 렌더링
+        const canvas = await html2canvas(target, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: isDark ? "#0f172a" : "#ffffff",
+            logging: false,
+            ignoreElements: (el) => el.classList.contains("no-print") || el.id === "pasteModal"
+        });
+
+        // Blob 생성 및 클립보드 복사
+        canvas.toBlob(async (blob) => {
+            if (!blob) {
+                alert("이미지 생성에 실패했습니다.");
+                if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+                return;
+            }
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.write) {
+                    const item = new ClipboardItem({ "image/png": blob });
+                    await navigator.clipboard.write([item]);
+                    alert("✨ [화면 이미지 복사 완료!]\n\n감사 결과 전체가 클립보드에 고해상도 이미지로 복사되었습니다.\n카카오톡, 쿨메신저, 한글(HWP), K-에듀파인 기안문, 메일 본문에 바로 붙여넣기(Ctrl+V)하세요!");
+                } else {
+                    throw new Error("클립보드 이미지 API 미지원");
+                }
+            } catch (clipErr) {
+                console.warn("Clipboard direct copy failed, falling back to download:", clipErr);
+                // 브라우저 권한 제한 시 파일로 다운로드
+                const title = document.getElementById("inProjectTitle")?.value?.trim() || "공사원가감사결과";
+                const link = document.createElement("a");
+                link.download = `${title}_감사보고서.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                alert("브라우저 보안 설정으로 클립보드 직접 복사가 제한되어 PNG 이미지 파일로 다운로드되었습니다.");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            }
+        }, "image/png");
+    } catch (err) {
+        console.error("Capture failed:", err);
+        alert("화면 캡처 중 오류가 발생했습니다: " + err.message);
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+}
+
+// OCR 상태 표시 헬퍼
+function showOcrProgress(msg) {
+    const box = document.getElementById("ocrProgressBox");
+    const txt = document.getElementById("ocrProgressText");
+    if (box && txt) {
+        box.style.display = "flex";
+        txt.innerText = msg;
+    }
+}
+
+function hideOcrProgress() {
+    const box = document.getElementById("ocrProgressBox");
+    if (box) box.style.display = "none";
+}
+
+let currentPasteImage = null; // 원본 Image 객체
+let currentRotationAngle = 0; // 0, 90, 180, 270
+
+// 탭 전환 (이미지 OCR vs 텍스트 붙여넣기)
+function switchPasteTab(tab) {
+    const textSec = document.getElementById("pasteTextSection");
+    const imgSec = document.getElementById("pasteImageSection");
+    const tabBtnText = document.getElementById("tabBtnText");
+    const tabBtnImage = document.getElementById("tabBtnImage");
+
+    if (textSec) textSec.style.display = 'none';
+    if (imgSec) imgSec.style.display = 'none';
+
+    if (tabBtnText) tabBtnText.className = 'btn btn-secondary';
+    if (tabBtnImage) tabBtnImage.className = 'btn btn-secondary';
+
+    if (tab === 'image') {
+        if (imgSec) imgSec.style.display = 'block';
+        if (tabBtnImage) tabBtnImage.className = 'btn btn-primary';
+    } else if (tab === 'text') {
+        if (textSec) textSec.style.display = 'block';
+        if (tabBtnText) tabBtnText.className = 'btn btn-primary';
+        setTimeout(() => document.getElementById("pasteInputText")?.focus(), 50);
+    }
+}
+
+// 스마트 복사·붙여넣기 모달 열기/닫기
+function openPasteModal() {
+    const m = document.getElementById("pasteModal");
+    if (m) {
+        m.classList.add("active");
+        if (!currentPasteImage) {
+            switchPasteTab('image');
+        }
+    }
+}
+
+function closePasteModal() {
+    const m = document.getElementById("pasteModal");
+    if (m) m.classList.remove("active");
+}
+
+// 사용설명서 모달 열기/닫기
+function openManualModal() {
+    const m = document.getElementById("manualModal");
+    if (m) m.classList.add("active");
+}
+
+function closeManualModal() {
+    const m = document.getElementById("manualModal");
+    if (m) m.classList.remove("active");
+}
+
+// 이미지를 캔버스에 로드 (클립보드 또는 파일)
+function loadPastedImageToCanvas(fileOrBlob) {
+    openPasteModal();
+    switchPasteTab('image');
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            currentPasteImage = img;
+            currentRotationAngle = 0;
+            renderCanvasImage();
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(fileOrBlob);
+}
+
+// 캔버스 렌더링 (회전 적용)
+function renderCanvasImage() {
+    if (!currentPasteImage) return;
+
+    const canvas = document.getElementById("pasteCanvas");
+    const emptyMsg = document.getElementById("canvasEmptyMsg");
+    if (!canvas) return;
+
+    if (emptyMsg) emptyMsg.style.display = "none";
+    canvas.style.display = "block";
+
+    const angle = (currentRotationAngle % 360 + 360) % 360;
+    const isRotated90 = (angle === 90 || angle === 270);
+    const targetW = isRotated90 ? currentPasteImage.height : currentPasteImage.width;
+    const targetH = isRotated90 ? currentPasteImage.width : currentPasteImage.height;
+
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.drawImage(currentPasteImage, -currentPasteImage.width / 2, -currentPasteImage.height / 2);
+    ctx.restore();
+}
+
+// Google Gemini AI 연동 (.env / env.js 기반 자동 로드)
+function getGeminiApiKey() {
+    return (window.ENV && window.ENV.GOOGLE_API_KEY) || localStorage.getItem("cost_audit_gemini_key") || "";
+}
+
+// 모델 우선순위: 3.5 lite 우선 시도 -> 오류 시 3.1 lite로 자동 롤링 백업
+const DEFAULT_GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-flash-latest"];
+
+// 캔버스 회전 버튼 핸들러 (+90 또는 -90도)
+function rotatePasteCanvas(deltaAngle) {
+    if (!currentPasteImage) {
+        alert("먼저 이미지를 붙여넣거나(Ctrl+V) 업로드해 주세요.");
+        return;
+    }
+    currentRotationAngle = (currentRotationAngle + deltaAngle + 360) % 360;
+    renderCanvasImage();
+}
+
+// Google Gemini 멀티모달 비전 AI 분석 엔진 (3.5 Lite -> 3.1 Lite 자동 롤링 백업)
+async function analyzeImageWithGemini(base64Data, mimeType = "image/jpeg", fileName = "스캔본 서류") {
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+        throw new Error("프로젝트 루트의 .env 파일에 GOOGLE_API_KEY를 설정해 주세요.");
+    }
+
+    const preferredModel = (window.ENV && window.ENV.GEMINI_MODEL) || "gemini-3.5-flash-lite";
+    const rawList = [preferredModel, ...DEFAULT_GEMINI_MODELS];
+    const modelCandidates = [...new Set(rawList)]; // 중복 제거 순서 유지 (3.5 lite -> 3.1 lite)
+
+    const prompt = `당신은 대한민국 교육행정 시설공사 원가계산서 전문 감사관입니다.
+첨부된 공사원가계산서/집계표/견적서 이미지를 1원 단위까지 정밀 판독하여 반드시 아래 JSON 규격으로만 응답하세요.
+(서류가 90도 회전되어 있거나 삐뚤어져 있어도 표 내용을 똑바로 읽어야 합니다.)
+
+[비목 매핑 필수 규칙]:
+1. directMaterial (직접재료비): '재료비'의 '직접재료비' 또는 '재료비 소계' 금액
+2. directLabor (직접노무비): '노무비'의 '직접노무비' 금액
+3. indirectLabor (간접노무비): '노무비'의 '간접노무비' 금액
+4. outputExpense (산출경비): 표에 '기계경비' 또는 '산출경비'라고 명시된 경우만 기재! 표에 '기타경비'만 있고 '산출경비/기계경비'가 별도로 없으면 반드시 0으로 기재하세요. (절대 기타경비를 산출경비에 넣지 마세요!)
+5. otherExpense (기타경비): 경비 항목의 '기타경비' 금액 (예: 1,670,853원)
+6. industrialAccident (산재보험료): '산재보험' 금액
+7. employmentInsurance (고용보험료): '고용보험' 금액
+8. healthInsurance (국민건강보험료): '건강보험' 금액 (없으면 0)
+9. pension (국민연금보험료): '연금보험' 금액 (없으면 0)
+10. elderlyCare (노인장기요양보험): '노인장기요양보험' 금액 (없으면 0)
+11. safetyManagement (산업안전보건관리비): '산업안전보건관리비' 또는 '안전관리비' 금액
+12. retirementDeduction (퇴직공제부금비): '퇴직공제부금비' 금액 (없으면 0)
+13. environmentPreservation (환경보전비): '환경보전비' 금액 (없으면 0)
+14. wageClaim (임금채권부담금): '임금채권부담금' 금액 (없으면 0)
+15. asbestosRelief (석면분담금): '석면분담금' 또는 '석면피해구제분담금' 금액 (없으면 0)
+16. generalAdmin (일반관리비): '일반관리비' 금액 (없으면 0)
+17. profit (이윤): '이윤' 금액
+18. wasteCost (폐기물처리비): 표 하단의 '폐기물처리' 또는 '폐기물처리비' 금액 (없으면 0)
+19. vendorTotal (총도급액): 최종 '총공사비', '총도급액', '합계' (부가가치세 포함 금액)
+
+반드시 마크다운 코드블록이나 기타 설명 없이 오직 순수한 JSON 문자열만 출력하세요:
+{
+  "projectTitle": "공사명",
+  "trade": "building",
+  "periodDays": 29,
+  "directMaterial": 0,
+  "directLabor": 0,
+  "indirectLabor": 0,
+  "outputExpense": 0,
+  "industrialAccident": 0,
+  "employmentInsurance": 0,
+  "healthInsurance": 0,
+  "pension": 0,
+  "elderlyCare": 0,
+  "safetyManagement": 0,
+  "retirementDeduction": 0,
+  "environmentPreservation": 0,
+  "wageClaim": 0,
+  "asbestosRelief": 0,
+  "otherExpense": 0,
+  "generalAdmin": 0,
+  "profit": 0,
+  "wasteCost": 0,
+  "vendorTotal": 0
+}`;
+
+    const cleanBase64 = base64Data.replace(/^data:[^;]+;base64,/, '');
+    let lastError = null;
+
+    for (let i = 0; i < modelCandidates.length; i++) {
+        const currentModel = modelCandidates[i];
+        if (i === 0) {
+            showOcrProgress(`🤖 Google Gemini (${currentModel}) AI로 정밀 분석 중...`);
+        } else {
+            showOcrProgress(`🔄 이전 모델 지연/오류로 (${currentModel})로 자동 백업 전환하여 분석 중...`);
+        }
+
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+
+        const payload = {
+            contents: [
+                {
+                    parts: [
+                        { text: prompt },
+                        {
+                            inline_data: {
+                                mime_type: mimeType,
+                                data: cleanBase64
+                            }
+                        }
+                    ]
+                }
+            ],
+            generationConfig: {
+                temperature: 0.1,
+                response_mime_type: "application/json"
+            }
+        };
+
+        try {
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                console.warn(`[Gemini Model ${currentModel} Failed with status ${response.status}]:`, errText);
+                lastError = new Error(`(${response.status}): ${errText}`);
+                continue; // 다음 롤링 백업 모델로 즉시 자동 전환!
+            }
+
+            const data = await response.json();
+            const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!candidateText) {
+                throw new Error("Gemini AI로부터 응답 데이터를 받지 못했습니다.");
+            }
+
+            console.log(`[Gemini (${currentModel}) Raw JSON Response]:\n`, candidateText);
+            const parsed = JSON.parse(candidateText);
+
+            hideOcrProgress();
+            applyGeminiResult(parsed, fileName);
+            return; // 성공 시 종료
+        } catch (fetchErr) {
+            console.warn(`[Gemini Model ${currentModel} Exception]:`, fetchErr);
+            lastError = fetchErr;
+        }
+    }
+
+    throw lastError || new Error("모든 Gemini 모델 시도에 실패했습니다.");
+}
+
+// Google Gemini AI 분석 결과 자동 적용 (메인 대시보드 직접 반영)
+function applyGeminiResult(res, sourceName = "스캔본 견적서") {
+    if (!res) return;
+
+    if (res.projectTitle) {
+        document.getElementById("inProjectTitle").value = res.projectTitle;
+        autoDetectTrade(res.projectTitle);
+    }
+    if (res.periodDays) {
+        document.getElementById("inPeriodDays").value = res.periodDays;
+    }
+
+    const setInput = (id, val) => {
+        if (typeof val === 'number' && val > 0) {
+            document.getElementById(id).value = formatWithComma(val);
+        } else if (val === 0) {
+            document.getElementById(id).value = "0";
+        }
+    };
+
+    setInput("inDirectMat", res.directMaterial);
+    setInput("inDirectLab", res.directLabor);
+    setInput("inOutputExp", res.outputExpense);
+    setInput("inWasteCost", res.wasteCost);
+    setInput("inVendorTotal", res.vendorTotal);
+
+    const breakdownMap = {
+        "indirect_labor": res.indirectLabor,
+        "industrial_accident": res.industrialAccident,
+        "employment_insurance": res.employmentInsurance,
+        "health_insurance": res.healthInsurance,
+        "pension": res.pension,
+        "elderly_care": res.elderlyCare,
+        "safety_management": res.safetyManagement,
+        "retirement_deduction": res.retirementDeduction,
+        "environment_preservation": res.environmentPreservation,
+        "wage_claim": res.wageClaim,
+        "asbestos_relief": res.asbestosRelief,
+        "other_expense": res.otherExpense,
+        "general_admin": res.generalAdmin,
+        "profit": res.profit
+    };
+
+    for (const [key, val] of Object.entries(breakdownMap)) {
+        if (typeof val === 'number' && val > 0) {
+            vendorBreakdown[key] = val;
+        } else if (val === 0) {
+            vendorBreakdown[key] = 0;
+        } else {
+            delete vendorBreakdown[key];
+        }
+    }
+
+    closePasteModal();
+    runCalculation();
+    alert(`🎉 [${sourceName}] 분석 완료!\n총도급액 및 세부 비목이 대시보드에 즉시 자동 반영되었습니다.`);
+}
+
+// 회전 보정된 캔버스에서 Gemini AI 또는 OCR 실행
+async function startOcrFromCanvas() {
+    const canvas = document.getElementById("pasteCanvas");
+    if (!canvas || !currentPasteImage) {
+        alert("판독할 이미지가 없습니다. 화면을 캡처한 뒤 Ctrl+V를 눌러주세요.");
+        return;
+    }
+
+    const btn = document.getElementById("btnStartOcr");
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "🤖 Gemini AI 판독 중...";
+    }
+
+    try {
+        // 캔버스의 현재 회전 보정된 이미지를 Base64 JPEG로 추출
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+        await analyzeImageWithGemini(dataUrl, "image/jpeg", "붙여넣은 캡처 이미지");
+    } catch (err) {
+        console.error("Gemini Vision failed, falling back to local OCR:", err);
+        alert(`Gemini AI 분석 실패: ${err.message}\n로컬 OCR 엔진으로 재시도합니다.`);
+        // 로컬 Tesseract fallback
+        await runLocalTesseractFallback();
+    } finally {
+        hideOcrProgress();
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "✨ 스마트 OCR 판독 시작 (정밀 분석)";
+        }
+    }
+}
+
+// 로컬 Tesseract Fallback 함수
+async function runLocalTesseractFallback() {
+    const canvas = document.getElementById("pasteCanvas");
+    if (!canvas) return;
+
+    if (typeof Tesseract === 'undefined') {
+        alert("OCR 인식 엔진을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+        return;
+    }
+
+    showOcrProgress("로컬 OCR 판독 중...");
+    try {
+        canvas.toBlob(async (blob) => {
+            const imageUrl = URL.createObjectURL(blob);
+            const ret = await Tesseract.recognize(imageUrl, 'kor+eng');
+            hideOcrProgress();
+            const text = ret.data ? ret.data.text : "";
+            if (!text || text.trim().length === 0) {
+                alert("로컬 OCR로도 글자를 감지하지 못했습니다. 수치 직접 입력을 권장합니다.");
+                return;
+            }
+            parseAndApplyCostText(text, "로컬 OCR fallback");
+        }, 'image/png');
+    } catch (e) {
+        hideOcrProgress();
+        alert(`로컬 OCR 오류: ${e.message}`);
+    }
+}
+
+// 스마트 견적서 텍스트/OCR 결과 파서 및 자동 주입
+function parseAndApplyCostText(rawText, sourceName) {
+    if (!rawText || rawText.trim().length === 0) {
+        alert("분석할 텍스트가 비어 있습니다.");
+        return;
+    }
+
+    console.log("[OCR Raw Text Input]:\n", rawText);
+    const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+    // 숫자 파싱 헬퍼: 라인 내의 모든 유효 금액(1,000원 이상 숫자)을 추출 (% 비율 제외)
+    function extractAmountsFromLine(line) {
+        // %가 붙은 숫자는 제거 (예: 6.00%, 3.56% 등)
+        const lineWithoutPercent = line.replace(/[0-9]+(?:\.[0-9]+)?\s*%/g, ' ');
+        const matches = lineWithoutPercent.match(/(?:[0-9]{1,3}(?:,[0-9]{3})+|[0-9]{4,})/g);
+        if (!matches) return [];
+        return matches.map(m => parseInt(m.replace(/,/g, ''), 10)).filter(n => !isNaN(n) && n > 0);
+    }
+
+    // 각 비목별 추출 결과 저장소
+    const extracted = {};
+
+    // 1단계: 라인별 정밀 스캔 (각 라인의 시작 또는 비목 키워드 분석)
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        // 공백 및 특수문자 제거 버전 (비목명 매칭용)
+        const clean = line.replace(/[\s\[\]\(\)\{\}\-_=+|]/g, '');
+        const amounts = extractAmountsFromLine(line);
+
+        // 금액이 없는 줄은 스킵 (다음 줄 침범 절대 방지!)
+        if (amounts.length === 0) continue;
+
+        // 계약금액 / 준공금액 중 마지막 유효 금액(준공금액) 채택
+        const targetAmt = amounts[amounts.length - 1];
+
+        // 1. 직접재료비: '직접재료비'가 포함되고 기타경비/노무비 산출식이 아닌 경우
+        if (clean.includes('직접재료비') || (clean.includes('재료비') && !clean.includes('기타') && !clean.includes('노무') && !clean.includes('간접') && !clean.includes('산출'))) {
+            if (!extracted.directMat) extracted.directMat = targetAmt;
+        }
+
+        // 2. 직접노무비: '직접노무비' (간접노무비 제외!)
+        if (clean.includes('직접노무비') || (clean.includes('직접노무') && !clean.includes('간접'))) {
+            if (!extracted.directLab) extracted.directLab = targetAmt;
+        }
+
+        // 3. 간접노무비
+        if (clean.includes('간접노무비') || clean.includes('간접노무')) {
+            if (!extracted.indirectLab) extracted.indirectLab = targetAmt;
+        }
+
+        // 4. 산출경비 (산재보험료 등 타 비목 제외)
+        if (clean.includes('산출경비') && !clean.includes('산재') && !clean.includes('보험')) {
+            if (!extracted.outputExp) extracted.outputExp = targetAmt;
+        }
+
+        // 5. 산재보험료
+        if (clean.includes('산재보험료') || clean.includes('산재보험')) {
+            if (!extracted.sanjae) extracted.sanjae = targetAmt;
+        }
+
+        // 6. 고용보험료
+        if (clean.includes('고용보험료') || clean.includes('고용보험')) {
+            if (!extracted.goyong) extracted.goyong = targetAmt;
+        }
+
+        // 7. 건강보험료
+        if (clean.includes('건강보험료') || clean.includes('국민건강')) {
+            if (!extracted.health) extracted.health = targetAmt;
+        }
+
+        // 8. 연금보험료
+        if (clean.includes('연금보험료') || clean.includes('국민연금')) {
+            if (!extracted.pension) extracted.pension = targetAmt;
+        }
+
+        // 9. 노인장기요양보험료
+        if (clean.includes('장기요양') || clean.includes('노인장기')) {
+            if (!extracted.care) extracted.care = targetAmt;
+        }
+
+        // 10. 산업안전보건관리비 (기타경비 산식 혼동 배제)
+        if (clean.includes('산업안전보건') || clean.includes('안전관리비') || (clean.includes('산안비') && !clean.includes('기타'))) {
+            if (!extracted.safety) extracted.safety = targetAmt;
+        }
+
+        // 11. 퇴직공제부금비
+        if (clean.includes('퇴직공제')) {
+            if (!extracted.retire) extracted.retire = targetAmt;
+        }
+
+        // 12. 환경보전비
+        if (clean.includes('환경보전비') || clean.includes('환경보전')) {
+            if (!extracted.env) extracted.env = targetAmt;
+        }
+
+        // 13. 기타경비
+        if (clean.includes('기타경비')) {
+            if (!extracted.otherExp) extracted.otherExp = targetAmt;
+        }
+
+        // 14. 일반관리비
+        if (clean.includes('일반관리비') || clean.includes('일반관리')) {
+            if (!extracted.admin) extracted.admin = targetAmt;
+        }
+
+        // 15. 이윤
+        if (clean.includes('이윤') && !clean.includes('일반관리비')) {
+            if (!extracted.profit) extracted.profit = targetAmt;
+        }
+
+        // 16. 폐기물처리비
+        if (clean.includes('폐기물처리') || clean.includes('폐기물')) {
+            if (!extracted.waste) extracted.waste = targetAmt;
+        }
+
+        // 17. 총도급액 / 도급액
+        if (clean.includes('도급액') || clean.includes('총도급') || clean.includes('도급금액') || clean.includes('총공사비')) {
+            if (!extracted.totalAmt) extracted.totalAmt = targetAmt;
+        }
+    }
+
+    // 2단계: 전체 텍스트 대상 정규식 백업 (라인 단위로 놓친 경우)
+    const fullText = rawText;
+    const findRegexAmt = (pattern) => {
+        const regex = new RegExp(pattern + '[^0-9\\r\\n]{0,40}?([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{4,})', 'i');
+        const m = fullText.match(regex);
+        if (m && m[1]) {
+            const val = parseInt(m[1].replace(/,/g, ''), 10);
+            if (!isNaN(val) && val > 0) return val;
+        }
+        return 0;
+    };
+
+    if (!extracted.directMat) extracted.directMat = findRegexAmt('직\\s*접\\s*재\\s*료\\s*비');
+    if (!extracted.directLab) extracted.directLab = findRegexAmt('직\\s*접\\s*노\\s*무\\s*비');
+    if (!extracted.indirectLab) extracted.indirectLab = findRegexAmt('간\\s*접\\s*노\\s*무\\s*비');
+    if (!extracted.totalAmt) extracted.totalAmt = findRegexAmt('(?:\\[|\\(|\\s)*도\\s*급\\s*액');
+
+    // 공사명 탐색
+    let projectTitle = "";
+    const titleMatch = fullText.match(/공\s*사\s*명\s*[:：]?\s*([^\n\r]+)/);
+    if (titleMatch && titleMatch[1]) {
+        projectTitle = titleMatch[1].trim().replace(/\[|\]/g, '');
+        document.getElementById("inProjectTitle").value = projectTitle;
+        autoDetectTrade(projectTitle);
+    } else {
+        autoDetectTrade(fullText);
+    }
+
+    // 공사기간 탐색
+    const periodMatch = fullText.match(/(?:공사기간|공\s*기)\s*[:：]?\s*([0-9]+)\s*(?:일|일간)/);
+    if (periodMatch && periodMatch[1]) {
+        document.getElementById("inPeriodDays").value = parseInt(periodMatch[1]);
+    }
+
+    // 3단계: 추출 결과 메인 대시보드 직접 반영
+    if (extracted.totalAmt) document.getElementById("inVendorTotal").value = formatWithComma(extracted.totalAmt);
+    if (extracted.directMat) document.getElementById("inDirectMat").value = formatWithComma(extracted.directMat);
+    if (extracted.directLab) document.getElementById("inDirectLab").value = formatWithComma(extracted.directLab);
+    if (extracted.outputExp) document.getElementById("inOutputExp").value = formatWithComma(extracted.outputExp);
+    if (extracted.waste) document.getElementById("inWasteCost").value = formatWithComma(extracted.waste);
+
+    const textBreakdownMap = {
+        "indirect_labor": extracted.indirectLab,
+        "industrial_accident": extracted.sanjae,
+        "employment_insurance": extracted.goyong,
+        "health_insurance": extracted.health,
+        "pension": extracted.pension,
+        "elderly_care": extracted.care,
+        "safety_management": extracted.safety,
+        "retirement_deduction": extracted.retire,
+        "environment_preservation": extracted.env,
+        "other_expense": extracted.otherExp,
+        "general_admin": extracted.admin,
+        "profit": extracted.profit
+    };
+
+    for (const [key, val] of Object.entries(textBreakdownMap)) {
+        if (typeof val === 'number' && val > 0) {
+            vendorBreakdown[key] = val;
+        } else {
+            delete vendorBreakdown[key];
+        }
+    }
+
+    closePasteModal();
+    runCalculation();
+    alert(`🎉 [${sourceName}] 분석 완료!\n총도급액 및 세부 비목이 대시보드에 즉시 반영되었습니다.`);
+}
+
+// 스마트 붙여넣기 모달에서 텍스트 버튼 클릭 시 실행
+function applyPastedText() {
+    const text = document.getElementById("pasteInputText").value;
+    parseAndApplyCostText(text, "텍스트 붙여넣기");
+}
+
+// 이미지 파일 처리기 -> 캔버스 미리보기로 연결
+function handleImageFile(file) {
+    if (!file) return;
+    loadPastedImageToCanvas(file);
+}
+
+// 전역 클립보드 붙여넣기(Ctrl+V) 이벤트 리스너
+window.addEventListener('paste', function(e) {
+    const activeEl = document.activeElement;
+    const isTextInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    let foundImage = false;
+
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            foundImage = true;
+            const blob = items[i].getAsFile();
+            e.preventDefault();
+            loadPastedImageToCanvas(blob);
+            break;
+        }
+    }
+
+    if (!foundImage && !isTextInput) {
+        const pasteText = e.clipboardData.getData('text');
+        if (pasteText && (pasteText.includes('재료비') || pasteText.includes('노무비') || pasteText.includes('도급') || pasteText.includes('원가'))) {
+            e.preventDefault();
+            parseAndApplyCostText(pasteText, "클립보드 텍스트");
+        }
+    }
+});
+
+// 파일 처리 라우터 (XLSX/XLS, PDF, 또는 이미지 파일)
+function handleFile(file) {
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    
+    // 이미지 파일 처리
+    if (['png', 'jpg', 'jpeg', 'webp', 'bmp', 'tif', 'tiff', 'gif'].includes(ext)) {
+        handleImageFile(file);
+    } else if (ext === 'pdf') {
+        handlePdfFile(file);
+    } else {
+        handleExcelFile(file);
+    }
+}
+
+// 엑셀(XLSX/XLS) 파일 파서 (원가계산서 시트 우선 탐색 및 전 비목 정밀 추출)
+function handleExcelFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            
+            // 1. '원가' 또는 '원가계산'이 포함된 시트를 우선 선택, 없으면 첫 번째 시트
+            let targetSheetName = wb.SheetNames.find(name => /원가|계산서|공사원가/i.test(name)) || wb.SheetNames[0];
+            const sheet = wb.Sheets[targetSheetName];
+            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            let foundDirectMat = 0;
+            let foundDirectLab = 0;
+            let foundOutputExp = 0;
+            let foundWasteCost = 0;
+            let foundTotal = 0;
+            const extractedBreakdown = {};
+
+            json.forEach(row => {
+                if (!row || row.length < 2) return;
+                const rStr = row.map(c => String(c || '')).join(" ").replace(/\s+/g, '');
+                
+                // 유효 숫자 추출 (소수점은 반올림/정수화)
+                const numbers = [];
+                row.forEach(c => {
+                    let num = 0;
+                    if (typeof c === 'number' && !isNaN(c)) {
+                        num = Math.round(c);
+                    } else if (typeof c === 'string') {
+                        const clean = c.replace(/[,\s원₩]/g, '');
+                        if (/^[0-9]+(?:\.[0-9]+)?$/.test(clean)) {
+                            num = Math.round(parseFloat(clean));
+                        }
+                    }
+                    if (num > 0) numbers.push(num);
+                });
+
+                if (numbers.length === 0) return;
+                const lastNum = numbers[numbers.length - 1];
+
+                // 주요 핵심 변수
+                if ((rStr.includes("직접재료비") || (rStr.includes("재료비") && !rStr.includes("기타") && !rStr.includes("소계") && !rStr.includes("간접"))) && foundDirectMat === 0) {
+                    foundDirectMat = lastNum;
+                }
+                if ((rStr.includes("직접노무비") || (rStr.includes("직접노무") && !rStr.includes("간접"))) && foundDirectLab === 0) {
+                    foundDirectLab = lastNum;
+                }
+                if (rStr.includes("산출경비") && !rStr.includes("보험") && !rStr.includes("기타") && foundOutputExp === 0) {
+                    foundOutputExp = lastNum;
+                }
+                if ((rStr.includes("폐기물처리") || rStr.includes("폐기물")) && foundWasteCost === 0) {
+                    foundWasteCost = lastNum;
+                }
+                if ((rStr.includes("총공사비") || rStr.includes("총도급") || rStr.includes("도급액") || rStr.includes("합계금액")) && lastNum > foundTotal) {
+                    foundTotal = lastNum;
+                }
+
+                // 세부 비목 매핑
+                if (rStr.includes("간접노무비") || rStr.includes("간접노무")) extractedBreakdown["indirect_labor"] = lastNum;
+                if (rStr.includes("산재보험료") || rStr.includes("산재보험")) extractedBreakdown["industrial_accident"] = lastNum;
+                if (rStr.includes("고용보험료") || rStr.includes("고용보험")) extractedBreakdown["employment_insurance"] = lastNum;
+                if (rStr.includes("건강보험료") || rStr.includes("국민건강")) extractedBreakdown["health_insurance"] = lastNum;
+                if (rStr.includes("연금보험료") || rStr.includes("국민연금")) extractedBreakdown["pension"] = lastNum;
+                if (rStr.includes("장기요양") || rStr.includes("노인장기")) extractedBreakdown["elderly_care"] = lastNum;
+                if (rStr.includes("산업안전보건") || rStr.includes("안전관리비") || (rStr.includes("산안비") && !rStr.includes("기타"))) extractedBreakdown["safety_management"] = lastNum;
+                if (rStr.includes("퇴직공제")) extractedBreakdown["retirement_deduction"] = lastNum;
+                if (rStr.includes("환경보전비") || rStr.includes("환경보전")) extractedBreakdown["environment_preservation"] = lastNum;
+                if (rStr.includes("기타경비")) extractedBreakdown["other_expense"] = lastNum;
+                if (rStr.includes("임금채권")) extractedBreakdown["wage_claim"] = lastNum;
+                if (rStr.includes("석면분담") || rStr.includes("석면피해")) extractedBreakdown["asbestos_relief"] = lastNum;
+                if (rStr.includes("일반관리비") || rStr.includes("일반관리")) extractedBreakdown["general_admin"] = lastNum;
+                if (rStr.includes("이윤") && !rStr.includes("일반관리")) extractedBreakdown["profit"] = lastNum;
+            });
+
+            // 콤마(,) 포맷팅하여 입력 필드에 주입
+            if (foundDirectMat > 0) document.getElementById("inDirectMat").value = formatWithComma(foundDirectMat);
+            if (foundDirectLab > 0) document.getElementById("inDirectLab").value = formatWithComma(foundDirectLab);
+            if (foundOutputExp > 0) document.getElementById("inOutputExp").value = formatWithComma(foundOutputExp);
+            if (foundWasteCost > 0) document.getElementById("inWasteCost").value = formatWithComma(foundWasteCost);
+            if (foundTotal > 0) document.getElementById("inVendorTotal").value = formatWithComma(foundTotal);
+
+            // 세부 비목 주입
+            for (const [key, val] of Object.entries(extractedBreakdown)) {
+                if (val > 0) {
+                    vendorBreakdown[key] = val;
+                }
+            }
+
+            const baseName = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById("inProjectTitle").value = baseName;
+            autoDetectTrade(baseName);
+
+            runCalculation();
+            alert(`🎉 엑셀 파일(${file.name} - [${targetSheetName}] 시트) 분석 완료!\n핵심 변수 및 세부 비목이 자동으로 완벽히 입력되었습니다.`);
+        } catch (err) {
+            alert(`엑셀 파싱 중 오류가 발생했습니다: ${err.message}`);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// PDF 견적서 정밀 파서 (PDF.js 기반, 자간 공백/다중페이지 완벽 대응)
+async function handlePdfFile(file) {
+    if (typeof pdfjsLib === 'undefined') {
+        alert('PDF 처리 엔진을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
+        return;
+    }
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        
+        let costSheetText = '';
+        let allText = '';
+        let foundCostPage = false;
+
+        // 1. 페이지별 탐색: [원가계산서]가 들어있는 페이지를 우선 추출
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            allText += pageText + '\n';
+
+            const cleanPageText = pageText.replace(/\s+/g, '');
+            if (cleanPageText.includes('원가계산서') && !foundCostPage) {
+                costSheetText = pageText;
+                foundCostPage = true;
+            }
+        }
+
+        // 텍스트가 40자 이하인 경우 = 복합기 스캔본 이미지 PDF
+        if (allText.trim().length < 40) {
+            showOcrProgress("📑 스캔본 이미지 PDF 감지! Google Gemini AI 고해상도 비전 분석으로 전환합니다...");
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 2.0 }); // 고화질 2배율 렌더링
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+            
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+            
+            await analyzeImageWithGemini(dataUrl, 'image/jpeg', file.name);
+            hideOcrProgress();
+            return;
+        }
+
+        // 원가계산서 전용 페이지가 없으면 전체 문서 사용
+        const targetText = foundCostPage ? (costSheetText + '\n' + allText) : allText;
+
+        // 2. 자간 공백(직 접 재 료 비 등) 및 특수문자를 아우르는 정밀 금액 파서
+        const parseAmountWithPattern = (patternList) => {
+            for (const p of patternList) {
+                const regex = new RegExp(p + '[\\s\\S]{0,35}?([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{4,})', 'i');
+                const m = targetText.match(regex);
+                if (m && m[1]) {
+                    const clean = m[1].replace(/[,\s]/g, '');
+                    const val = parseInt(clean);
+                    if (!isNaN(val) && val > 0) return val;
+                }
+            }
+            return 0;
+        };
+
+        const directMat = parseAmountWithPattern([
+            '직\\s*접\\s*재\\s*료\\s*비',
+            '재\\s*료\\s*비\\s*소\\s*계',
+            '가\\s*[.)\\-]\\s*재\\s*료\\s*비'
+        ]);
+
+        const directLab = parseAmountWithPattern([
+            '직\\s*접\\s*노\\s*무\\s*비',
+            '나\\s*[-.]\\s*1\\s*[.)\\-]\\s*직\\s*접\\s*노\\s*무\\s*비'
+        ]);
+
+        const indirectLab = parseAmountWithPattern([
+            '간\\s*접\\s*노\\s*무\\s*비',
+            '나\\s*[-.]\\s*2\\s*[.)\\-]\\s*간\\s*접\\s*노\\s*무\\s*비'
+        ]);
+
+        const outputExp = parseAmountWithPattern([
+            '산\\s*출\\s*경\\s*비',
+            '기\\s*계\\s*경\\s*비',
+            '기\\s*계\\s*경\\s*비\\s*소\\s*계'
+        ]);
+
+        const sanjae = parseAmountWithPattern(['산\\s*재\\s*보\\s*험']);
+        const goyong = parseAmountWithPattern(['고\\s*용\\s*보\\s*험']);
+        const health = parseAmountWithPattern(['건\\s*강\\s*보\\s*험']);
+        const pension = parseAmountWithPattern(['연\\s*금\\s*보\\s*험', '국\\s*민\\s*연\\s*금']);
+        const care = parseAmountWithPattern(['노\\s*인\\s*장\\s*기\\s*요\\s*양', '장\\s*기\\s*요\\s*양']);
+        const safety = parseAmountWithPattern(['산\\s*업\\s*안\\s*전\\s*보\\s*건', '안\\s*전\\s*관\\s*리\\s*비', '산\\s*안\\s*비']);
+        const retire = parseAmountWithPattern(['퇴\\s*직\\s*공\\s*제']);
+        const env = parseAmountWithPattern(['환\\s*경\\s*보\\s*전\\s*비', '환\\s*경\\s*보\\s*전']);
+        const otherExp = parseAmountWithPattern(['기\\s*타\\s*경\\s*비']);
+        const admin = parseAmountWithPattern(['일\\s*반\\s*관\\s*리\\s*비']);
+        const profit = parseAmountWithPattern(['이\\s*윤']);
+        const waste = parseAmountWithPattern(['폐\\s*기\\s*물\\s*처\\s*리', '폐\\s*기\\s*물']);
+
+        const totalAmt = parseAmountWithPattern([
+            '도\\s*급\\s*금\\s*액',
+            '총\\s*도\\s*급\\s*액',
+            '총\\s*공\\s*사\\s*비',
+            '견\\s*적\\s*가',
+            '총\\s*합\\s*계'
+        ]);
+
+        // 입력 폼에 추출된 값 세팅 (콤마 적용)
+        if (directMat > 0) document.getElementById("inDirectMat").value = formatWithComma(directMat);
+        if (directLab > 0) document.getElementById("inDirectLab").value = formatWithComma(directLab);
+        if (outputExp > 0) document.getElementById("inOutputExp").value = formatWithComma(outputExp);
+        if (waste > 0) document.getElementById("inWasteCost").value = formatWithComma(waste);
+        if (totalAmt > 0) document.getElementById("inVendorTotal").value = formatWithComma(totalAmt);
+
+        // 세부 비목 세팅
+        if (indirectLab > 0) vendorBreakdown["indirect_labor"] = indirectLab;
+        if (sanjae > 0) vendorBreakdown["industrial_accident"] = sanjae;
+        if (goyong > 0) vendorBreakdown["employment_insurance"] = goyong;
+        if (health > 0) vendorBreakdown["health_insurance"] = health;
+        if (pension > 0) vendorBreakdown["pension"] = pension;
+        if (care > 0) vendorBreakdown["elderly_care"] = care;
+        if (safety > 0) vendorBreakdown["safety_management"] = safety;
+        if (retire > 0) vendorBreakdown["retirement_deduction"] = retire;
+        if (env > 0) vendorBreakdown["environment_preservation"] = env;
+        if (otherExp > 0) vendorBreakdown["other_expense"] = otherExp;
+        if (admin > 0) vendorBreakdown["general_admin"] = admin;
+        if (profit > 0) vendorBreakdown["profit"] = profit;
+
+        // 공사명
+        const baseName = file.name.replace(/\.[^/.]+$/, "");
+        const titleMatch = targetText.match(/공\s*사\s*명\s*[:：]?\s*([^\n\r]+)/);
+        const projectTitle = titleMatch ? titleMatch[1].trim() : baseName;
+        document.getElementById("inProjectTitle").value = projectTitle;
+
+        // 공종 자동 감지
+        autoDetectTrade(projectTitle + " " + targetText.slice(0, 1000));
+
+        // 공사기간 감지
+        const periodMatch = targetText.match(/(?:공사기간|공\s*기)\s*[:：]?\s*([0-9]+)\s*(?:일|일간)/);
+        if (periodMatch) {
+            document.getElementById("inPeriodDays").value = parseInt(periodMatch[1]);
+        }
+
+        runCalculation();
+        
+        let msg = `PDF 파일 분석 완료!\n`;
+        msg += `• 공사명: ${projectTitle}\n`;
+        msg += `• 직접재료비: ${directMat > 0 ? formatWithComma(directMat) + '원' : '미감지(수동입력 권장)'}\n`;
+        msg += `• 직접노무비: ${directLab > 0 ? formatWithComma(directLab) + '원' : '미감지(수동입력 권장)'}\n`;
+        msg += `• 총도급액: ${totalAmt > 0 ? formatWithComma(totalAmt) + '원' : '미감지'}`;
+        alert(msg);
+    } catch (err) {
+        alert(`PDF 파싱 실패: ${err.message}\n직접 수치를 입력하여 검수를 진행하실 수 있습니다.`);
+    }
+}
+
+// 공사명/텍스트 기반 공종 자동 감지
+function autoDetectTrade(text) {
+    const t = text.toLowerCase();
+    const sel = document.getElementById("selTrade");
+    if (!sel) return;
+
+    if (t.includes("석면") || t.includes("텍스") || t.includes("해체제거")) {
+        sel.value = "asbestos";
+    } else if (t.includes("전기") || t.includes("조명") || t.includes("led") || t.includes("수배전반") || t.includes("배선")) {
+        sel.value = "electrical";
+    } else if (t.includes("통신") || t.includes("cctv") || t.includes("방송") || t.includes("lan") || t.includes("네트워크")) {
+        sel.value = "telecom";
+    } else if (t.includes("소방") || t.includes("스프링클러") || t.includes("화재") || t.includes("감지기")) {
+        sel.value = "fire";
+    } else if (t.includes("토목") || t.includes("포장") || t.includes("옹벽") || t.includes("운동장") || t.includes("배수로")) {
+        sel.value = "civil";
+    } else {
+        sel.value = "building";
+    }
+}
+
+// 드래그앤드롭 이벤트 리스너
+const dropZone = document.getElementById("dropZone");
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.add('dragover'); }, false);
+});
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); }, false);
+});
+dropZone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    if (dt.files && dt.files.length > 0) handleFile(dt.files[0]);
+});
+
+// 테마 전환 (다크 <-> 라이트/화이트)
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute("data-theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+    setTheme(next);
+}
+
+function setTheme(theme) {
+    const html = document.documentElement;
+    html.setAttribute("data-theme", theme);
+    localStorage.setItem("cost_audit_theme", theme);
+
+    const icon = document.getElementById("themeIcon");
+    const text = document.getElementById("themeText");
+    if (icon && text) {
+        if (theme === "light") {
+            icon.innerText = "🌙";
+            text.innerText = "다크 모드";
+        } else {
+            icon.innerText = "☀️";
+            text.innerText = "화이트 모드";
+        }
+    }
+}
+
+function initTheme() {
+    const saved = localStorage.getItem("cost_audit_theme") || "dark";
+    setTheme(saved);
+}
+
+// 초기 실행
+window.onload = function() {
+    initTheme();
+    runCalculation();
+};
+</script>
+
+</body>
+</html>
+
