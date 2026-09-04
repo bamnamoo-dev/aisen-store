@@ -231,7 +231,7 @@ export default function HomePage() {
         </a>
 
         {/* =========================================================================
-            ROW 2: 회계 & 예산 & 정산 (Emerald Green Top Accent 🟢)
+            ROW 2: 회계 & 예산 & 계약 (Emerald Green Top Accent 🟢)
         ========================================================================= */}
 
         {/* CARD 5: 학교회계 대시보드 */}
@@ -304,9 +304,9 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 7: 엑셀시트별 분리저장기 */}
+        {/* CARD 7: 스마트 원가계산서 검증기 (회계·계약 전진 배치 ⭐) */}
         <Link 
-          href="/tools/sheet-splitter" 
+          href="/tools/cost-audit" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           {/* Top Accent Stripe */}
@@ -315,26 +315,26 @@ export default function HomePage() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
-                <FileSpreadsheet size={18} />
+                <Calculator size={18} />
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
-                  초고속 분리
+                  2026 고시
                 </span>
                 <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </div>
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
-              엑셀시트 분리기
+              스마트 원가계산서 검증기
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장
+              조달청 법정 제비율 역산 대차대조 &amp; Gemini AI 서류 판독
             </p>
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
-            <span>시트 분리하기</span>
+            <span>검증기 열기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
@@ -375,7 +375,7 @@ export default function HomePage() {
         </Link>
 
         {/* =========================================================================
-            ROW 3: 행정 실무 & 서식 & 도면 (Purple Top Accent 🟣)
+            ROW 3: 행정 실무 자료실 & 문서 툴킷 (Purple Top Accent 🟣)
         ========================================================================= */}
 
         {/* CARD 9: 행정 자료실 */}
@@ -483,9 +483,9 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 12: 교실배치도 제작기 */}
+        {/* CARD 12: 엑셀시트 분리기 (실무 유틸리티 도메인 연계 ⭐) */}
         <Link 
-          href="/tools/classmap" 
+          href="/tools/sheet-splitter" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           {/* Top Accent Stripe */}
@@ -494,38 +494,73 @@ export default function HomePage() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 group-hover:scale-105 transition-transform">
-                <LayoutGrid size={18} />
+                <FileSpreadsheet size={18} />
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200 whitespace-nowrap">
-                  도면제작
+                  초고속 분리
                 </span>
                 <ArrowRight size={14} className="text-slate-400 group-hover:text-purple-600 transition-colors" />
               </div>
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
-              교실배치도 제작기
+              엑셀시트 분리기
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              층별·특별실 교실배치도 시각화 및 직관적 도면 생성
+              엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장
             </p>
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
-            <span>배치도 제작</span>
+            <span>시트 분리하기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
         {/* =========================================================================
-            ROW 4: 힐링 포인트 (Rose Coral Top Accent 🔴)
+            ROW 4: 시즌 도면 & 힐링 (와이드 2x2 균형 배치 꽉 찬 그리드)
         ========================================================================= */}
 
-        {/* CARD 13: 수박 게임 */}
+        {/* CARD 13: 스마트 교실배치도 제작기 (2칸 와이드 카드) */}
+        <Link 
+          href="/tools/classmap" 
+          className="col-span-1 sm:col-span-1 lg:col-span-2 relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer bg-white"
+        >
+          {/* Top Accent Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-indigo-600 group-hover:h-[5px] transition-all" />
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 group-hover:scale-105 transition-transform">
+                <LayoutGrid size={18} />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[11.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200 whitespace-nowrap">
+                  도면제작 &amp; 인쇄
+                </span>
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
+              </div>
+            </div>
+
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+              스마트 교실배치도 제작기
+            </h2>
+            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
+              층별·특별실 평면도 시각화, 학년도별 교실배치 JSON 백업 및 A4 고화질 도면 출력
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-indigo-600 font-bold">
+            <span>배치도 제작하기</span>
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </Link>
+
+        {/* CARD 14: 수박 게임 (2칸 와이드 카드) */}
         <Link 
           href="/tools/watermelon" 
-          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="col-span-1 sm:col-span-1 lg:col-span-2 relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-rose-500 group-hover:h-[5px] transition-all" />
@@ -537,57 +572,22 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200 whitespace-nowrap">
-                  랭킹 게임
+                  전국 교직원 랭킹
                 </span>
                 <ArrowRight size={14} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
               </div>
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
-              수박 게임
+              행정 힐링 수박 게임
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              3D 벡터 과일 합치기 &amp; 실시간 글로벌 랭킹 게임
+              3D 물리엔진 과일 합성 진화 게임 &amp; 실시간 전국 랭킹 Top 10 (보스키 ` 탑재)
             </p>
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-rose-600 font-bold">
-            <span>게임 시작</span>
-            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-          </div>
-        </Link>
-
-        {/* CARD 14: 스마트 원가계산서 검증기 */}
-        <Link 
-          href="/tools/cost-audit" 
-          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
-        >
-          {/* Top Accent Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
-                <Calculator size={18} />
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
-                  2026 고시
-                </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
-              </div>
-            </div>
-
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              스마트 원가계산서 검증기
-            </h2>
-            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              조달청 법정 제비율 역산 대차대조 &amp; Gemini AI 서류 판독
-            </p>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
-            <span>검증기 열기</span>
+            <span>게임 시작하기</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
