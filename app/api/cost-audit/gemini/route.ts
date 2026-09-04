@@ -11,6 +11,9 @@ const FALLBACK_MODELS = [
 // 1인당 1일 최대 호출 한도 (학교 동일 IP 환경 고려하여 브라우저 사용자 UID 기준)
 const DAILY_MAX_CALLS_PER_USER = 30;
 
+// 관리자 계정 목록 (한도 완전 제외 및 무제한 이용)
+const ADMIN_EMAILS = ['bamnmaoo@gmail.com', 'bamnamoo@gmail.com'];
+
 // 서버 메모리 일일 사용량 캐시: key = `${today}_${userId}` -> count
 interface UsageRecord {
   count: number;
@@ -34,7 +37,7 @@ function getKstDayInfo() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { base64Data, mimeType = 'image/jpeg', prompt, clientUid } = body;
+    const { base64Data, mimeType = 'image/jpeg', prompt, clientUid, userEmail } = body;
 
     if (!base64Data) {
       return NextResponse.json(
@@ -43,12 +46,16 @@ export async function POST(req: Request) {
       );
     }
 
+    // 0. 관리자 계정 확인 (bamnmaoo@gmail.com 등은 30회 한도 완전 제외)
+    const normalizedEmail = (userEmail || '').toLowerCase().trim();
+    const isAdmin = ADMIN_EMAILS.includes(normalizedEmail);
+
     // 1. 사용자 식별자 확인 (학교 공용 IP 환경 배려: 클라이언트 고유 UID 우선, 없을 시 IP)
     const forwardedFor = req.headers.get('x-forwarded-for') || '';
     const clientIp = forwardedFor.split(',')[0].trim() || 'unknown';
     const userId = clientUid ? `uid_${clientUid}` : `ip_${clientIp}`;
 
-    // 2. 일일 30회 제한 검증
+    // 2. 일일 30회 제한 검증 (관리자는 제외!)
     const { dateStr, resetAt } = getKstDayInfo();
     const cacheKey = `${dateStr}_${userId}`;
     const record = userDailyUsage.get(cacheKey) || { count: 0, resetAt };
@@ -61,7 +68,7 @@ export async function POST(req: Request) {
       }
     }
 
-    if (record.count >= DAILY_MAX_CALLS_PER_USER) {
+    if (!isAdmin && record.count >= DAILY_MAX_CALLS_PER_USER) {
       return NextResponse.json(
         {
           error: `오늘의 1인 무료 AI 정밀 판독 한도(${DAILY_MAX_CALLS_PER_USER}회)를 모두 사용하셨습니다.\n(※ 엑셀 및 PDF 서류 업로드 감사는 무제한 이용 가능합니다. 내일 0시에 초기화됩니다.)`,
@@ -131,17 +138,20 @@ export async function POST(req: Request) {
 
         const parsed = JSON.parse(candidateText);
 
-        // 성공 시 사용 횟수 증가 및 기록
-        record.count += 1;
-        userDailyUsage.set(cacheKey, record);
+        // 성공 시 사용 횟수 증가 (관리자는 차감 없이 무제한)
+        if (!isAdmin) {
+          record.count += 1;
+          userDailyUsage.set(cacheKey, record);
+        }
 
         return NextResponse.json({
           success: true,
           model,
           data: parsed,
-          limit: DAILY_MAX_CALLS_PER_USER,
-          used: record.count,
-          remaining: DAILY_MAX_CALLS_PER_USER - record.count,
+          isAdmin,
+          limit: isAdmin ? 999999 : DAILY_MAX_CALLS_PER_USER,
+          used: isAdmin ? 0 : record.count,
+          remaining: isAdmin ? 999999 : (DAILY_MAX_CALLS_PER_USER - record.count),
         });
       } catch (err: any) {
         console.warn(`[API Gemini ${model} Exception]:`, err.message);

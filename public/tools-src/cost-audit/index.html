@@ -1063,7 +1063,7 @@
         <div id="pasteImageSection">
             <div style="background:rgba(59, 130, 246, 0.09); border:1px solid rgba(59, 130, 246, 0.3); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--accent-blue); margin-bottom:10px; line-height:1.5;">
                 ⚡ <strong>스마트 회전 지원</strong>: 스캔본/캡처 견적서가 90° 누워있어도 <strong>시스템이 자동으로 회전하여 최적 각도로 판독</strong>합니다!<br>
-                🛡️ <strong>1인당 1일 30회 무료 AI 판독</strong>: 학교 공용 IP 환경을 배려하여 <strong>개별 사용자 브라우저 기준 1인당 1일 30회</strong>까지 넉넉하게 제공됩니다. (※ 엑셀·PDF 파일 업로드는 <strong>무제한 무료</strong>입니다.)
+                <div id="pasteRateNotice">🛡️ <strong>1인당 1일 30회 무료 AI 판독</strong>: 학교 공용 IP 환경을 배려하여 <strong>개별 사용자 브라우저 기준 1인당 1일 30회</strong>까지 넉넉하게 제공됩니다. (※ 엑셀·PDF 파일 업로드는 <strong>무제한 무료</strong>입니다.)</div>
             </div>
             
             <div id="canvasContainer" style="max-height:360px; min-height:180px; overflow:auto; border:1px solid var(--card-border); border-radius:10px; background:rgba(0,0,0,0.18); display:flex; justify-content:center; align-items:center; padding:12px;">
@@ -1757,6 +1757,20 @@ function openPasteModal() {
         if (!currentPasteImage) {
             switchPasteTab('image');
         }
+
+        // 관리자 인증 여부에 따른 배지 동적 업데이트
+        const noticeEl = document.getElementById("pasteRateNotice");
+        if (noticeEl) {
+            if (isUserAdmin()) {
+                noticeEl.innerHTML = `👑 <strong>관리자 계정 (${getUserEmail()})</strong> 인증됨: 1일 30회 한도 완전 제외 (<strong>무제한 AI 판독</strong>)`;
+                noticeEl.style.color = "#f59e0b";
+                noticeEl.style.fontWeight = "700";
+            } else {
+                noticeEl.innerHTML = `🛡️ <strong>1인당 1일 30회 무료 AI 판독</strong>: 학교 공용 IP 환경을 배려하여 <strong>개별 사용자 브라우저 기준 1인당 1일 30회</strong>까지 넉넉하게 제공됩니다. (※ 엑셀·PDF 파일 업로드는 <strong>무제한 무료</strong>입니다.)`;
+                noticeEl.style.color = "";
+                noticeEl.style.fontWeight = "";
+            }
+        }
     }
 }
 
@@ -1819,6 +1833,21 @@ function renderCanvasImage() {
     ctx.rotate((angle * Math.PI) / 180);
     ctx.drawImage(currentPasteImage, -currentPasteImage.width / 2, -currentPasteImage.height / 2);
     ctx.restore();
+}
+
+// 관리자 계정 목록 (한도 완전 제외 및 무제한 이용)
+const ADMIN_EMAILS = ['bamnmaoo@gmail.com', 'bamnamoo@gmail.com'];
+
+function getUserEmail() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailFromUrl = urlParams.get('email');
+    if (emailFromUrl) return emailFromUrl;
+    return localStorage.getItem("cost_audit_admin_email") || "";
+}
+
+function isUserAdmin() {
+    const email = (getUserEmail() || "").toLowerCase().trim();
+    return ADMIN_EMAILS.includes(email);
 }
 
 // 고유 클라이언트 식별자 (학교 동일 IP 공유 환경에서 1인당 30회 공평 배분)
@@ -1904,22 +1933,25 @@ async function analyzeImageWithGemini(base64Data, mimeType = "image/jpeg", fileN
   "vendorTotal": 0
 }`;
 
-    // 1. 고유 사용자 식별자 생성/조회 (학교 동일 IP 공유 환경 배려)
+    // 1. 고유 사용자 식별자 생성/조회 및 관리자 이메일 확인
     const clientUid = getClientUid();
+    const userEmail = getUserEmail();
 
-    // 2. Next.js 보안 서버 라우트(/api/cost-audit/gemini) 호출 (1인당 30회 일일 한도 적용)
+    // 2. Next.js 보안 서버 라우트(/api/cost-audit/gemini) 호출 (관리자는 무제한, 일반은 1일 30회)
     try {
         const response = await fetch("/api/cost-audit/gemini", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ base64Data, mimeType, prompt, clientUid })
+            body: JSON.stringify({ base64Data, mimeType, prompt, clientUid, userEmail })
         });
 
         if (response.ok) {
             const resData = await response.json();
             if (resData.data) {
                 hideOcrProgress();
-                if (typeof resData.remaining === 'number') {
+                if (resData.isAdmin) {
+                    console.log(`👑 [관리자 인증] 1일 30회 제한 없이 무제한 AI 판독이 적용되었습니다.`);
+                } else if (typeof resData.remaining === 'number') {
                     console.log(`[AI 쿼터 현황] 오늘 남은 횟수: ${resData.remaining}/${resData.limit}회`);
                 }
                 applyGeminiResult(resData.data, fileName);

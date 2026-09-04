@@ -1,15 +1,28 @@
 'use client';
 
 import { Calculator } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import ToolHeader from '@/components/ToolHeader';
+import { supabase } from '@/lib/supabase';
 
 export default function CostAuditPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeSrc, setIframeSrc] = useState('/tools-src/cost-audit/index.html');
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const email = session?.user?.email;
+      if (email) {
+        setIframeSrc(`/tools-src/cost-audit/index.html?email=${encodeURIComponent(email)}`);
+      }
+    };
+    checkAuth();
+  }, []);
 
   const handleReload = () => {
     if (iframeRef.current) {
-      iframeRef.current.src = '/tools-src/cost-audit/index.html';
+      iframeRef.current.src = iframeSrc;
     }
   };
 
@@ -27,7 +40,7 @@ export default function CostAuditPage() {
       {/* 원본 웹앱 100% 풀스크린 뷰어 */}
       <iframe
         ref={iframeRef}
-        src="/tools-src/cost-audit/index.html"
+        src={iframeSrc}
         title="스마트 원가계산서 검증기"
         className="w-full flex-1 border-none bg-slate-950"
         allow="clipboard-read; clipboard-write; printing"
