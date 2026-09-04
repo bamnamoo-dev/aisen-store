@@ -1062,7 +1062,8 @@
         <!-- 이미지 OCR 영역 -->
         <div id="pasteImageSection">
             <div style="background:rgba(59, 130, 246, 0.09); border:1px solid rgba(59, 130, 246, 0.3); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--accent-blue); margin-bottom:10px; line-height:1.5;">
-                ⚡ <strong>스마트 회전 지원</strong>: 스캔본/캡처 견적서가 90° 누워있어도 <strong>시스템이 자동으로 회전하여 최적 각도로 판독</strong>합니다! 필요시 [🔄 90° 회전] 버튼으로 수동 회전도 가능합니다.
+                ⚡ <strong>스마트 회전 지원</strong>: 스캔본/캡처 견적서가 90° 누워있어도 <strong>시스템이 자동으로 회전하여 최적 각도로 판독</strong>합니다!<br>
+                🛡️ <strong>1인당 1일 30회 무료 AI 판독</strong>: 학교 공용 IP 환경을 배려하여 <strong>개별 사용자 브라우저 기준 1인당 1일 30회</strong>까지 넉넉하게 제공됩니다. (※ 엑셀·PDF 파일 업로드는 <strong>무제한 무료</strong>입니다.)
             </div>
             
             <div id="canvasContainer" style="max-height:360px; min-height:180px; overflow:auto; border:1px solid var(--card-border); border-radius:10px; background:rgba(0,0,0,0.18); display:flex; justify-content:center; align-items:center; padding:12px;">
@@ -1820,6 +1821,16 @@ function renderCanvasImage() {
     ctx.restore();
 }
 
+// 고유 클라이언트 식별자 (학교 동일 IP 공유 환경에서 1인당 30회 공평 배분)
+function getClientUid() {
+    let uid = localStorage.getItem("cost_audit_client_uid");
+    if (!uid) {
+        uid = "user_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now().toString(36);
+        localStorage.setItem("cost_audit_client_uid", uid);
+    }
+    return uid;
+}
+
 // Google Gemini AI 연동 (.env / env.js 기반 자동 로드)
 function getGeminiApiKey() {
     return (window.ENV && window.ENV.GOOGLE_API_KEY) || localStorage.getItem("cost_audit_gemini_key") || "";
@@ -1893,35 +1904,47 @@ async function analyzeImageWithGemini(base64Data, mimeType = "image/jpeg", fileN
   "vendorTotal": 0
 }`;
 
-    // 1. Next.js 보안 서버 라우트(/api/cost-audit/gemini) 우선 호출 (API 키 100% 은닉)
+    // 1. 고유 사용자 식별자 생성/조회 (학교 동일 IP 공유 환경 배려)
+    const clientUid = getClientUid();
+
+    // 2. Next.js 보안 서버 라우트(/api/cost-audit/gemini) 호출 (1인당 30회 일일 한도 적용)
     try {
         const response = await fetch("/api/cost-audit/gemini", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ base64Data, mimeType, prompt })
+            body: JSON.stringify({ base64Data, mimeType, prompt, clientUid })
         });
 
         if (response.ok) {
             const resData = await response.json();
             if (resData.data) {
                 hideOcrProgress();
+                if (typeof resData.remaining === 'number') {
+                    console.log(`[AI 쿼터 현황] 오늘 남은 횟수: ${resData.remaining}/${resData.limit}회`);
+                }
                 applyGeminiResult(resData.data, fileName);
                 return;
             }
+        } else if (response.status === 429) {
+            // 30회 초과 시 친절한 안내 알림
+            const errJson = await response.json();
+            hideOcrProgress();
+            alert(`⚠️ ${errJson.error || "오늘의 1인 무료 AI 판독 한도(30회)를 초과했습니다."}\n\n💡 엑셀(.xlsx)이나 PDF 서류는 무제한으로 계속 감사하실 수 있습니다!`);
+            return;
         }
         console.warn("[Server Route Fallback] 서버 라우트 응답 상태:", response.status);
     } catch (serverErr) {
         console.warn("[Server Route Offline/Local File] 클라이언트 직접 모드로 폴백:", serverErr);
     }
 
-    // 2. 서버 라우트 부재 시 (단독 file:// 실행 등) 클라이언트 로컬스토리지 키로 폴백
+    // 3. 서버 라우트 부재 시 (단독 file:// 실행 등) 클라이언트 로컬스토리지 키로 폴백
     const fallbackKey = getGeminiApiKey();
     if (!fallbackKey) {
         hideOcrProgress();
         throw new Error("보안 서버 연결에 실패했습니다. (단독 실행 시 로컬스토리지에 Gemini API Key를 설정해 주세요.)");
     }
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${fallbackKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${fallbackKey}`;
     const cleanBase64 = base64Data.replace(/^data:[^;]+;base64,/, '');
     const clientRes = await fetch(endpoint, {
         method: "POST",
