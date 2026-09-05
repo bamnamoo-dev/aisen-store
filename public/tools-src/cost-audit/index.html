@@ -579,20 +579,20 @@
             color: #0f172a;
         }
 
-        /* 공문 상자 (에디터 스타일 & 우측 대차대조표와 바닥 끝단 완벽 일치) */
+        /* 공문 상자 (컴팩트 에디터 스타일 & 세로폭 축소 + 스크롤바 탑재로 좌우 균형 일치) */
         .notice-box {
             background: var(--notice-bg);
             border: 1px solid var(--notice-border);
             border-left: 3px solid var(--accent-blue);
             border-radius: 8px;
-            padding: 10px 12px;
+            padding: 8px 10px;
             font-family: "Pretendard", -apple-system, BlinkMacSystemFont, monospace;
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--notice-text);
             white-space: pre-wrap;
-            line-height: 1.5;
-            flex: 1;
-            min-height: 85px;
+            line-height: 1.45;
+            height: 115px;
+            max-height: 115px;
             overflow-y: auto;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
         }
@@ -1060,30 +1060,15 @@
                 </div>
             </div>
 
-            <!-- 실시간 감사 지적사항 요약 칩 패널 (공백 해소 및 감사 핵심 쟁점 1초 직관 파악) -->
-            <div id="violationSummarySection" style="margin-top:6px; margin-bottom:6px; border-top:1px solid var(--card-border); padding-top:6px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
-                        <span>⚖️</span> 실시간 감사 지적사항 요약
-                    </span>
-                    <span id="violationCountBadge" style="font-size:11px; font-weight:800; padding:1px 7px; border-radius:9999px; background:rgba(148, 163, 184, 0.15); color:var(--text-muted);">대기 중</span>
-                </div>
-                <div id="violationChipsArea" style="display:flex; flex-direction:column; gap:4px; max-height:130px; overflow-y:auto; padding-right:2px;">
-                    <div style="font-size:11.5px; color:var(--text-muted); padding:6px 8px; background:var(--input-bg); border-radius:6px; border:1px dashed var(--card-border); text-align:center;">
-                        견적서 입력 시 위반 항목이 자동 요약됩니다.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 공문 미리보기 (남는 세로 공간을 자연스럽게 채워 바닥 끝단 완벽 일치) -->
-            <div style="border-top:1px solid var(--card-border); padding-top:6px; flex:1; display:flex; flex-direction:column; min-height:100px;">
+            <!-- 공문 미리보기 (세로폭 컴팩트 축소 115px & 스크롤바로 좌우 균형 일치) -->
+            <div style="border-top:1px solid var(--card-border); padding-top:6px; margin-top:6px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
                         <span>📄</span> 수정요청 공문 문구
                     </span>
-                    <button class="btn btn-secondary no-print" style="height:25px; padding:0 9px; font-size:11px;" onclick="copyNotice()">📋 복사</button>
+                    <button class="btn btn-secondary no-print" style="height:24px; padding:0 8px; font-size:11px;" onclick="copyNotice()">📋 복사</button>
                 </div>
-                <div class="notice-box" id="officialNoticeBox" style="min-height:95px;"></div>
+                <div class="notice-box" id="officialNoticeBox"></div>
             </div>
         </section>
 
@@ -1115,6 +1100,21 @@
                     </thead>
                     <tbody id="diffTableBody"></tbody>
                 </table>
+            </div>
+
+            <!-- 실시간 감사 지적사항 요약 칩 패널 (우측 하단 배치로 좌우 높이 완벽 일치 & 와이드 2열 그리드) -->
+            <div id="violationSummarySection" style="margin-top:8px; margin-bottom:6px; border-top:1px solid var(--card-border); padding-top:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
+                        <span>⚖️</span> 실시간 감사 지적사항 요약
+                    </span>
+                    <span id="violationCountBadge" style="font-size:11px; font-weight:800; padding:1px 7px; border-radius:9999px; background:rgba(148, 163, 184, 0.15); color:var(--text-muted);">대기 중</span>
+                </div>
+                <div id="violationChipsArea" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:5px; max-height:115px; overflow-y:auto; padding-right:2px;">
+                    <div style="font-size:11.5px; color:var(--text-muted); padding:6px 8px; background:var(--input-bg); border-radius:6px; border:1px dashed var(--card-border); text-align:center; grid-column:1/-1;">
+                        견적서 입력 시 위반 항목이 자동 요약됩니다.
+                    </div>
+                </div>
             </div>
 
             <!-- 감사관 핵심 팁 (콤팩트 인라인 바) -->
@@ -1865,7 +1865,7 @@ function runCalculation(isFromDiffInput = false) {
             countBadge.style.background = 'rgba(16, 185, 129, 0.15)';
             countBadge.style.color = '#10b981';
             chipsArea.innerHTML = `
-                <div style="font-size:11.5px; line-height:1.35; padding:6px 9px; border-radius:6px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); color:#10b981; font-weight:600;">
+                <div style="font-size:11.5px; line-height:1.35; padding:6px 9px; border-radius:6px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); color:#10b981; font-weight:600; grid-column:1/-1;">
                     🟢 <strong>전 비목 적합</strong>: 조달청 법정 상한 및 제비율을 100% 준수하고 있습니다.
                 </div>
             `;
