@@ -4,8 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>스마트 원가계산서 검증기 | AI-SEN Verify Master</title>
-    <!-- CDN SheetJS (XLSX 파싱용) -->
+    <!-- CDN SheetJS (XLSX 원본 - 견적서 파싱 및 파일 읽기용) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        // 파일 읽기용 표준 XLSX 안전 보관
+        window.XLSXReader = window.XLSX;
+        // xlsx-js-style 주입을 위해 일시적으로 전역 XLSX 해제
+        delete window.XLSX;
+    </script>
+    <!-- CDN xlsx-js-style (신호등 색상/스타일 셀 서식 생성 전용) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script>
+        // 스타일 지원 XLSX 객체 분리 보관
+        window.XLSXStyle = window.XLSX || window.XLSXReader;
+        // 기본 XLSX는 100% 안전한 파일 파싱을 위해 원본 XLSXReader로 즉시 복원
+        window.XLSX = window.XLSXReader;
+    </script>
     <!-- CDN PDF.js (PDF 파싱용) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
@@ -2899,11 +2913,45 @@ function initTheme() {
 }
 
 // =========================================================================
+// 엑셀 파일 안전 다운로드 (xlsx-js-style 및 Blob 2단계 폴백)
+// =========================================================================
+function saveWorkbook(wb, fileName) {
+    const xlsxLib = window.XLSXStyle || window.XLSX;
+    try {
+        xlsxLib.writeFile(wb, fileName);
+    } catch (err) {
+        console.warn("xlsxLib.writeFile failed, attempting direct Blob download fallback:", err);
+        try {
+            const wbout = xlsxLib.write(wb, { bookType: 'xlsx', type: 'array' });
+            const BlobConstructor = window.Blob || (typeof Blob !== 'undefined' ? Blob : null);
+            if (!BlobConstructor) throw new Error("Blob is not supported in this environment");
+            const blob = new BlobConstructor([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = (window.URL || URL).createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            if (typeof setTimeout !== 'undefined') {
+                setTimeout(() => (window.URL || URL).revokeObjectURL(url), 10000);
+            } else if (typeof window !== 'undefined' && window.setTimeout) {
+                window.setTimeout(() => (window.URL || URL).revokeObjectURL(url), 10000);
+            }
+        } catch (blobErr) {
+            console.error("Direct Blob download also failed:", blobErr);
+            throw blobErr;
+        }
+    }
+}
+
+// =========================================================================
 // [기능 3] 2026 조달청 표준 학교공사 원가계산서 템플릿(.xlsx) 다운로드 (수식형 & 자가진단)
 // =========================================================================
 function downloadStandardTemplate() {
     try {
-        if (typeof XLSX === 'undefined') {
+        const xlsxLib = window.XLSXStyle || window.XLSX;
+        if (typeof xlsxLib === 'undefined') {
             alert("엑셀 엔진(SheetJS)을 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
             return;
         }
@@ -2915,7 +2963,7 @@ function downloadStandardTemplate() {
         };
         const tradeName = tradeNames[trade] || "건축공사";
 
-        // 공종별 안전 요율 매핑 (오류 원천 차단)
+        // 공종별 안전 요율 매핑
         const tradeRatesMap = {
             building: { indLab: 0.145, otherExp: 0.0535, safety: 0.0293 },
             civil: { indLab: 0.191, otherExp: 0.055, safety: 0.0315 },
@@ -2952,39 +3000,39 @@ function downloadStandardTemplate() {
         const calcVat = Math.round(calcTotalCost * 0.10);
         const calcFinalTotal = Math.floor((calcTotalCost + calcVat) / 10) * 10;
 
-        // AOA 기본 뼈대 구성 (Row 0 ~ Row 36)
+        // AOA 기본 뼈대 구성 (원형 신호등 ● 심볼 및 선명한 텍스트 탑재)
         const aoa = [
             ["【공사원가계산서】 (2026 조달청 표준 학교공사 수식형 서식)", "", "", "", ""],
             ["■ 공종:", tradeName, "■ 공사기간(일수):", 30, "※ D2셀에 29 이하 입력 시 건강/연금/요양 자동 0원 및 오류 감지!"],
-            ["※ 노란색/연회색 셀(공사기간, 직접재료비, 직접노무비 등)을 수정하시면 조달청 제비율 및 법정 오류가 실시간 자동 연산됩니다.", "", "", "", ""],
+            ["※ 노란색 셀(공사기간, 직접재료비, 직접노무비 등)을 수정하시면 조달청 제비율 및 법정 신호등 오류가 실시간 연산됩니다.", "", "", "", ""],
             ["", "", "", "", ""],
-            ["비 목 (항목명)", "금 액 (원)", "요율 / 구성비", "2026 조달청 산출 공식", "실시간 법정 자가진단 (오류 감지)"],
-            ["직접재료비", baseMat, "-", "설계도면 및 수량산출내역서 기준 실비", "🟢 정상 입력"],
-            ["간접재료비", 0, "-", "직접재료비에 포함되지 않는 소모성 재료비", "🟢 정상"],
+            ["비 목 (항목명)", "금 액 (원)", "요율 / 구성비", "2026 조달청 산출 공식", "실시간 법정 자가진단 (신호등 오류감지)"],
+            ["직접재료비", baseMat, "-", "설계도면 및 수량산출내역서 기준 실비", "● [정상] 설계 및 산출내역 기준"],
+            ["간접재료비", 0, "-", "직접재료비에 포함되지 않는 소모성 재료비", "● [정상] 소모성 재료비"],
             ["[재료비 소계]", baseMat, "-", "직접재료비 + 간접재료비", "-"],
-            ["직접노무비", baseLab, "-", "공사 목적물 시공에 직접 투입되는 노무비", "🟢 정상 입력"],
-            ["간접노무비", calcIndLab, indLabRate, "직접노무비 × 간접노무비율", "🟢 적합"],
+            ["직접노무비", baseLab, "-", "공사 목적물 시공에 직접 투입되는 노무비", "● [정상] 직접투입 노무비"],
+            ["간접노무비", calcIndLab, indLabRate, "직접노무비 × 간접노무비율", "● [적합] 법정 상한 이내"],
             ["[노무비 소계]", calcLabTotal, "-", "직접노무비 + 간접노무비", "-"],
-            ["기계경비 (산출경비)", 0, "-", "중장비 임대료 및 유류대 등 품셈 실비", "🟢 정상"],
-            ["기타경비", calcOtherExp, otherExpRate, "(재료비 소계 + 노무비 소계) × 기타경비율", "🟢 적합"],
-            ["산재보험료", calcAccident, 0.037, "노무비 소계 × 3.70% (1일 이상 공사 의무 계상)", "🟢 의무 계상"],
-            ["고용보험료", calcEmploy, 0.0098, "노무비 소계 × 0.98% (1일 이상 공사 의무 계상)", "🟢 의무 계상"],
-            ["국민건강보험료", calcHealth, 0.03545, "직접노무비 × 3.545% (※ 30일 이상 의무 계상)", "🟢 30일 이상 의무 계상"],
-            ["국민연금보험료", calcPension, 0.045, "직접노무비 × 4.500% (※ 30일 이상 의무 계상)", "🟢 30일 이상 의무 계상"],
-            ["노인장기요양보험", calcCare, 0.1295, "국민건강보험료 × 12.95% (※ 30일 이상 의무 계상)", "🟢 30일 이상 의무 계상"],
-            ["산업안전보건관리비", calcSafety, safetyRate, "(직접재료비 + 직접노무비) × 2.93% (2천만 이상 의무)", "❌ [오류] 대상액 2천만 미만 의무면제(0원)"],
-            ["퇴직공제부금비", 0, 0.023, "직접노무비 × 2.30% (순공사 1억 이상 의무 계상)", "🟢 1억 원 미만 공사 0원"],
-            ["환경보전비", calcEnv, 0.003, "직접공사비(재료+노무+기계) × 0.30%", "🟢 실내보수 등 미발생시 준공 감액"],
-            ["임금채권부담금", calcWage, 0.0009, "노무비 소계 × 0.09%", "🟢 적합"],
-            ["석면분담금", calcAsbestos, 0.00006, "노무비 소계 × 0.006%", "🟢 적합"],
+            ["기계경비 (산출경비)", 0, "-", "중장비 임대료 및 유류대 등 품셈 실비", "● [정상] 품셈 기준 실비"],
+            ["기타경비", calcOtherExp, otherExpRate, "(재료비 소계 + 노무비 소계) × 기타경비율", "● [적합] 법정 요율 이내"],
+            ["산재보험료", calcAccident, 0.037, "노무비 소계 × 3.70% (1일 이상 공사 의무 계상)", "● [의무] 1일 이상 의무 계상"],
+            ["고용보험료", calcEmploy, 0.0098, "노무비 소계 × 0.98% (1일 이상 공사 의무 계상)", "● [의무] 1일 이상 의무 계상"],
+            ["국민건강보험료", calcHealth, 0.03545, "직접노무비 × 3.545% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
+            ["국민연금보험료", calcPension, 0.045, "직접노무비 × 4.500% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
+            ["노인장기요양보험", calcCare, 0.1295, "국민건강보험료 × 12.95% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
+            ["산업안전보건관리비", calcSafety, safetyRate, "(직접재료비 + 직접노무비) × 2.93% (2천만 이상 의무)", (baseMat + baseLab) >= 20000000 ? "● [적합] 대상액 2천만 이상 의무 계상" : "● [오류] 대상액 2천만 미만 의무면제(0원)"],
+            ["퇴직공제부금비", 0, 0.023, "직접노무비 × 2.30% (순공사 1억 이상 의무 계상)", "● [정상] 1억 원 미만 공사 0원"],
+            ["환경보전비", calcEnv, 0.003, "직접공사비(재료+노무+기계) × 0.30%", "● [주의] 실내보수 등 미발생시 준공 감액"],
+            ["임금채권부담금", calcWage, 0.0009, "노무비 소계 × 0.09%", "● [적합] 법정 요율 이내"],
+            ["석면분담금", calcAsbestos, 0.00006, "노무비 소계 × 0.006%", "● [적합] 법정 요율 이내"],
             ["[경비 소계]", calcExpTotal, "-", "기타경비 + 4대보험 + 산안비 + 환경보전비 등 일체 경비 합계", "-"],
             ["[순공사원가]", calcNetCost, "-", "재료비 소계 + 노무비 소계 + 경비 소계", "-"],
-            ["일반관리비", calcAdmin, 0.06, "순공사원가 × 6.00% (기재부 계약예규 상한)", "🟢 적합"],
-            ["이윤", calcProfit, 0.15, "(노무비 소계 + 경비 소계 + 일반관리비) × 15.00% (※ 재료비 제외)", "🟢 적합 (재료비 제외)"],
-            ["폐기물처리비", 0, "-", "폐기물처리 실비 (별도 정산)", "🟢 정상"],
+            ["일반관리비", calcAdmin, 0.06, "순공사원가 × 6.00% (기재부 계약예규 상한)", "● [적합] 법정 상한(6%) 이내"],
+            ["이윤", calcProfit, 0.15, "(노무비 소계 + 경비 소계 + 일반관리비) × 15.00% (※ 재료비 제외)", "● [적합] 법정 상한(15%) 이내 (재료비 제외)"],
+            ["폐기물처리비", 0, "-", "폐기물처리 실비 (별도 정산)", "● [정상] 폐기물 실비 별도정산"],
             ["[총원가]", calcTotalCost, "-", "순공사원가 + 일반관리비 + 이윤 + 폐기물처리비", "-"],
-            ["부가가치세", calcVat, 0.10, "총원가 × 10%", "🟢 적합"],
-            ["【총도급액 (합계)】", calcFinalTotal, "-", "총원가 + 부가가치세 (국고금관리법 10원 미만 절사)", "🟢 최종 도급액 (10원 절사)"],
+            ["부가가치세", calcVat, 0.10, "총원가 × 10%", "● [적합] 10% 정상 반영"],
+            ["【총도급액 (합계)】", calcFinalTotal, "-", "총원가 + 부가가치세 (국고금관리법 10원 미만 절사)", "● [완료] 최종 도급액 (10원 절사)"],
             ["", "", "", "", ""],
             ["■ 2026 조달청 간접공사비 작성 핵심 수칙 안내:", "", "", "", ""],
             ["  1. [30일 미만 단기공사]: 공사기간이 30일 미만(D2셀)인 경우 국민건강, 국민연금, 노인장기요양보험료는 법적으로 반드시 0원으로 계상해야 합니다.", "", "", "", ""],
@@ -2993,8 +3041,8 @@ function downloadStandardTemplate() {
             ["  4. [사후정산제도]: 국민건강, 국민연금, 노인장기요양, 퇴직공제, 환경보전비는 준공 시 납부확인서 증빙 실비로 사후 정산됩니다.", "", "", "", ""]
         ];
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        const wb = xlsxLib.utils.book_new();
+        const ws = xlsxLib.utils.aoa_to_sheet(aoa);
 
         // 열 너비 설정
         ws['!cols'] = [
@@ -3002,7 +3050,7 @@ function downloadStandardTemplate() {
             { wch: 20 }, // 금액
             { wch: 16 }, // 요율
             { wch: 55 }, // 산출공식
-            { wch: 45 }  // 자가진단
+            { wch: 45 }  // 신호등 자가진단
         ];
 
         // 셀 병합 설정
@@ -3016,17 +3064,102 @@ function downloadStandardTemplate() {
             { s: { r: 36, c: 0 }, e: { r: 36, c: 4 } }
         ];
 
-        // 살아있는 엑셀 수식(f) 및 초기값(v), 숫자서식(z) 완벽 주입 (Row 6 ~ 31)
+        // 엑셀 서식 스타일 정의 (신호등 및 관공서 표준 스타일)
+        const borderThin = {
+            top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+            bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+            left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+            right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+        };
+        const styleHeader = {
+            fill: { fgColor: { rgb: '1E293B' } },
+            font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: 'FFFFFF' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: borderThin
+        };
+        const styleSubtotal = {
+            fill: { fgColor: { rgb: 'F1F5F9' } },
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '0F172A' } },
+            border: borderThin
+        };
+        const styleGrandTotal = {
+            fill: { fgColor: { rgb: 'DBEAFE' } },
+            font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E40AF' } },
+            border: {
+                top: { style: 'thin', color: { rgb: '3B82F6' } },
+                bottom: { style: 'double', color: { rgb: '1E40AF' } },
+                left: { style: 'thin', color: { rgb: '3B82F6' } },
+                right: { style: 'thin', color: { rgb: '3B82F6' } }
+            }
+        };
+        const styleInput = {
+            fill: { fgColor: { rgb: 'FEF9C3' } }, // 연노랑 입력 강조
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '1E3A8A' } },
+            alignment: { horizontal: 'right', vertical: 'center' },
+            border: {
+                top: { style: 'medium', color: { rgb: 'F59E0B' } },
+                bottom: { style: 'medium', color: { rgb: 'F59E0B' } },
+                left: { style: 'medium', color: { rgb: 'F59E0B' } },
+                right: { style: 'medium', color: { rgb: 'F59E0B' } }
+            }
+        };
+        // 🟢 신호등 [적합 / 정상 / 의무] 스타일
+        const styleGreenSignal = {
+            fill: { fgColor: { rgb: 'E6F4EA' } }, // 연초록 신호등 배경
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '137333' } }, // 선명한 진초록 원형 심볼 및 글자
+            alignment: { horizontal: 'left', vertical: 'center' },
+            border: borderThin
+        };
+        // 🔴 신호등 [부적합 / 오류 / 초과] 스타일
+        const styleRedSignal = {
+            fill: { fgColor: { rgb: 'FCE8E6' } }, // 연빨강 신호등 배경
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'C5221F' } }, // 강렬한 경고 레드 원형 심볼 및 글자
+            alignment: { horizontal: 'left', vertical: 'center' },
+            border: {
+                top: { style: 'thin', color: { rgb: 'EF4444' } },
+                bottom: { style: 'thin', color: { rgb: 'EF4444' } },
+                left: { style: 'thin', color: { rgb: 'EF4444' } },
+                right: { style: 'thin', color: { rgb: 'EF4444' } }
+            }
+        };
+        // 🟡 신호등 [주의 / 확인 / 감액안내] 스타일
+        const styleAmberSignal = {
+            fill: { fgColor: { rgb: 'FEF7E0' } }, // 연노랑/호박 신호등 배경
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B06000' } }, // 짙은 주황 원형 심볼 및 글자
+            alignment: { horizontal: 'left', vertical: 'center' },
+            border: borderThin
+        };
+        const styleNormal = {
+            font: { name: '맑은 고딕', sz: 10, color: { rgb: '1F2937' } },
+            border: borderThin
+        };
+
         const numFmt = '#,##0';
         const pctFmt = '0.00%';
 
-        // 입력 셀 포맷
-        if (ws['B6']) ws['B6'].z = numFmt;
-        if (ws['B7']) ws['B7'].z = numFmt;
-        if (ws['B9']) ws['B9'].z = numFmt;
-        if (ws['B12']) ws['B12'].z = numFmt;
-        if (ws['B28']) ws['B28'].z = numFmt;
-        ws['D2'] = { t: 'n', v: 30, z: '#,##0' };
+        // 기본 셀 서식 및 테두리 초기화 (Row 4 ~ 30)
+        const cols = ['A', 'B', 'C', 'D', 'E'];
+        for (let r = 5; r <= 31; r++) {
+            cols.forEach(col => {
+                const ref = `${col}${r}`;
+                if (ws[ref]) {
+                    ws[ref].s = { ...styleNormal };
+                }
+            });
+        }
+
+        // 헤더 행 스타일 (Row 4, 1-indexed 5)
+        ['A5', 'B5', 'C5', 'D5', 'E5'].forEach(ref => {
+            if (ws[ref]) ws[ref].s = styleHeader;
+        });
+
+        // 입력 셀 포맷 & 스타일
+        if (ws['B6']) { ws['B6'].z = numFmt; ws['B6'].s = styleInput; }
+        if (ws['B7']) { ws['B7'].z = numFmt; ws['B7'].s = styleInput; }
+        if (ws['B9']) { ws['B9'].z = numFmt; ws['B9'].s = styleInput; }
+        if (ws['B12']) { ws['B12'].z = numFmt; ws['B12'].s = styleInput; }
+        if (ws['B28']) { ws['B28'].z = numFmt; ws['B28'].s = styleInput; }
+        ws['D2'] = { t: 'n', v: 30, z: '#,##0', s: styleInput };
 
         // 요율 셀 포맷
         ['C10', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22', 'C23', 'C26', 'C27', 'C30'].forEach(cell => {
@@ -3036,59 +3169,80 @@ function downloadStandardTemplate() {
         });
 
         // 재료비 소계
-        ws['B8'] = { t: 'n', f: 'B6+B7', v: baseMat, z: numFmt };
+        ws['B8'] = { t: 'n', f: 'B6+B7', v: baseMat, z: numFmt, s: styleSubtotal };
+        ['A8', 'C8', 'D8', 'E8'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // 간접노무비 & 노무비 소계
         ws['B10'] = { t: 'n', f: 'ROUND(B9*C10, 0)', v: calcIndLab, z: numFmt };
-        ws['B11'] = { t: 'n', f: 'B9+B10', v: calcLabTotal, z: numFmt };
+        ws['B11'] = { t: 'n', f: 'B9+B10', v: calcLabTotal, z: numFmt, s: styleSubtotal };
+        ['A11', 'C11', 'D11', 'E11'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // 기타경비 & 4대보험
         ws['B13'] = { t: 'n', f: 'ROUND((B8+B11)*C13, 0)', v: calcOtherExp, z: numFmt };
         ws['B14'] = { t: 'n', f: 'ROUND(B11*C14, 0)', v: calcAccident, z: numFmt };
         ws['B15'] = { t: 'n', f: 'ROUND(B11*C15, 0)', v: calcEmploy, z: numFmt };
 
-        // 국민건강, 국민연금, 노인장기요양 (공사기간 D2셀 30일 미만 검증 수식)
+        // 국민건강, 국민연금, 노인장기요양 (공사기간 D2셀 30일 미만 검증 수식 & 신호등)
         ws['B16'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B9*C16, 0))', v: calcHealth, z: numFmt };
-        ws['E16'] = { t: 's', f: 'IF($D$2<30, "❌ [오류] 30일 미만 계상 불가(0원 삭감)", "🟢 30일 이상 의무 계상")', v: "🟢 30일 이상 의무 계상" };
+        ws['E16'] = { t: 's', f: 'IF($D$2<30, "● [오류] 30일 미만 계상 불가(0원 삭감)", "● [적합] 30일 이상 의무 계상")', v: "● [적합] 30일 이상 의무 계상", s: styleGreenSignal };
 
         ws['B17'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B9*C17, 0))', v: calcPension, z: numFmt };
-        ws['E17'] = { t: 's', f: 'IF($D$2<30, "❌ [오류] 30일 미만 계상 불가(0원 삭감)", "🟢 30일 이상 의무 계상")', v: "🟢 30일 이상 의무 계상" };
+        ws['E17'] = { t: 's', f: 'IF($D$2<30, "● [오류] 30일 미만 계상 불가(0원 삭감)", "● [적합] 30일 이상 의무 계상")', v: "● [적합] 30일 이상 의무 계상", s: styleGreenSignal };
 
         ws['B18'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B16*C18, 0))', v: calcCare, z: numFmt };
-        ws['E18'] = { t: 's', f: 'IF($D$2<30, "❌ [오류] 30일 미만 계상 불가(0원 삭감)", "🟢 30일 이상 의무 계상")', v: "🟢 30일 이상 의무 계상" };
+        ws['E18'] = { t: 's', f: 'IF($D$2<30, "● [오류] 30일 미만 계상 불가(0원 삭감)", "● [적합] 30일 이상 의무 계상")', v: "● [적합] 30일 이상 의무 계상", s: styleGreenSignal };
 
-        // 산업안전보건관리비 (대상액 2천만 원 미만 면제 수식)
+        // 산업안전보건관리비 (대상액 2천만 원 미만 면제 수식 & 신호등)
+        const isSafetyOver = (baseMat + baseLab) >= 20000000;
         ws['B19'] = { t: 'n', f: 'IF((B6+B9)<20000000, 0, ROUND((B6+B9)*C19, 0))', v: calcSafety, z: numFmt };
-        ws['E19'] = { t: 's', f: 'IF((B6+B9)<20000000, "❌ [오류] 대상액 2천만 미만 의무면제(0원)", "🟢 대상액 2천만 이상 의무 계상")', v: (baseMat + baseLab) >= 20000000 ? "🟢 대상액 2천만 이상 의무 계상" : "❌ [오류] 대상액 2천만 미만 의무면제(0원)" };
+        ws['E19'] = { t: 's', f: 'IF((B6+B9)<20000000, "● [오류] 대상액 2천만 미만 의무면제(0원)", "● [적합] 대상액 2천만 이상 의무 계상")', v: isSafetyOver ? "● [적합] 대상액 2천만 이상 의무 계상" : "● [오류] 대상액 2천만 미만 의무면제(0원)", s: isSafetyOver ? styleGreenSignal : styleRedSignal };
 
         // 퇴직공제부금비 (직접비 7천만 미만 간이 0원)
         ws['B20'] = { t: 'n', f: 'IF((B6+B9)<70000000, 0, ROUND(B9*C20, 0))', v: 0, z: numFmt };
-        ws['E20'] = { t: 's', f: 'IF((B6+B9)<70000000, "🟢 1억 원 미만 공사 0원", "🟢 1억 원 이상 의무 계상")', v: "🟢 1억 원 미만 공사 0원" };
+        ws['E20'] = { t: 's', f: 'IF((B6+B9)<70000000, "● [정상] 1억 원 미만 공사 0원", "● [적합] 1억 원 이상 의무 계상")', v: "● [정상] 1억 원 미만 공사 0원", s: styleGreenSignal };
 
         // 환경보전비, 임금채권, 석면
         ws['B21'] = { t: 'n', f: 'ROUND((B8+B11+B12)*C21, 0)', v: calcEnv, z: numFmt };
+        ws['E21'] = { t: 's', v: "● [주의] 실내보수 등 미발생시 준공 감액", s: styleAmberSignal };
+
         ws['B22'] = { t: 'n', f: 'ROUND(B11*C22, 0)', v: calcWage, z: numFmt };
+        ws['E22'] = { t: 's', v: "● [적합] 법정 요율 이내", s: styleGreenSignal };
+
         ws['B23'] = { t: 'n', f: 'ROUND(B11*C23, 0)', v: calcAsbestos, z: numFmt };
+        ws['E23'] = { t: 's', v: "● [적합] 법정 요율 이내", s: styleGreenSignal };
 
         // 경비 소계 및 순공사원가
-        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: calcExpTotal, z: numFmt };
-        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: calcNetCost, z: numFmt };
+        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: calcExpTotal, z: numFmt, s: styleSubtotal };
+        ['A24', 'C24', 'D24', 'E24'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
-        // 일반관리비 (6% 상한 감지)
+        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: calcNetCost, z: numFmt, s: styleSubtotal };
+        ['A25', 'C25', 'D25', 'E25'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
+
+        // 일반관리비 (6% 상한 감지 신호등)
         ws['B26'] = { t: 'n', f: 'ROUND(B25*C26, 0)', v: calcAdmin, z: numFmt };
-        ws['E26'] = { t: 's', f: 'IF(C26>0.06, "❌ [오류] 기재부 상한(6%) 초과", "🟢 적합")', v: "🟢 적합" };
+        ws['E26'] = { t: 's', f: 'IF(C26>0.06, "● [초과] 기재부 상한(6%) 초과", "● [적합] 법정 상한(6%) 이내")', v: "● [적합] 법정 상한(6%) 이내", s: styleGreenSignal };
 
-        // 이윤 (15% 상한 감지 및 재료비 제외 법정 공식 엄수)
+        // 이윤 (15% 상한 감지 및 재료비 제외 법정 공식 엄수 신호등)
         ws['B27'] = { t: 'n', f: 'ROUND((B11+B24+B26)*C27, 0)', v: calcProfit, z: numFmt };
-        ws['E27'] = { t: 's', f: 'IF(C27>0.15, "❌ [오류] 기재부 상한(15%) 초과", "🟢 적합 (재료비 제외)")', v: "🟢 적합 (재료비 제외)" };
+        ws['E27'] = { t: 's', f: 'IF(C27>0.15, "● [초과] 기재부 상한(15%) 초과", "● [적합] 법정 상한(15%) 이내 (재료비 제외)")', v: "● [적합] 법정 상한(15%) 이내 (재료비 제외)", s: styleGreenSignal };
 
         // 총원가, 부가가치세, 총도급액 (10원 미만 절사)
-        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: calcTotalCost, z: numFmt };
-        ws['B30'] = { t: 'n', f: 'ROUND(B29*C30, 0)', v: calcVat, z: numFmt };
-        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: calcFinalTotal, z: numFmt };
+        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: calcTotalCost, z: numFmt, s: styleSubtotal };
+        ['A29', 'C29', 'D29', 'E29'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
-        XLSX.utils.book_append_sheet(wb, ws, "표준원가계산서");
-        XLSX.writeFile(wb, `2026_조달청_표준_공사원가계산서_양식_${tradeName}.xlsx`);
+        ws['B30'] = { t: 'n', f: 'ROUND(B29*C30, 0)', v: calcVat, z: numFmt };
+        ws['E30'] = { t: 's', v: "● [적합] 10% 정상 반영", s: styleGreenSignal };
+
+        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: calcFinalTotal, z: numFmt, s: styleGrandTotal };
+        ['A31', 'C31', 'D31', 'E31'].forEach(ref => { if (ws[ref]) ws[ref].s = styleGrandTotal; });
+
+        // 나머지 일반 신호등 셀 일괄 서식 적용
+        ['E6', 'E7', 'E9', 'E10', 'E12', 'E13', 'E14', 'E15', 'E28'].forEach(ref => {
+            if (ws[ref]) ws[ref].s = styleGreenSignal;
+        });
+
+        xlsxLib.utils.book_append_sheet(wb, ws, "표준원가계산서");
+        saveWorkbook(wb, `2026_조달청_표준_공사원가계산서_양식_${tradeName}.xlsx`);
     } catch (err) {
         console.error("downloadStandardTemplate error:", err);
         alert("표준 서식 다운로드 중 오류가 발생했습니다: " + err.message);
@@ -3096,11 +3250,12 @@ function downloadStandardTemplate() {
 }
 
 // =========================================================================
-// [기능 1] 감사결과 대차대조표 엑셀(.xlsx) 다운로드 (3번 표준 서식 스타일 & 수식 연동)
+// [기능 1] 감사결과 대차대조표 엑셀(.xlsx) 다운로드 (신호등 색상 서식 & 수식 연동)
 // =========================================================================
 function downloadAuditResultExcel() {
     try {
-        if (typeof XLSX === 'undefined') {
+        const xlsxLib = window.XLSXStyle || window.XLSX;
+        if (typeof xlsxLib === 'undefined') {
             alert("엑셀 엔진(SheetJS)을 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
             return;
         }
@@ -3159,7 +3314,7 @@ function downloadAuditResultExcel() {
             return fallback;
         };
 
-        // 공종별 안전 요율 매핑 (오류 원천 차단)
+        // 공종별 안전 요율 매핑
         const tradeRatesMap = {
             building: { indLab: 0.145, otherExp: 0.0535, safety: 0.0293 },
             civil: { indLab: 0.191, otherExp: 0.055, safety: 0.0315 },
@@ -3237,71 +3392,71 @@ function downloadAuditResultExcel() {
         const badgeElem = document.getElementById("badgeStatus");
         const badgeStatus = badgeElem ? badgeElem.innerText.trim() : "검토 완료";
 
-        // 3번 표준 서식 행 구조와 1:1 일치하는 6열 대차대조표 AOA
+        // 신호등 기호가 적용된 6열 대차대조표 AOA
         const aoaData = [
             [`【공사원가계산서 감사결과 대차대조표】 ${title}`, "", "", "", "", ""],
             ["■ 공종:", tradeName, "■ 공사기간(일수):", period, "■ 감사일자: " + today, "■ 최종판정: " + badgeStatus],
-            ["■ 총도급액 대차대조:", actualVendorTotal, standardTotal, totalDiffAmt, totalDiffAmt > 10 ? "🔴 삭감 대상" : "🟢 적합", `총 삭감/조정액: ${totalDiffAmt > 0 ? '+' : ''}${formatWithComma(totalDiffAmt)}원`],
+            ["■ 총도급액 대차대조:", actualVendorTotal, standardTotal, totalDiffAmt, totalDiffAmt > 10 ? "● [삭감 대상]" : "● [적합]", `총 삭감/조정액: ${totalDiffAmt > 0 ? '+' : ''}${formatWithComma(totalDiffAmt)}원`],
             ["", "", "", "", "", ""],
-            ["비 목 (항목명)", "업체 제출액 (A)", "조달청 적정액 (B)", "차액 (삭감액: A-B)", "감사 판정", "2026 조달청 산출 기준 및 감사관 검토의견"],
+            ["비 목 (항목명)", "업체 제출액 (A)", "조달청 적정액 (B)", "차액 (삭감액: A-B)", "감사 판정 (신호등)", "2026 조달청 산출 기준 및 감사관 검토의견"],
             
             // Row 5 (6행): 직접재료비
-            ["직접재료비", directMat, directMat, 0, "🟢 적합", "설계도서 및 산출내역서 기준 실비"],
+            ["직접재료비", directMat, directMat, 0, "● [적합]", "설계도서 및 산출내역서 기준 실비"],
             // Row 6 (7행): 간접재료비
-            ["간접재료비", 0, 0, 0, "🟢 적합", "간접재료비 미계상"],
+            ["간접재료비", 0, 0, 0, "● [적합]", "간접재료비 미계상"],
             // Row 7 (8행): [재료비 소계]
-            ["[재료비 소계]", directMat, directMat, 0, "🟢 적합", "직접재료비 + 간접재료비"],
+            ["[재료비 소계]", directMat, directMat, 0, "● [적합]", "직접재료비 + 간접재료비"],
             
             // Row 8 (9행): 직접노무비
-            ["직접노무비", directLab, directLab, 0, "🟢 적합", "공사 목적물 직접 투입 노무비"],
+            ["직접노무비", directLab, directLab, 0, "● [적합]", "공사 목적물 직접 투입 노무비"],
             // Row 9 (10행): 간접노무비
-            ["간접노무비", vIndLab, sIndLab, vIndLab - sIndLab, vIndLab - sIndLab > 10 ? "🔴 초과(삭감)" : "🟢 적합", `직접노무비 × ${(indLabRate * 100).toFixed(2)}% (공종별 기준요율)`],
+            ["간접노무비", vIndLab, sIndLab, vIndLab - sIndLab, vIndLab - sIndLab > 10 ? "● [초과(삭감)]" : "● [적합]", `직접노무비 × ${(indLabRate * 100).toFixed(2)}% (공종별 기준요율)`],
             // Row 10 (11행): [노무비 소계]
-            ["[노무비 소계]", vLabTotal, sLabTotal, vLabTotal - sLabTotal, vLabTotal - sLabTotal > 10 ? "🔴 초과" : "🟢 적합", "직접노무비 + 간접노무비"],
+            ["[노무비 소계]", vLabTotal, sLabTotal, vLabTotal - sLabTotal, vLabTotal - sLabTotal > 10 ? "● [초과]" : "● [적합]", "직접노무비 + 간접노무비"],
             
             // Row 11 (12행): 기계경비
-            ["기계경비 (산출경비)", outputExp, outputExp, 0, "🟢 적합", "산출내역서 기준 실비"],
+            ["기계경비 (산출경비)", outputExp, outputExp, 0, "● [적합]", "산출내역서 기준 실비"],
             // Row 12 (13행): 기타경비
-            ["기타경비", vOther, sOther, vOther - sOther, vOther - sOther > 10 ? "🔴 초과(삭감)" : "🟢 적합", `(재료비 소계 + 노무비 소계) × ${(otherExpRate * 100).toFixed(2)}%`],
+            ["기타경비", vOther, sOther, vOther - sOther, vOther - sOther > 10 ? "● [초과(삭감)]" : "● [적합]", `(재료비 소계 + 노무비 소계) × ${(otherExpRate * 100).toFixed(2)}%`],
             // Row 13 (14행): 산재보험료
-            ["산재보험료", vAccident, sAccident, vAccident - sAccident, vAccident - sAccident > 10 ? "🔴 초과(삭감)" : "🟢 적합", "노무비 소계 × 3.70% (1일 이상 의무 계상)"],
+            ["산재보험료", vAccident, sAccident, vAccident - sAccident, vAccident - sAccident > 10 ? "● [초과(삭감)]" : "● [적합]", "노무비 소계 × 3.70% (1일 이상 의무 계상)"],
             // Row 14 (15행): 고용보험료
-            ["고용보험료", vEmploy, sEmploy, vEmploy - sEmploy, vEmploy - sEmploy > 10 ? "🔴 초과(삭감)" : "🟢 적합", "노무비 소계 × 0.98% (1일 이상 의무 계상)"],
+            ["고용보험료", vEmploy, sEmploy, vEmploy - sEmploy, vEmploy - sEmploy > 10 ? "● [초과(삭감)]" : "● [적합]", "노무비 소계 × 0.98% (1일 이상 의무 계상)"],
             // Row 15 (16행): 국민건강보험료
-            ["국민건강보험료", vHealth, sHealth, vHealth - sHealth, vHealth - sHealth > 10 ? "🔴 초과(삭감)" : "🟢 적합", period < 30 ? "30일 미만 공사 법적 제외(0원) / 부당계상 전액 삭감" : "30일 이상 의무 계상 (사후정산 PS)"],
+            ["국민건강보험료", vHealth, sHealth, vHealth - sHealth, vHealth - sHealth > 10 ? "● [초과(삭감)]" : "● [적합]", period < 30 ? "30일 미만 공사 법적 제외(0원) / 부당계상 전액 삭감" : "30일 이상 의무 계상 (사후정산 PS)"],
             // Row 16 (17행): 국민연금보험료
-            ["국민연금보험료", vPension, sPension, vPension - sPension, vPension - sPension > 10 ? "🔴 초과(삭감)" : "🟢 적합", period < 30 ? "30일 미만 공사 법적 제외(0원) / 부당계상 전액 삭감" : "30일 이상 의무 계상 (사후정산 PS)"],
+            ["국민연금보험료", vPension, sPension, vPension - sPension, vPension - sPension > 10 ? "● [초과(삭감)]" : "● [적합]", period < 30 ? "30일 미만 공사 법적 제외(0원) / 부당계상 전액 삭감" : "30일 이상 의무 계상 (사후정산 PS)"],
             // Row 17 (18행): 노인장기요양보험
-            ["노인장기요양보험", vCare, sCare, vCare - sCare, vCare - sCare > 10 ? "🔴 초과(삭감)" : "🟢 적합", period < 30 ? "30일 미만 공사 법적 제외(0원) / 부당계상 전액 삭감" : "국민건강보험료 × 12.95% (사후정산 PS)"],
+            ["노인장기요양보험", vCare, sCare, vCare - sCare, vCare - sCare > 10 ? "● [초과(삭감)]" : "● [적합]", period < 30 ? "30일 미만 공사 법적 제외(0원) / 부당계상 전액 삭감" : "국민건강보험료 × 12.95% (사후정산 PS)"],
             // Row 18 (19행): 산업안전보건관리비
-            ["산업안전보건관리비", vSafety, sSafety, vSafety - sSafety, vSafety - sSafety > 10 ? "🔴 초과(삭감)" : "🟢 적합", (directMat + directLab) < 20000000 ? "대상액 2천만 원 미만 의무면제 대상 (0원)" : `(재료비+직노) × ${(safetyRate * 100).toFixed(2)}%`],
+            ["산업안전보건관리비", vSafety, sSafety, vSafety - sSafety, vSafety - sSafety > 10 ? "● [초과(삭감)]" : "● [적합]", (directMat + directLab) < 20000000 ? "대상액 2천만 원 미만 의무면제 대상 (0원)" : `(재료비+직노) × ${(safetyRate * 100).toFixed(2)}%`],
             // Row 19 (20행): 퇴직공제부금비
-            ["퇴직공제부금비", vRetire, sRetire, vRetire - sRetire, vRetire - sRetire > 10 ? "🔴 초과(삭감)" : "🟢 적합", "순공사원가 1억 원 이상 의무 계상 (미만 0원)"],
+            ["퇴직공제부금비", vRetire, sRetire, vRetire - sRetire, vRetire - sRetire > 10 ? "● [초과(삭감)]" : "● [적합]", "순공사원가 1억 원 이상 의무 계상 (미만 0원)"],
             // Row 20 (21행): 환경보전비
-            ["환경보전비", vEnv, sEnv, vEnv - sEnv, vEnv - sEnv > 10 ? "🔴 초과(삭감)" : "🟢 적합", "직접공사비 × 0.30% (실내보수 준공 감액 대상)"],
+            ["환경보전비", vEnv, sEnv, vEnv - sEnv, vEnv - sEnv > 10 ? "● [초과(삭감)]" : "● [적합]", "직접공사비 × 0.30% (실내보수 준공 감액 대상)"],
             // Row 21 (22행): 임금채권부담금
-            ["임금채권부담금", vWage, sWage, vWage - sWage, vWage - sWage > 10 ? "🔴 초과(삭감)" : "🟢 적합", "노무비 소계 × 0.09%"],
+            ["임금채권부담금", vWage, sWage, vWage - sWage, vWage - sWage > 10 ? "● [초과(삭감)]" : "● [적합]", "노무비 소계 × 0.09%"],
             // Row 22 (23행): 석면분담금
-            ["석면분담금", vAsbestos, sAsbestos, vAsbestos - sAsbestos, vAsbestos - sAsbestos > 10 ? "🔴 초과(삭감)" : "🟢 적합", "노무비 소계 × 0.006%"],
+            ["석면분담금", vAsbestos, sAsbestos, vAsbestos - sAsbestos, vAsbestos - sAsbestos > 10 ? "● [초과(삭감)]" : "● [적합]", "노무비 소계 × 0.006%"],
             // Row 23 (24행): [경비 소계]
-            ["[경비 소계]", vExpSum, sExpSum, vExpSum - sExpSum, vExpSum - sExpSum > 10 ? "🔴 초과" : "🟢 적합", "경비 비목 일체 합계"],
+            ["[경비 소계]", vExpSum, sExpSum, vExpSum - sExpSum, vExpSum - sExpSum > 10 ? "● [초과]" : "● [적합]", "경비 비목 일체 합계"],
             
             // Row 24 (25행): [순공사원가]
-            ["[순공사원가]", vNetCost, sNetCost, vNetCost - sNetCost, vNetCost - sNetCost > 10 ? "🔴 초과" : "🟢 적합", "재료비 소계 + 노무비 소계 + 경비 소계"],
+            ["[순공사원가]", vNetCost, sNetCost, vNetCost - sNetCost, vNetCost - sNetCost > 10 ? "● [초과]" : "● [적합]", "재료비 소계 + 노무비 소계 + 경비 소계"],
             
             // Row 25 (26행): 일반관리비
-            ["일반관리비", vAdmin, sAdmin, vAdmin - sAdmin, vAdmin - sAdmin > 10 ? "🔴 초과(삭감)" : "🟢 적합", "순공사원가 × 6.00% (기재부 계약예규 상한 이내)"],
+            ["일반관리비", vAdmin, sAdmin, vAdmin - sAdmin, vAdmin - sAdmin > 10 ? "● [초과(삭감)]" : "● [적합]", "순공사원가 × 6.00% (기재부 계약예규 상한 이내)"],
             // Row 26 (27행): 이윤
-            ["이윤", vProfit, sProfit, vProfit - sProfit, vProfit - sProfit > 10 ? "🔴 초과(삭감)" : "🟢 적합", "(노무비 + 경비 + 일반관리비) × 15.00% (※ 재료비 제외)"],
+            ["이윤", vProfit, sProfit, vProfit - sProfit, vProfit - sProfit > 10 ? "● [초과(삭감)]" : "● [적합]", "(노무비 + 경비 + 일반관리비) × 15.00% (※ 재료비 제외)"],
             // Row 27 (28행): 폐기물처리비
-            ["폐기물처리비", wasteCost, wasteCost, 0, "🟢 적합", "폐기물처리 실비 (별도 정산)"],
+            ["폐기물처리비", wasteCost, wasteCost, 0, "● [적합]", "폐기물처리 실비 (별도 정산)"],
             
             // Row 28 (29행): [총원가]
-            ["[총원가]", vTotalCost, sTotalCost, vTotalCost - sTotalCost, vTotalCost - sTotalCost > 10 ? "🔴 초과" : "🟢 적합", "순공사원가 + 일반관리비 + 이윤 + 폐기물처리비"],
+            ["[총원가]", vTotalCost, sTotalCost, vTotalCost - sTotalCost, vTotalCost - sTotalCost > 10 ? "● [초과]" : "● [적합]", "순공사원가 + 일반관리비 + 이윤 + 폐기물처리비"],
             // Row 29 (30행): 부가가치세
-            ["부가가치세", vVat, sVat, vVat - sVat, vVat - sVat > 10 ? "🔴 초과" : "🟢 적합", "총원가 × 10%"],
+            ["부가가치세", vVat, sVat, vVat - sVat, vVat - sVat > 10 ? "● [초과]" : "● [적합]", "총원가 × 10%"],
             // Row 30 (31행): 【총도급액 (합계)】
-            ["【총도급액 (합계)】", actualVendorTotal, standardTotal, totalDiffAmt, totalDiffAmt > 10 ? "🔴 초과(삭감)" : "🟢 적합", "국고금관리법 10원 미만 절사 반영 최종 도급액"],
+            ["【총도급액 (합계)】", actualVendorTotal, standardTotal, totalDiffAmt, totalDiffAmt > 10 ? "● [초과(삭감)]" : "● [적합]", "국고금관리법 10원 미만 절사 반영 최종 도급액"],
             ["", "", "", "", "", ""],
             ["【감사관 종합 검토의견 및 시공사 수정요청 통보문】", "", "", "", "", ""]
         ];
@@ -3315,8 +3470,8 @@ function downloadAuditResultExcel() {
             });
         }
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(aoaData);
+        const wb = xlsxLib.utils.book_new();
+        const ws = xlsxLib.utils.aoa_to_sheet(aoaData);
 
         // 열 너비 설정
         ws['!cols'] = [
@@ -3324,7 +3479,7 @@ function downloadAuditResultExcel() {
             { wch: 20 }, // 업체 제출액
             { wch: 20 }, // 조달청 적정액
             { wch: 20 }, // 차액(삭감액)
-            { wch: 16 }, // 감사 판정
+            { wch: 18 }, // 감사 판정 (신호등)
             { wch: 60 }  // 검토의견
         ];
 
@@ -3333,20 +3488,87 @@ function downloadAuditResultExcel() {
             { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }
         ];
 
+        // 스타일 정의
+        const borderThin = {
+            top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+            bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+            left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+            right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+        };
+        const styleHeader = {
+            fill: { fgColor: { rgb: '1E293B' } },
+            font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: 'FFFFFF' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: borderThin
+        };
+        const styleSubtotal = {
+            fill: { fgColor: { rgb: 'F1F5F9' } },
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '0F172A' } },
+            border: borderThin
+        };
+        const styleGrandTotal = {
+            fill: { fgColor: { rgb: 'DBEAFE' } },
+            font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E40AF' } },
+            border: {
+                top: { style: 'thin', color: { rgb: '3B82F6' } },
+                bottom: { style: 'double', color: { rgb: '1E40AF' } },
+                left: { style: 'thin', color: { rgb: '3B82F6' } },
+                right: { style: 'thin', color: { rgb: '3B82F6' } }
+            }
+        };
+        const styleGreenSignal = {
+            fill: { fgColor: { rgb: 'E6F4EA' } },
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '137333' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: borderThin
+        };
+        const styleRedSignal = {
+            fill: { fgColor: { rgb: 'FCE8E6' } },
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'C5221F' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: {
+                top: { style: 'thin', color: { rgb: 'EF4444' } },
+                bottom: { style: 'thin', color: { rgb: 'EF4444' } },
+                left: { style: 'thin', color: { rgb: 'EF4444' } },
+                right: { style: 'thin', color: { rgb: 'EF4444' } }
+            }
+        };
+        const styleNormal = {
+            font: { name: '맑은 고딕', sz: 10, color: { rgb: '1F2937' } },
+            border: borderThin
+        };
+
         const numFmt = '#,##0';
 
         // 3행 총도급액 요약 수식 주입
+        const isTotalExcess = totalDiffAmt > 10;
         ws['B3'] = { t: 'n', f: 'B31', v: actualVendorTotal, z: numFmt };
         ws['C3'] = { t: 'n', f: 'C31', v: standardTotal, z: numFmt };
-        ws['D3'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt };
-        ws['E3'] = { t: 's', f: 'IF(D3>10, "🔴 삭감 대상", "🟢 적합")', v: totalDiffAmt > 10 ? "🔴 삭감 대상" : "🟢 적합" };
+        ws['D3'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt, s: isTotalExcess ? styleRedSignal : styleGreenSignal };
+        ws['E3'] = { t: 's', f: 'IF(D3>10, "● [삭감 대상]", "● [적합]")', v: isTotalExcess ? "● [삭감 대상]" : "● [적합]", s: isTotalExcess ? styleRedSignal : styleGreenSignal };
 
         // D2 셀: 공사기간 일수
         ws['D2'] = { t: 'n', v: period, z: '#,##0' };
 
+        // 기본 셀 서식 및 테두리 초기화
+        const dCols = ['A', 'B', 'C', 'D', 'E', 'F'];
+        for (let r = 5; r <= 31; r++) {
+            dCols.forEach(col => {
+                const ref = `${col}${r}`;
+                if (ws[ref]) {
+                    ws[ref].s = { ...styleNormal };
+                }
+            });
+        }
+
+        // 헤더 행 스타일
+        ['A5', 'B5', 'C5', 'D5', 'E5', 'F5'].forEach(ref => {
+            if (ws[ref]) ws[ref].s = styleHeader;
+        });
+
         // Row 6 ~ 31 수식 주입 함수
-        const setDiffRow = (rowIdx, fC, vC, itemDesc) => {
-            const r = rowIdx; // 1-indexed (e.g. 6)
+        const setDiffRow = (rowIdx, fC, vC) => {
+            const r = rowIdx;
             const bCell = `B${r}`;
             const cCell = `C${r}`;
             const dCell = `D${r}`;
@@ -3365,14 +3587,22 @@ function downloadAuditResultExcel() {
             const curB = ws[bCell] ? (ws[bCell].v || 0) : 0;
             const curC = ws[cCell] ? (ws[cCell].v || 0) : 0;
             const diff = curB - curC;
-            ws[dCell] = { t: 'n', f: `${bCell}-${cCell}`, v: diff, z: numFmt };
+            const isRowExcess = diff > 10;
+            ws[dCell] = {
+                t: 'n',
+                f: `${bCell}-${cCell}`,
+                v: diff,
+                z: numFmt,
+                s: isRowExcess ? styleRedSignal : styleNormal
+            };
 
-            // E열 (판정: 차액이 10원 초과면 삭감, -10원 미만이면 과소, 그 외 적합)
-            const statusText = diff > 10 ? "🔴 초과(삭감)" : (diff < -10 ? "🔵 과소" : "🟢 적합");
+            // E열 (신호등 판정: 10원 초과 시 빨간색 삭감, 그 외 녹색 적합)
+            const statusText = isRowExcess ? "● [초과(삭감)]" : (diff < -10 ? "● [과소]" : "● [적합]");
             ws[eCell] = {
                 t: 's',
-                f: `IF(${dCell}>10, "🔴 초과(삭감)", IF(${dCell}<-10, "🔵 과소", "🟢 적합"))`,
-                v: statusText
+                f: `IF(${dCell}>10, "● [초과(삭감)]", IF(${dCell}<-10, "● [과소]", "● [적합]"))`,
+                v: statusText,
+                s: isRowExcess ? styleRedSignal : styleGreenSignal
             };
         };
 
@@ -3380,19 +3610,22 @@ function downloadAuditResultExcel() {
         setDiffRow(6, null, directMat);
         setDiffRow(7, null, 0);
         // Row 8: [재료비 소계]
-        ws['B8'] = { t: 'n', f: 'B6+B7', v: directMat, z: numFmt };
-        ws['C8'] = { t: 'n', f: 'C6+C7', v: directMat, z: numFmt };
-        ws['D8'] = { t: 'n', f: 'B8-C8', v: 0, z: numFmt };
-        ws['E8'] = { t: 's', f: 'IF(D8>10, "🔴 초과", IF(D8<-10, "🔵 과소", "🟢 적합"))', v: "🟢 적합" };
+        ws['B8'] = { t: 'n', f: 'B6+B7', v: directMat, z: numFmt, s: styleSubtotal };
+        ws['C8'] = { t: 'n', f: 'C6+C7', v: directMat, z: numFmt, s: styleSubtotal };
+        ws['D8'] = { t: 'n', f: 'B8-C8', v: 0, z: numFmt, s: styleSubtotal };
+        ws['E8'] = { t: 's', f: 'IF(D8>10, "● [초과]", "● [적합]")', v: "● [적합]", s: styleGreenSignal };
+        ['A8', 'F8'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 9 ~ 11: 노무비
         setDiffRow(9, null, directLab);
         setDiffRow(10, `ROUND(C9*${indLabRate}, 0)`, sIndLab);
         // Row 11: [노무비 소계]
-        ws['B11'] = { t: 'n', f: 'B9+B10', v: vLabTotal, z: numFmt };
-        ws['C11'] = { t: 'n', f: 'C9+C10', v: sLabTotal, z: numFmt };
-        ws['D11'] = { t: 'n', f: 'B11-C11', v: vLabTotal - sLabTotal, z: numFmt };
-        ws['E11'] = { t: 's', f: 'IF(D11>10, "🔴 초과", IF(D11<-10, "🔵 과소", "🟢 적합"))', v: vLabTotal - sLabTotal > 10 ? "🔴 초과" : "🟢 적합" };
+        const labDiff = vLabTotal - sLabTotal;
+        ws['B11'] = { t: 'n', f: 'B9+B10', v: vLabTotal, z: numFmt, s: styleSubtotal };
+        ws['C11'] = { t: 'n', f: 'C9+C10', v: sLabTotal, z: numFmt, s: styleSubtotal };
+        ws['D11'] = { t: 'n', f: 'B11-C11', v: labDiff, z: numFmt, s: labDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['E11'] = { t: 's', f: 'IF(D11>10, "● [초과]", "● [적합]")', v: labDiff > 10 ? "● [초과]" : "● [적합]", s: labDiff > 10 ? styleRedSignal : styleGreenSignal };
+        ['A11', 'F11'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 12 ~ 23: 경비
         setDiffRow(12, null, outputExp);
@@ -3415,44 +3648,52 @@ function downloadAuditResultExcel() {
         setDiffRow(23, 'ROUND(C11*0.00006, 0)', sAsbestos);
 
         // Row 24: [경비 소계]
-        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: vExpSum, z: numFmt };
-        ws['C24'] = { t: 'n', f: 'SUM(C12:C23)', v: sExpSum, z: numFmt };
-        ws['D24'] = { t: 'n', f: 'B24-C24', v: vExpSum - sExpSum, z: numFmt };
-        ws['E24'] = { t: 's', f: 'IF(D24>10, "🔴 초과", IF(D24<-10, "🔵 과소", "🟢 적합"))', v: vExpSum - sExpSum > 10 ? "🔴 초과" : "🟢 적합" };
+        const expDiff = vExpSum - sExpSum;
+        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: vExpSum, z: numFmt, s: styleSubtotal };
+        ws['C24'] = { t: 'n', f: 'SUM(C12:C23)', v: sExpSum, z: numFmt, s: styleSubtotal };
+        ws['D24'] = { t: 'n', f: 'B24-C24', v: expDiff, z: numFmt, s: expDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['E24'] = { t: 's', f: 'IF(D24>10, "● [초과]", "● [적합]")', v: expDiff > 10 ? "● [초과]" : "● [적합]", s: expDiff > 10 ? styleRedSignal : styleGreenSignal };
+        ['A24', 'F24'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 25: [순공사원가]
-        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: vNetCost, z: numFmt };
-        ws['C25'] = { t: 'n', f: 'C8+C11+C24', v: sNetCost, z: numFmt };
-        ws['D25'] = { t: 'n', f: 'B25-C25', v: vNetCost - sNetCost, z: numFmt };
-        ws['E25'] = { t: 's', f: 'IF(D25>10, "🔴 초과", IF(D25<-10, "🔵 과소", "🟢 적합"))', v: vNetCost - sNetCost > 10 ? "🔴 초과" : "🟢 적합" };
+        const netDiff = vNetCost - sNetCost;
+        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: vNetCost, z: numFmt, s: styleSubtotal };
+        ws['C25'] = { t: 'n', f: 'C8+C11+C24', v: sNetCost, z: numFmt, s: styleSubtotal };
+        ws['D25'] = { t: 'n', f: 'B25-C25', v: netDiff, z: numFmt, s: netDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['E25'] = { t: 's', f: 'IF(D25>10, "● [초과]", "● [적합]")', v: netDiff > 10 ? "● [초과]" : "● [적합]", s: netDiff > 10 ? styleRedSignal : styleGreenSignal };
+        ['A25', 'F25'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 26 ~ 28: 일반관리비, 이윤, 폐기물
         setDiffRow(26, 'ROUND(C25*0.06, 0)', sAdmin);
-        setDiffRow(27, 'ROUND((C11+C24+C26)*0.15, 0)', sProfit); // 재료비 C8 제외 법정 공식 준수
+        setDiffRow(27, 'ROUND((C11+C24+C26)*0.15, 0)', sProfit);
         setDiffRow(28, null, wasteCost);
 
         // Row 29: [총원가]
-        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: vTotalCost, z: numFmt };
-        ws['C29'] = { t: 'n', f: 'C25+C26+C27+C28', v: sTotalCost, z: numFmt };
-        ws['D29'] = { t: 'n', f: 'B29-C29', v: vTotalCost - sTotalCost, z: numFmt };
-        ws['E29'] = { t: 's', f: 'IF(D29>10, "🔴 초과", IF(D29<-10, "🔵 과소", "🟢 적합"))', v: vTotalCost - sTotalCost > 10 ? "🔴 초과" : "🟢 적합" };
+        const costDiff = vTotalCost - sTotalCost;
+        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: vTotalCost, z: numFmt, s: styleSubtotal };
+        ws['C29'] = { t: 'n', f: 'C25+C26+C27+C28', v: sTotalCost, z: numFmt, s: styleSubtotal };
+        ws['D29'] = { t: 'n', f: 'B29-C29', v: costDiff, z: numFmt, s: costDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['E29'] = { t: 's', f: 'IF(D29>10, "● [초과]", "● [적합]")', v: costDiff > 10 ? "● [초과]" : "● [적합]", s: costDiff > 10 ? styleRedSignal : styleGreenSignal };
+        ['A29', 'F29'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 30: 부가가치세
+        const vatDiff = vVat - sVat;
         ws['B30'] = { t: 'n', f: 'ROUND(B29*0.1, 0)', v: vVat, z: numFmt };
         ws['C30'] = { t: 'n', f: 'ROUND(C29*0.1, 0)', v: sVat, z: numFmt };
-        ws['D30'] = { t: 'n', f: 'B30-C30', v: vVat - sVat, z: numFmt };
-        ws['E30'] = { t: 's', f: 'IF(D30>10, "🔴 초과", IF(D30<-10, "🔵 과소", "🟢 적합"))', v: vVat - sVat > 10 ? "🔴 초과" : "🟢 적합" };
+        ws['D30'] = { t: 'n', f: 'B30-C30', v: vatDiff, z: numFmt, s: vatDiff > 10 ? styleRedSignal : styleNormal };
+        ws['E30'] = { t: 's', f: 'IF(D30>10, "● [초과]", "● [적합]")', v: vatDiff > 10 ? "● [초과]" : "● [적합]", s: vatDiff > 10 ? styleRedSignal : styleGreenSignal };
 
         // Row 31: 【총도급액 (합계)】
-        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: actualVendorTotal, z: numFmt };
-        ws['C31'] = { t: 'n', f: 'FLOOR(C29+C30, 10)', v: standardTotal, z: numFmt };
-        ws['D31'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt };
-        ws['E31'] = { t: 's', f: 'IF(D31>10, "🔴 초과(삭감)", IF(D31<-10, "🔵 과소", "🟢 적합"))', v: totalDiffAmt > 10 ? "🔴 초과(삭감)" : "🟢 적합" };
+        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: actualVendorTotal, z: numFmt, s: styleGrandTotal };
+        ws['C31'] = { t: 'n', f: 'FLOOR(C29+C30, 10)', v: standardTotal, z: numFmt, s: styleGrandTotal };
+        ws['D31'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt, s: isTotalExcess ? styleRedSignal : styleGrandTotal };
+        ws['E31'] = { t: 's', f: 'IF(D31>10, "● [초과(삭감)]", "● [적합]")', v: isTotalExcess ? "● [초과(삭감)]" : "● [적합]", s: isTotalExcess ? styleRedSignal : styleGreenSignal };
+        ['A31', 'F31'].forEach(ref => { if (ws[ref]) ws[ref].s = styleGrandTotal; });
 
-        XLSX.utils.book_append_sheet(wb, ws, "감사결과_대차대조표");
+        xlsxLib.utils.book_append_sheet(wb, ws, "감사결과_대차대조표");
         const safeTitle = title.replace(/[\\/:*?"<>|]/g, '_');
         const fileName = `[감사결과]_${safeTitle}_대차대조표.xlsx`;
-        XLSX.writeFile(wb, fileName);
+        saveWorkbook(wb, fileName);
     } catch (err) {
         console.error("downloadAuditResultExcel error:", err);
         alert("감사결과 엑셀 다운로드 중 오류가 발생했습니다: " + err.message);
