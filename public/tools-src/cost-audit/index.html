@@ -429,12 +429,12 @@
             overflow: hidden;
         }
 
-        /* 콤팩트 2열 입력 폼 그리드 */
+        /* 콤팩트 2열 입력 폼 그리드 (간격 및 시인성 균형 최적화) */
         .form-grid-2col {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 7px 10px;
-            margin-bottom: 6px;
+            gap: 9px 12px;
+            margin-bottom: 8px;
             width: 100%;
         }
         .form-grid-full {
@@ -444,11 +444,11 @@
             margin-bottom: 0;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
             min-width: 0;
         }
         .form-group label {
-            font-size: 11.5px;
+            font-size: 12px;
             color: var(--text-muted);
             font-weight: 700;
             white-space: nowrap;
@@ -463,8 +463,8 @@
             background: var(--input-bg);
             border: 1px solid var(--input-border);
             border-radius: 8px;
-            height: 34px;
-            padding: 0 10px;
+            height: 36px;
+            padding: 0 11px;
             color: var(--text-main);
             font-size: 13.5px;
             outline: none;
@@ -524,7 +524,7 @@
         }
         th {
             text-align: left;
-            padding: 7px 9px;
+            padding: 8px 11px;
             background: var(--th-bg);
             color: var(--text-muted);
             border-bottom: 1.5px solid var(--card-border);
@@ -534,10 +534,10 @@
             letter-spacing: -0.01em;
         }
         td {
-            padding: 4.5px 9px;
+            padding: 6px 11px;
             border-bottom: 1px solid var(--tr-border);
             vertical-align: middle;
-            line-height: 1.25;
+            line-height: 1.3;
         }
         tr:hover td {
             background: var(--tr-hover);
@@ -1060,15 +1060,30 @@
                 </div>
             </div>
 
+            <!-- 실시간 감사 지적사항 요약 칩 패널 (공백 해소 및 감사 핵심 쟁점 1초 직관 파악) -->
+            <div id="violationSummarySection" style="margin-top:6px; margin-bottom:6px; border-top:1px solid var(--card-border); padding-top:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
+                        <span>⚖️</span> 실시간 감사 지적사항 요약
+                    </span>
+                    <span id="violationCountBadge" style="font-size:11px; font-weight:800; padding:1px 7px; border-radius:9999px; background:rgba(148, 163, 184, 0.15); color:var(--text-muted);">대기 중</span>
+                </div>
+                <div id="violationChipsArea" style="display:flex; flex-direction:column; gap:4px; max-height:130px; overflow-y:auto; padding-right:2px;">
+                    <div style="font-size:11.5px; color:var(--text-muted); padding:6px 8px; background:var(--input-bg); border-radius:6px; border:1px dashed var(--card-border); text-align:center;">
+                        견적서 입력 시 위반 항목이 자동 요약됩니다.
+                    </div>
+                </div>
+            </div>
+
             <!-- 공문 미리보기 (남는 세로 공간을 자연스럽게 채워 바닥 끝단 완벽 일치) -->
-            <div style="margin-top:8px; border-top:1px solid var(--card-border); padding-top:6px; flex:1; display:flex; flex-direction:column; min-height:100px;">
+            <div style="border-top:1px solid var(--card-border); padding-top:6px; flex:1; display:flex; flex-direction:column; min-height:100px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
                         <span>📄</span> 수정요청 공문 문구
                     </span>
                     <button class="btn btn-secondary no-print" style="height:25px; padding:0 9px; font-size:11px;" onclick="copyNotice()">📋 복사</button>
                 </div>
-                <div class="notice-box" id="officialNoticeBox"></div>
+                <div class="notice-box" id="officialNoticeBox" style="min-height:95px;"></div>
             </div>
         </section>
 
@@ -1785,6 +1800,16 @@ function runCalculation(isFromDiffInput = false) {
         diffSub.innerText = "견적서 파일(엑셀, PDF, 캡처)을 업로드하세요";
         badgeContainer.innerHTML = `<span class="badge badge-idle">⚪ 대기 (견적서 입력 대기)</span>`;
         document.getElementById("officialNoticeBox").innerText = "견적서 파일(엑셀, PDF, 캡처)을 드래그하여 첨부하거나 좌측 핵심 원가 변수를 입력하시면 조달청 제비율 대차대조 감사 결과 및 시공사 통보용 수정요청 공문이 자동으로 생성됩니다.";
+        const countBadge = document.getElementById("violationCountBadge");
+        const chipsArea = document.getElementById("violationChipsArea");
+        if (countBadge) {
+            countBadge.innerText = "대기 중";
+            countBadge.style.background = "rgba(148, 163, 184, 0.15)";
+            countBadge.style.color = "var(--text-muted)";
+        }
+        if (chipsArea) {
+            chipsArea.innerHTML = `<div style="font-size:11.5px; color:var(--text-muted); padding:6px 8px; background:var(--input-bg); border-radius:6px; border:1px dashed var(--card-border); text-align:center;">견적서 입력 시 위반 항목이 자동 요약됩니다.</div>`;
+        }
         return;
     }
 
@@ -1800,6 +1825,51 @@ function runCalculation(isFromDiffInput = false) {
         badgeContainer.innerHTML = `<span class="badge badge-yellow">🟡 주의 (세부 비목 위반 보완필요)</span>`;
     } else {
         badgeContainer.innerHTML = `<span class="badge badge-green">🟢 적합 (정상 견적)</span>`;
+    }
+
+    // 실시간 감사 지적사항 요약 칩 렌더링 (공백 완벽 채움 & 실무 핵심 요약)
+    const countBadge = document.getElementById("violationCountBadge");
+    const chipsArea = document.getElementById("violationChipsArea");
+    if (countBadge && chipsArea) {
+        let chipItems = [];
+        if (totalDiff > 0) {
+            chipItems.push({
+                type: 'danger',
+                text: `🚨 <strong>총도급액 초과</strong>: 법정 상한 대비 <strong>+${formatWithComma(totalDiff)}원</strong> 초과 (감액 필수)`
+            });
+        }
+        if (period > 0 && period < 30) {
+            chipItems.push({
+                type: 'warning',
+                text: `⚠️ <strong>공기 ${period}일(30일 미만)</strong>: 국민건강·연금·노인요양 0원 강제 제외 (부당계상 전액 삭감)`
+            });
+        }
+        violations.forEach(v => {
+            chipItems.push({
+                type: 'danger',
+                text: `🔴 <strong>${v.name}</strong>: 상한(${formatWithComma(v.std)}원) 대비 <strong>+${formatWithComma(v.diff)}원 과다</strong> (삭감)`
+            });
+        });
+
+        if (chipItems.length > 0) {
+            countBadge.innerText = `${chipItems.length}건 적발`;
+            countBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+            countBadge.style.color = '#ef4444';
+            chipsArea.innerHTML = chipItems.map(item => `
+                <div style="font-size:11.5px; line-height:1.35; padding:5px 8px; border-radius:6px; background:${item.type === 'danger' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)'}; border:1px solid ${item.type === 'danger' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}; color:var(--text-main);">
+                    ${item.text}
+                </div>
+            `).join('');
+        } else {
+            countBadge.innerText = '0건 (적합)';
+            countBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+            countBadge.style.color = '#10b981';
+            chipsArea.innerHTML = `
+                <div style="font-size:11.5px; line-height:1.35; padding:6px 9px; border-radius:6px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); color:#10b981; font-weight:600;">
+                    🟢 <strong>전 비목 적합</strong>: 조달청 법정 상한 및 제비율을 100% 준수하고 있습니다.
+                </div>
+            `;
+        }
     }
 
     // 시공사 통보용 공문 문구 작성
@@ -3044,14 +3114,38 @@ function downloadStandardTemplate() {
         const wb = xlsxLib.utils.book_new();
         const ws = xlsxLib.utils.aoa_to_sheet(aoa);
 
-        // 열 너비 설정
+        // 시인성 극대화 열 너비 설정 (텍스트 잘림 0%)
         ws['!cols'] = [
-            { wch: 28 }, // 비목
-            { wch: 20 }, // 금액
-            { wch: 16 }, // 요율
-            { wch: 55 }, // 산출공식
-            { wch: 45 }  // 신호등 자가진단
+            { wch: 26 }, // 비목
+            { wch: 19 }, // 금액
+            { wch: 15 }, // 요율
+            { wch: 52 }, // 산출공식
+            { wch: 38 }  // 신호등 자가진단
         ];
+
+        // 시인성 극대화 행 높이 설정 (답답함 해소 & 공공기관 서식 규격)
+        const rowHeights = [
+            { hpt: 35 }, // Row 0 (1행): 타이틀
+            { hpt: 24 }, // Row 1 (2행): 공종 및 공사기간
+            { hpt: 20 }, // Row 2 (3행): 안내문구
+            { hpt: 10 }, // Row 3 (4행): 빈 줄
+            { hpt: 28 }, // Row 4 (5행): 테이블 헤더
+        ];
+        // Row 5~30: 데이터 행
+        for (let r = 5; r <= 30; r++) {
+            if ([7, 10, 23, 24, 28].includes(r)) {
+                rowHeights.push({ hpt: 24 }); // 소계행
+            } else if (r === 30) {
+                rowHeights.push({ hpt: 32 }); // 총도급액 합계행
+            } else {
+                rowHeights.push({ hpt: 22 }); // 일반 데이터행
+            }
+        }
+        rowHeights.push({ hpt: 12 }); // Row 31 (빈 줄)
+        for (let r = 32; r <= 36; r++) {
+            rowHeights.push({ hpt: 20 }); // 하단 핵심 수칙 안내행
+        }
+        ws['!rows'] = rowHeights;
 
         // 셀 병합 설정
         ws['!merges'] = [
@@ -3064,27 +3158,40 @@ function downloadStandardTemplate() {
             { s: { r: 36, c: 0 }, e: { r: 36, c: 4 } }
         ];
 
-        // 엑셀 서식 스타일 정의 (신호등 및 관공서 표준 스타일)
+        // 엑셀 서식 스타일 정의 (맑은 고딕 계층화 & 공공 표준 테마)
         const borderThin = {
             top: { style: 'thin', color: { rgb: 'D1D5DB' } },
             bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
             left: { style: 'thin', color: { rgb: 'D1D5DB' } },
             right: { style: 'thin', color: { rgb: 'D1D5DB' } }
         };
+        const styleTitle = {
+            fill: { fgColor: { rgb: 'EFF6FF' } }, // 부드러운 스카이블루 배경
+            font: { name: '맑은 고딕', sz: 14, bold: true, color: { rgb: '1E3A8A' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: {
+                top: { style: 'thin', color: { rgb: '93C5FD' } },
+                bottom: { style: 'medium', color: { rgb: '2563EB' } },
+                left: { style: 'thin', color: { rgb: '93C5FD' } },
+                right: { style: 'thin', color: { rgb: '93C5FD' } }
+            }
+        };
         const styleHeader = {
-            fill: { fgColor: { rgb: '1E293B' } },
+            fill: { fgColor: { rgb: '1E293B' } }, // 다크 슬레이트 네이비
             font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: 'FFFFFF' } },
             alignment: { horizontal: 'center', vertical: 'center' },
             border: borderThin
         };
         const styleSubtotal = {
-            fill: { fgColor: { rgb: 'F1F5F9' } },
+            fill: { fgColor: { rgb: 'F1F5F9' } }, // 쿨그레이 소계
             font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '0F172A' } },
+            alignment: { vertical: 'center' },
             border: borderThin
         };
         const styleGrandTotal = {
-            fill: { fgColor: { rgb: 'DBEAFE' } },
-            font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E40AF' } },
+            fill: { fgColor: { rgb: 'DBEAFE' } }, // 로열 스카이블루
+            font: { name: '맑은 고딕', sz: 11.5, bold: true, color: { rgb: '1E40AF' } },
+            alignment: { vertical: 'center' },
             border: {
                 top: { style: 'thin', color: { rgb: '3B82F6' } },
                 bottom: { style: 'double', color: { rgb: '1E40AF' } },
@@ -3093,8 +3200,8 @@ function downloadStandardTemplate() {
             }
         };
         const styleInput = {
-            fill: { fgColor: { rgb: 'FEF9C3' } }, // 연노랑 입력 강조
-            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '1E3A8A' } },
+            fill: { fgColor: { rgb: 'FEF9C3' } }, // 크림 옐로우 입력 강조
+            font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: '1E3A8A' } },
             alignment: { horizontal: 'right', vertical: 'center' },
             border: {
                 top: { style: 'medium', color: { rgb: 'F59E0B' } },
@@ -3103,52 +3210,87 @@ function downloadStandardTemplate() {
                 right: { style: 'medium', color: { rgb: 'F59E0B' } }
             }
         };
-        // 🟢 신호등 [적합 / 정상 / 의무] 스타일
+        // 🟢 신호등 [적합 / 정상 / 의무]
         const styleGreenSignal = {
-            fill: { fgColor: { rgb: 'E6F4EA' } }, // 연초록 신호등 배경
-            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '137333' } }, // 선명한 진초록 원형 심볼 및 글자
-            alignment: { horizontal: 'left', vertical: 'center' },
-            border: borderThin
-        };
-        // 🔴 신호등 [부적합 / 오류 / 초과] 스타일
-        const styleRedSignal = {
-            fill: { fgColor: { rgb: 'FCE8E6' } }, // 연빨강 신호등 배경
-            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'C5221F' } }, // 강렬한 경고 레드 원형 심볼 및 글자
+            fill: { fgColor: { rgb: 'DCFCE7' } }, // 파스텔 연녹
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '15803D' } }, // 선명한 포레스트 그린
             alignment: { horizontal: 'left', vertical: 'center' },
             border: {
-                top: { style: 'thin', color: { rgb: 'EF4444' } },
-                bottom: { style: 'thin', color: { rgb: 'EF4444' } },
-                left: { style: 'thin', color: { rgb: 'EF4444' } },
-                right: { style: 'thin', color: { rgb: 'EF4444' } }
+                top: { style: 'thin', color: { rgb: '86EFAC' } },
+                bottom: { style: 'thin', color: { rgb: '86EFAC' } },
+                left: { style: 'thin', color: { rgb: '86EFAC' } },
+                right: { style: 'thin', color: { rgb: '86EFAC' } }
             }
         };
-        // 🟡 신호등 [주의 / 확인 / 감액안내] 스타일
-        const styleAmberSignal = {
-            fill: { fgColor: { rgb: 'FEF7E0' } }, // 연노랑/호박 신호등 배경
-            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B06000' } }, // 짙은 주황 원형 심볼 및 글자
+        // 🔴 신호등 [부적합 / 오류 / 초과]
+        const styleRedSignal = {
+            fill: { fgColor: { rgb: 'FEE2E2' } }, // 파스텔 연빨강
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } }, // 경고 레드 볼드
             alignment: { horizontal: 'left', vertical: 'center' },
-            border: borderThin
+            border: {
+                top: { style: 'thin', color: { rgb: 'FCA5A5' } },
+                bottom: { style: 'thin', color: { rgb: 'FCA5A5' } },
+                left: { style: 'thin', color: { rgb: 'FCA5A5' } },
+                right: { style: 'thin', color: { rgb: 'FCA5A5' } }
+            }
+        };
+        // 🟡 신호등 [주의 / 확인 / 감액안내]
+        const styleAmberSignal = {
+            fill: { fgColor: { rgb: 'FEF3C7' } }, // 파스텔 연호박
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B45309' } }, // 짙은 주황 볼드
+            alignment: { horizontal: 'left', vertical: 'center' },
+            border: {
+                top: { style: 'thin', color: { rgb: 'FCD34D' } },
+                bottom: { style: 'thin', color: { rgb: 'FCD34D' } },
+                left: { style: 'thin', color: { rgb: 'FCD34D' } },
+                right: { style: 'thin', color: { rgb: 'FCD34D' } }
+            }
         };
         const styleNormal = {
             font: { name: '맑은 고딕', sz: 10, color: { rgb: '1F2937' } },
+            alignment: { vertical: 'center' },
             border: borderThin
+        };
+        const styleAlignRight = {
+            ...styleNormal,
+            alignment: { horizontal: 'right', vertical: 'center' }
+        };
+        const styleAlignCenter = {
+            ...styleNormal,
+            alignment: { horizontal: 'center', vertical: 'center' }
         };
 
         const numFmt = '#,##0';
         const pctFmt = '0.00%';
 
-        // 기본 셀 서식 및 테두리 초기화 (Row 4 ~ 30)
+        // 기본 셀 서식 및 테두리 초기화 (Row 5 ~ 31)
         const cols = ['A', 'B', 'C', 'D', 'E'];
         for (let r = 5; r <= 31; r++) {
             cols.forEach(col => {
                 const ref = `${col}${r}`;
                 if (ws[ref]) {
-                    ws[ref].s = { ...styleNormal };
+                    if (col === 'B') ws[ref].s = { ...styleAlignRight };
+                    else if (col === 'C') ws[ref].s = { ...styleAlignCenter };
+                    else ws[ref].s = { ...styleNormal };
                 }
             });
         }
 
-        // 헤더 행 스타일 (Row 4, 1-indexed 5)
+        // 타이틀 서식 (A1)
+        if (ws['A1']) ws['A1'].s = styleTitle;
+
+        // 메타 정보 서식 (Row 2, 1-indexed 2)
+        const metaBase = { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '334155' } }, alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'F8FAFC' } }, border: borderThin };
+        if (ws['A2']) ws['A2'].s = metaBase;
+        if (ws['B2']) ws['B2'].s = { font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: '0F172A' } }, alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'F1F5F9' } }, border: borderThin };
+        if (ws['C2']) ws['C2'].s = metaBase;
+        ws['D2'] = { t: 'n', v: 30, z: '#,##0', s: { ...styleInput, alignment: { horizontal: 'center', vertical: 'center' } } };
+        if (ws['E2']) ws['E2'].s = { font: { name: '맑은 고딕', sz: 9.5, bold: true, color: { rgb: 'DC2626' } }, alignment: { horizontal: 'left', vertical: 'center' }, fill: { fgColor: { rgb: 'FEF2F2' } }, border: { top: { style: 'thin', color: { rgb: 'FECACA' } }, bottom: { style: 'thin', color: { rgb: 'FECACA' } }, left: { style: 'thin', color: { rgb: 'FECACA' } }, right: { style: 'thin', color: { rgb: 'FECACA' } } } };
+
+        // Row 3 안내문 서식
+        if (ws['A3']) ws['A3'].s = { font: { name: '맑은 고딕', sz: 9.5, color: { rgb: '475569' } }, alignment: { horizontal: 'left', vertical: 'center' } };
+
+        // 헤더 행 스타일 (Row 5, 1-indexed 5)
         ['A5', 'B5', 'C5', 'D5', 'E5'].forEach(ref => {
             if (ws[ref]) ws[ref].s = styleHeader;
         });
@@ -3159,7 +3301,6 @@ function downloadStandardTemplate() {
         if (ws['B9']) { ws['B9'].z = numFmt; ws['B9'].s = styleInput; }
         if (ws['B12']) { ws['B12'].z = numFmt; ws['B12'].s = styleInput; }
         if (ws['B28']) { ws['B28'].z = numFmt; ws['B28'].s = styleInput; }
-        ws['D2'] = { t: 'n', v: 30, z: '#,##0', s: styleInput };
 
         // 요율 셀 포맷
         ['C10', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22', 'C23', 'C26', 'C27', 'C30'].forEach(cell => {
@@ -3169,76 +3310,82 @@ function downloadStandardTemplate() {
         });
 
         // 재료비 소계
-        ws['B8'] = { t: 'n', f: 'B6+B7', v: baseMat, z: numFmt, s: styleSubtotal };
+        ws['B8'] = { t: 'n', f: 'B6+B7', v: baseMat, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ['A8', 'C8', 'D8', 'E8'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // 간접노무비 & 노무비 소계
-        ws['B10'] = { t: 'n', f: 'ROUND(B9*C10, 0)', v: calcIndLab, z: numFmt };
-        ws['B11'] = { t: 'n', f: 'B9+B10', v: calcLabTotal, z: numFmt, s: styleSubtotal };
+        ws['B10'] = { t: 'n', f: 'ROUND(B9*C10, 0)', v: calcIndLab, z: numFmt, s: styleAlignRight };
+        ws['B11'] = { t: 'n', f: 'B9+B10', v: calcLabTotal, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ['A11', 'C11', 'D11', 'E11'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // 기타경비 & 4대보험
-        ws['B13'] = { t: 'n', f: 'ROUND((B8+B11)*C13, 0)', v: calcOtherExp, z: numFmt };
-        ws['B14'] = { t: 'n', f: 'ROUND(B11*C14, 0)', v: calcAccident, z: numFmt };
-        ws['B15'] = { t: 'n', f: 'ROUND(B11*C15, 0)', v: calcEmploy, z: numFmt };
+        ws['B13'] = { t: 'n', f: 'ROUND((B8+B11)*C13, 0)', v: calcOtherExp, z: numFmt, s: styleAlignRight };
+        ws['B14'] = { t: 'n', f: 'ROUND(B11*C14, 0)', v: calcAccident, z: numFmt, s: styleAlignRight };
+        ws['B15'] = { t: 'n', f: 'ROUND(B11*C15, 0)', v: calcEmploy, z: numFmt, s: styleAlignRight };
 
         // 국민건강, 국민연금, 노인장기요양 (공사기간 D2셀 30일 미만 검증 수식 & 신호등)
-        ws['B16'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B9*C16, 0))', v: calcHealth, z: numFmt };
+        ws['B16'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B9*C16, 0))', v: calcHealth, z: numFmt, s: styleAlignRight };
         ws['E16'] = { t: 's', f: 'IF($D$2<30, "● [오류] 30일 미만 계상 불가(0원 삭감)", "● [적합] 30일 이상 의무 계상")', v: "● [적합] 30일 이상 의무 계상", s: styleGreenSignal };
 
-        ws['B17'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B9*C17, 0))', v: calcPension, z: numFmt };
+        ws['B17'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B9*C17, 0))', v: calcPension, z: numFmt, s: styleAlignRight };
         ws['E17'] = { t: 's', f: 'IF($D$2<30, "● [오류] 30일 미만 계상 불가(0원 삭감)", "● [적합] 30일 이상 의무 계상")', v: "● [적합] 30일 이상 의무 계상", s: styleGreenSignal };
 
-        ws['B18'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B16*C18, 0))', v: calcCare, z: numFmt };
+        ws['B18'] = { t: 'n', f: 'IF($D$2<30, 0, ROUND(B16*C18, 0))', v: calcCare, z: numFmt, s: styleAlignRight };
         ws['E18'] = { t: 's', f: 'IF($D$2<30, "● [오류] 30일 미만 계상 불가(0원 삭감)", "● [적합] 30일 이상 의무 계상")', v: "● [적합] 30일 이상 의무 계상", s: styleGreenSignal };
 
         // 산업안전보건관리비 (대상액 2천만 원 미만 면제 수식 & 신호등)
         const isSafetyOver = (baseMat + baseLab) >= 20000000;
-        ws['B19'] = { t: 'n', f: 'IF((B6+B9)<20000000, 0, ROUND((B6+B9)*C19, 0))', v: calcSafety, z: numFmt };
+        ws['B19'] = { t: 'n', f: 'IF((B6+B9)<20000000, 0, ROUND((B6+B9)*C19, 0))', v: calcSafety, z: numFmt, s: styleAlignRight };
         ws['E19'] = { t: 's', f: 'IF((B6+B9)<20000000, "● [오류] 대상액 2천만 미만 의무면제(0원)", "● [적합] 대상액 2천만 이상 의무 계상")', v: isSafetyOver ? "● [적합] 대상액 2천만 이상 의무 계상" : "● [오류] 대상액 2천만 미만 의무면제(0원)", s: isSafetyOver ? styleGreenSignal : styleRedSignal };
 
         // 퇴직공제부금비 (직접비 7천만 미만 간이 0원)
-        ws['B20'] = { t: 'n', f: 'IF((B6+B9)<70000000, 0, ROUND(B9*C20, 0))', v: 0, z: numFmt };
+        ws['B20'] = { t: 'n', f: 'IF((B6+B9)<70000000, 0, ROUND(B9*C20, 0))', v: 0, z: numFmt, s: styleAlignRight };
         ws['E20'] = { t: 's', f: 'IF((B6+B9)<70000000, "● [정상] 1억 원 미만 공사 0원", "● [적합] 1억 원 이상 의무 계상")', v: "● [정상] 1억 원 미만 공사 0원", s: styleGreenSignal };
 
         // 환경보전비, 임금채권, 석면
-        ws['B21'] = { t: 'n', f: 'ROUND((B8+B11+B12)*C21, 0)', v: calcEnv, z: numFmt };
+        ws['B21'] = { t: 'n', f: 'ROUND((B8+B11+B12)*C21, 0)', v: calcEnv, z: numFmt, s: styleAlignRight };
         ws['E21'] = { t: 's', v: "● [주의] 실내보수 등 미발생시 준공 감액", s: styleAmberSignal };
 
-        ws['B22'] = { t: 'n', f: 'ROUND(B11*C22, 0)', v: calcWage, z: numFmt };
+        ws['B22'] = { t: 'n', f: 'ROUND(B11*C22, 0)', v: calcWage, z: numFmt, s: styleAlignRight };
         ws['E22'] = { t: 's', v: "● [적합] 법정 요율 이내", s: styleGreenSignal };
 
-        ws['B23'] = { t: 'n', f: 'ROUND(B11*C23, 0)', v: calcAsbestos, z: numFmt };
+        ws['B23'] = { t: 'n', f: 'ROUND(B11*C23, 0)', v: calcAsbestos, z: numFmt, s: styleAlignRight };
         ws['E23'] = { t: 's', v: "● [적합] 법정 요율 이내", s: styleGreenSignal };
 
         // 경비 소계 및 순공사원가
-        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: calcExpTotal, z: numFmt, s: styleSubtotal };
+        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: calcExpTotal, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ['A24', 'C24', 'D24', 'E24'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
-        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: calcNetCost, z: numFmt, s: styleSubtotal };
+        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: calcNetCost, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ['A25', 'C25', 'D25', 'E25'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // 일반관리비 (6% 상한 감지 신호등)
-        ws['B26'] = { t: 'n', f: 'ROUND(B25*C26, 0)', v: calcAdmin, z: numFmt };
+        ws['B26'] = { t: 'n', f: 'ROUND(B25*C26, 0)', v: calcAdmin, z: numFmt, s: styleAlignRight };
         ws['E26'] = { t: 's', f: 'IF(C26>0.06, "● [초과] 기재부 상한(6%) 초과", "● [적합] 법정 상한(6%) 이내")', v: "● [적합] 법정 상한(6%) 이내", s: styleGreenSignal };
 
         // 이윤 (15% 상한 감지 및 재료비 제외 법정 공식 엄수 신호등)
-        ws['B27'] = { t: 'n', f: 'ROUND((B11+B24+B26)*C27, 0)', v: calcProfit, z: numFmt };
+        ws['B27'] = { t: 'n', f: 'ROUND((B11+B24+B26)*C27, 0)', v: calcProfit, z: numFmt, s: styleAlignRight };
         ws['E27'] = { t: 's', f: 'IF(C27>0.15, "● [초과] 기재부 상한(15%) 초과", "● [적합] 법정 상한(15%) 이내 (재료비 제외)")', v: "● [적합] 법정 상한(15%) 이내 (재료비 제외)", s: styleGreenSignal };
 
         // 총원가, 부가가치세, 총도급액 (10원 미만 절사)
-        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: calcTotalCost, z: numFmt, s: styleSubtotal };
+        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: calcTotalCost, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ['A29', 'C29', 'D29', 'E29'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
-        ws['B30'] = { t: 'n', f: 'ROUND(B29*C30, 0)', v: calcVat, z: numFmt };
+        ws['B30'] = { t: 'n', f: 'ROUND(B29*C30, 0)', v: calcVat, z: numFmt, s: styleAlignRight };
         ws['E30'] = { t: 's', v: "● [적합] 10% 정상 반영", s: styleGreenSignal };
 
-        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: calcFinalTotal, z: numFmt, s: styleGrandTotal };
+        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: calcFinalTotal, z: numFmt, s: { ...styleGrandTotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ['A31', 'C31', 'D31', 'E31'].forEach(ref => { if (ws[ref]) ws[ref].s = styleGrandTotal; });
 
         // 나머지 일반 신호등 셀 일괄 서식 적용
         ['E6', 'E7', 'E9', 'E10', 'E12', 'E13', 'E14', 'E15', 'E28'].forEach(ref => {
             if (ws[ref]) ws[ref].s = styleGreenSignal;
+        });
+
+        // 하단 핵심 수칙 안내 블록 스타일 (Row 33 ~ 37)
+        if (ws['A33']) ws['A33'].s = { font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: '1E293B' } }, fill: { fgColor: { rgb: 'F1F5F9' } }, border: borderThin, alignment: { horizontal: 'left', vertical: 'center' } };
+        ['A34', 'A35', 'A36', 'A37'].forEach(ref => {
+            if (ws[ref]) ws[ref].s = { font: { name: '맑은 고딕', sz: 9.5, color: { rgb: '334155' } }, alignment: { horizontal: 'left', vertical: 'center' } };
         });
 
         xlsxLib.utils.book_append_sheet(wb, ws, "표준원가계산서");
@@ -3473,27 +3620,65 @@ function downloadAuditResultExcel() {
         const wb = xlsxLib.utils.book_new();
         const ws = xlsxLib.utils.aoa_to_sheet(aoaData);
 
-        // 열 너비 설정
+        // 시인성 극대화 열 너비 설정 (텍스트 잘림 0%)
         ws['!cols'] = [
-            { wch: 28 }, // 비목명
-            { wch: 20 }, // 업체 제출액
-            { wch: 20 }, // 조달청 적정액
-            { wch: 20 }, // 차액(삭감액)
+            { wch: 26 }, // 비목명
+            { wch: 19 }, // 업체 제출액 (A)
+            { wch: 19 }, // 조달청 적정액 (B)
+            { wch: 19 }, // 차액 (삭감액: A-B)
             { wch: 18 }, // 감사 판정 (신호등)
-            { wch: 60 }  // 검토의견
+            { wch: 58 }  // 검토의견 및 기준
         ];
 
-        // 셀 병합 설정
+        // 시인성 극대화 행 높이 설정 (대차대조 카드 32pt, 헤더 28pt, 총도급액 32pt)
+        const dRowHeights = [
+            { hpt: 35 }, // Row 0 (1행): 타이틀
+            { hpt: 24 }, // Row 1 (2행): 메타정보
+            { hpt: 32 }, // Row 2 (3행): 총도급액 대차대조 요약 카드
+            { hpt: 10 }, // Row 3 (4행): 빈 줄
+            { hpt: 28 }, // Row 4 (5행): 테이블 헤더
+        ];
+        // Row 5~30: 본문 데이터 및 소계 행
+        for (let r = 5; r <= 30; r++) {
+            if ([7, 10, 23, 24, 28].includes(r)) {
+                dRowHeights.push({ hpt: 24 }); // 소계행
+            } else if (r === 30) {
+                dRowHeights.push({ hpt: 32 }); // 총도급액 합계행
+            } else {
+                dRowHeights.push({ hpt: 22 }); // 일반 데이터행
+            }
+        }
+        dRowHeights.push({ hpt: 12 }); // Row 31 (빈 줄)
+        dRowHeights.push({ hpt: 26 }); // Row 32 (공문 타이틀 헤더)
+        // 이후 공문 본문 라인들
+        for (let r = 33; r < aoaData.length; r++) {
+            dRowHeights.push({ hpt: 20 });
+        }
+        ws['!rows'] = dRowHeights;
+
+        // 셀 병합 설정 (타이틀 및 공문 타이틀)
         ws['!merges'] = [
-            { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } },
+            { s: { r: 32, c: 0 }, e: { r: 32, c: 5 } }
         ];
 
-        // 스타일 정의
+        // 스타일 정의 (맑은 고딕 통일 및 공공기관 표준 품격)
         const borderThin = {
             top: { style: 'thin', color: { rgb: 'D1D5DB' } },
             bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
             left: { style: 'thin', color: { rgb: 'D1D5DB' } },
             right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+        };
+        const styleTitle = {
+            fill: { fgColor: { rgb: 'EFF6FF' } }, // 부드러운 스카이블루 배경
+            font: { name: '맑은 고딕', sz: 14, bold: true, color: { rgb: '1E3A8A' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: {
+                top: { style: 'thin', color: { rgb: '93C5FD' } },
+                bottom: { style: 'medium', color: { rgb: '2563EB' } },
+                left: { style: 'thin', color: { rgb: '93C5FD' } },
+                right: { style: 'thin', color: { rgb: '93C5FD' } }
+            }
         };
         const styleHeader = {
             fill: { fgColor: { rgb: '1E293B' } },
@@ -3504,11 +3689,13 @@ function downloadAuditResultExcel() {
         const styleSubtotal = {
             fill: { fgColor: { rgb: 'F1F5F9' } },
             font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '0F172A' } },
+            alignment: { vertical: 'center' },
             border: borderThin
         };
         const styleGrandTotal = {
             fill: { fgColor: { rgb: 'DBEAFE' } },
-            font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E40AF' } },
+            font: { name: '맑은 고딕', sz: 11.5, bold: true, color: { rgb: '1E40AF' } },
+            alignment: { vertical: 'center' },
             border: {
                 top: { style: 'thin', color: { rgb: '3B82F6' } },
                 bottom: { style: 'double', color: { rgb: '1E40AF' } },
@@ -3517,51 +3704,71 @@ function downloadAuditResultExcel() {
             }
         };
         const styleGreenSignal = {
-            fill: { fgColor: { rgb: 'E6F4EA' } },
-            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '137333' } },
-            alignment: { horizontal: 'center', vertical: 'center' },
-            border: borderThin
-        };
-        const styleRedSignal = {
-            fill: { fgColor: { rgb: 'FCE8E6' } },
-            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'C5221F' } },
+            fill: { fgColor: { rgb: 'DCFCE7' } },
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '15803D' } },
             alignment: { horizontal: 'center', vertical: 'center' },
             border: {
-                top: { style: 'thin', color: { rgb: 'EF4444' } },
-                bottom: { style: 'thin', color: { rgb: 'EF4444' } },
-                left: { style: 'thin', color: { rgb: 'EF4444' } },
-                right: { style: 'thin', color: { rgb: 'EF4444' } }
+                top: { style: 'thin', color: { rgb: '86EFAC' } },
+                bottom: { style: 'thin', color: { rgb: '86EFAC' } },
+                left: { style: 'thin', color: { rgb: '86EFAC' } },
+                right: { style: 'thin', color: { rgb: '86EFAC' } }
+            }
+        };
+        const styleRedSignal = {
+            fill: { fgColor: { rgb: 'FEE2E2' } },
+            font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border: {
+                top: { style: 'thin', color: { rgb: 'FCA5A5' } },
+                bottom: { style: 'thin', color: { rgb: 'FCA5A5' } },
+                left: { style: 'thin', color: { rgb: 'FCA5A5' } },
+                right: { style: 'thin', color: { rgb: 'FCA5A5' } }
             }
         };
         const styleNormal = {
             font: { name: '맑은 고딕', sz: 10, color: { rgb: '1F2937' } },
+            alignment: { vertical: 'center' },
             border: borderThin
+        };
+        const styleAlignRight = {
+            ...styleNormal,
+            alignment: { horizontal: 'right', vertical: 'center' }
         };
 
         const numFmt = '#,##0';
 
-        // 3행 총도급액 요약 수식 주입
+        // 타이틀 서식 (A1)
+        if (ws['A1']) ws['A1'].s = styleTitle;
+
+        // 메타 정보 서식 (Row 2, 1-indexed 2)
+        const dMetaBase = { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '334155' } }, alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'F8FAFC' } }, border: borderThin };
+        ['A2', 'C2', 'E2'].forEach(ref => { if (ws[ref]) ws[ref].s = dMetaBase; });
+        if (ws['B2']) ws['B2'].s = { font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: '0F172A' } }, alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'F1F5F9' } }, border: borderThin };
+        ws['D2'] = { t: 'n', v: period, z: '#,##0', s: { font: { name: '맑은 고딕', sz: 10.5, bold: true, color: { rgb: '1E3A8A' } }, alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FEF9C3' } }, border: borderThin } };
+        if (ws['F2']) ws['F2'].s = { font: { name: '맑은 고딕', sz: 10.5, bold: true, color: isTotalExcess ? { rgb: 'B91C1C' } : { rgb: '15803D' } }, alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: isTotalExcess ? { rgb: 'FEE2E2' } : { rgb: 'DCFCE7' } }, border: borderThin };
+
+        // 3행 총도급액 요약 카드 수식 & 고도화 스타일 주입 (Row 3, 1-indexed 3)
         const isTotalExcess = totalDiffAmt > 10;
-        ws['B3'] = { t: 'n', f: 'B31', v: actualVendorTotal, z: numFmt };
-        ws['C3'] = { t: 'n', f: 'C31', v: standardTotal, z: numFmt };
-        ws['D3'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt, s: isTotalExcess ? styleRedSignal : styleGreenSignal };
+        ws['A3'] = { t: 's', v: "■ 총도급액 대차대조:", s: { font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E293B' } }, fill: { fgColor: { rgb: 'F1F5F9' } }, alignment: { horizontal: 'center', vertical: 'center' }, border: borderThin } };
+        ws['B3'] = { t: 'n', f: 'B31', v: actualVendorTotal, z: numFmt, s: { font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: 'B45309' } }, fill: { fgColor: { rgb: 'FEF3C7' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } };
+        ws['C3'] = { t: 'n', f: 'C31', v: standardTotal, z: numFmt, s: { font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E40AF' } }, fill: { fgColor: { rgb: 'DBEAFE' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } };
+        ws['D3'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt, s: { font: { name: '맑은 고딕', sz: 11.5, bold: true, color: isTotalExcess ? { rgb: 'B91C1C' } : { rgb: '15803D' } }, fill: { fgColor: isTotalExcess ? { rgb: 'FEE2E2' } : { rgb: 'DCFCE7' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } };
         ws['E3'] = { t: 's', f: 'IF(D3>10, "● [삭감 대상]", "● [적합]")', v: isTotalExcess ? "● [삭감 대상]" : "● [적합]", s: isTotalExcess ? styleRedSignal : styleGreenSignal };
+        ws['F3'] = { t: 's', v: `총 삭감/조정액: ${totalDiffAmt > 0 ? '+' : ''}${formatWithComma(totalDiffAmt)}원`, s: { font: { name: '맑은 고딕', sz: 10.5, bold: true, color: isTotalExcess ? { rgb: 'B91C1C' } : { rgb: '15803D' } }, fill: { fgColor: { rgb: 'F8FAFC' } }, alignment: { horizontal: 'left', vertical: 'center' }, border: borderThin } };
 
-        // D2 셀: 공사기간 일수
-        ws['D2'] = { t: 'n', v: period, z: '#,##0' };
-
-        // 기본 셀 서식 및 테두리 초기화
+        // 기본 셀 서식 및 테두리 초기화 (Row 5 ~ 31)
         const dCols = ['A', 'B', 'C', 'D', 'E', 'F'];
         for (let r = 5; r <= 31; r++) {
             dCols.forEach(col => {
                 const ref = `${col}${r}`;
                 if (ws[ref]) {
-                    ws[ref].s = { ...styleNormal };
+                    if (['B', 'C', 'D'].includes(col)) ws[ref].s = { ...styleAlignRight };
+                    else ws[ref].s = { ...styleNormal };
                 }
             });
         }
 
-        // 헤더 행 스타일
+        // 헤더 행 스타일 (Row 5)
         ['A5', 'B5', 'C5', 'D5', 'E5', 'F5'].forEach(ref => {
             if (ws[ref]) ws[ref].s = styleHeader;
         });
@@ -3574,13 +3781,17 @@ function downloadAuditResultExcel() {
             const dCell = `D${r}`;
             const eCell = `E${r}`;
 
-            if (ws[bCell]) ws[bCell].z = numFmt;
+            if (ws[bCell]) {
+                ws[bCell].z = numFmt;
+                ws[bCell].s = styleAlignRight;
+            }
             
             // C열 (조달청 적정액 수식)
             if (fC) {
-                ws[cCell] = { t: 'n', f: fC, v: vC, z: numFmt };
+                ws[cCell] = { t: 'n', f: fC, v: vC, z: numFmt, s: styleAlignRight };
             } else if (ws[cCell]) {
                 ws[cCell].z = numFmt;
+                ws[cCell].s = styleAlignRight;
             }
 
             // D열 (차액: B - C)
@@ -3593,7 +3804,7 @@ function downloadAuditResultExcel() {
                 f: `${bCell}-${cCell}`,
                 v: diff,
                 z: numFmt,
-                s: isRowExcess ? styleRedSignal : styleNormal
+                s: isRowExcess ? { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } }, fill: { fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } : styleAlignRight
             };
 
             // E열 (신호등 판정: 10원 초과 시 빨간색 삭감, 그 외 녹색 적합)
@@ -3610,9 +3821,9 @@ function downloadAuditResultExcel() {
         setDiffRow(6, null, directMat);
         setDiffRow(7, null, 0);
         // Row 8: [재료비 소계]
-        ws['B8'] = { t: 'n', f: 'B6+B7', v: directMat, z: numFmt, s: styleSubtotal };
-        ws['C8'] = { t: 'n', f: 'C6+C7', v: directMat, z: numFmt, s: styleSubtotal };
-        ws['D8'] = { t: 'n', f: 'B8-C8', v: 0, z: numFmt, s: styleSubtotal };
+        ws['B8'] = { t: 'n', f: 'B6+B7', v: directMat, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['C8'] = { t: 'n', f: 'C6+C7', v: directMat, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['D8'] = { t: 'n', f: 'B8-C8', v: 0, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ws['E8'] = { t: 's', f: 'IF(D8>10, "● [초과]", "● [적합]")', v: "● [적합]", s: styleGreenSignal };
         ['A8', 'F8'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
@@ -3621,9 +3832,9 @@ function downloadAuditResultExcel() {
         setDiffRow(10, `ROUND(C9*${indLabRate}, 0)`, sIndLab);
         // Row 11: [노무비 소계]
         const labDiff = vLabTotal - sLabTotal;
-        ws['B11'] = { t: 'n', f: 'B9+B10', v: vLabTotal, z: numFmt, s: styleSubtotal };
-        ws['C11'] = { t: 'n', f: 'C9+C10', v: sLabTotal, z: numFmt, s: styleSubtotal };
-        ws['D11'] = { t: 'n', f: 'B11-C11', v: labDiff, z: numFmt, s: labDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['B11'] = { t: 'n', f: 'B9+B10', v: vLabTotal, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['C11'] = { t: 'n', f: 'C9+C10', v: sLabTotal, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['D11'] = { t: 'n', f: 'B11-C11', v: labDiff, z: numFmt, s: labDiff > 10 ? { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } }, fill: { fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } : { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ws['E11'] = { t: 's', f: 'IF(D11>10, "● [초과]", "● [적합]")', v: labDiff > 10 ? "● [초과]" : "● [적합]", s: labDiff > 10 ? styleRedSignal : styleGreenSignal };
         ['A11', 'F11'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
@@ -3649,17 +3860,17 @@ function downloadAuditResultExcel() {
 
         // Row 24: [경비 소계]
         const expDiff = vExpSum - sExpSum;
-        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: vExpSum, z: numFmt, s: styleSubtotal };
-        ws['C24'] = { t: 'n', f: 'SUM(C12:C23)', v: sExpSum, z: numFmt, s: styleSubtotal };
-        ws['D24'] = { t: 'n', f: 'B24-C24', v: expDiff, z: numFmt, s: expDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['B24'] = { t: 'n', f: 'SUM(B12:B23)', v: vExpSum, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['C24'] = { t: 'n', f: 'SUM(C12:C23)', v: sExpSum, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['D24'] = { t: 'n', f: 'B24-C24', v: expDiff, z: numFmt, s: expDiff > 10 ? { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } }, fill: { fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } : { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ws['E24'] = { t: 's', f: 'IF(D24>10, "● [초과]", "● [적합]")', v: expDiff > 10 ? "● [초과]" : "● [적합]", s: expDiff > 10 ? styleRedSignal : styleGreenSignal };
         ['A24', 'F24'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 25: [순공사원가]
         const netDiff = vNetCost - sNetCost;
-        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: vNetCost, z: numFmt, s: styleSubtotal };
-        ws['C25'] = { t: 'n', f: 'C8+C11+C24', v: sNetCost, z: numFmt, s: styleSubtotal };
-        ws['D25'] = { t: 'n', f: 'B25-C25', v: netDiff, z: numFmt, s: netDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: vNetCost, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['C25'] = { t: 'n', f: 'C8+C11+C24', v: sNetCost, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['D25'] = { t: 'n', f: 'B25-C25', v: netDiff, z: numFmt, s: netDiff > 10 ? { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } }, fill: { fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } : { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ws['E25'] = { t: 's', f: 'IF(D25>10, "● [초과]", "● [적합]")', v: netDiff > 10 ? "● [초과]" : "● [적합]", s: netDiff > 10 ? styleRedSignal : styleGreenSignal };
         ['A25', 'F25'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
@@ -3670,25 +3881,37 @@ function downloadAuditResultExcel() {
 
         // Row 29: [총원가]
         const costDiff = vTotalCost - sTotalCost;
-        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: vTotalCost, z: numFmt, s: styleSubtotal };
-        ws['C29'] = { t: 'n', f: 'C25+C26+C27+C28', v: sTotalCost, z: numFmt, s: styleSubtotal };
-        ws['D29'] = { t: 'n', f: 'B29-C29', v: costDiff, z: numFmt, s: costDiff > 10 ? styleRedSignal : styleSubtotal };
+        ws['B29'] = { t: 'n', f: 'B25+B26+B27+B28', v: vTotalCost, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['C29'] = { t: 'n', f: 'C25+C26+C27+C28', v: sTotalCost, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['D29'] = { t: 'n', f: 'B29-C29', v: costDiff, z: numFmt, s: costDiff > 10 ? { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } }, fill: { fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } : { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ws['E29'] = { t: 's', f: 'IF(D29>10, "● [초과]", "● [적합]")', v: costDiff > 10 ? "● [초과]" : "● [적합]", s: costDiff > 10 ? styleRedSignal : styleGreenSignal };
         ['A29', 'F29'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 30: 부가가치세
         const vatDiff = vVat - sVat;
-        ws['B30'] = { t: 'n', f: 'ROUND(B29*0.1, 0)', v: vVat, z: numFmt };
-        ws['C30'] = { t: 'n', f: 'ROUND(C29*0.1, 0)', v: sVat, z: numFmt };
-        ws['D30'] = { t: 'n', f: 'B30-C30', v: vatDiff, z: numFmt, s: vatDiff > 10 ? styleRedSignal : styleNormal };
+        ws['B30'] = { t: 'n', f: 'ROUND(B29*0.1, 0)', v: vVat, z: numFmt, s: styleAlignRight };
+        ws['C30'] = { t: 'n', f: 'ROUND(C29*0.1, 0)', v: sVat, z: numFmt, s: styleAlignRight };
+        ws['D30'] = { t: 'n', f: 'B30-C30', v: vatDiff, z: numFmt, s: vatDiff > 10 ? { font: { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: 'B91C1C' } }, fill: { fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } : styleAlignRight };
         ws['E30'] = { t: 's', f: 'IF(D30>10, "● [초과]", "● [적합]")', v: vatDiff > 10 ? "● [초과]" : "● [적합]", s: vatDiff > 10 ? styleRedSignal : styleGreenSignal };
 
         // Row 31: 【총도급액 (합계)】
-        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: actualVendorTotal, z: numFmt, s: styleGrandTotal };
-        ws['C31'] = { t: 'n', f: 'FLOOR(C29+C30, 10)', v: standardTotal, z: numFmt, s: styleGrandTotal };
-        ws['D31'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt, s: isTotalExcess ? styleRedSignal : styleGrandTotal };
+        ws['B31'] = { t: 'n', f: 'FLOOR(B29+B30, 10)', v: actualVendorTotal, z: numFmt, s: { ...styleGrandTotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['C31'] = { t: 'n', f: 'FLOOR(C29+C30, 10)', v: standardTotal, z: numFmt, s: { ...styleGrandTotal, alignment: { horizontal: 'right', vertical: 'center' } } };
+        ws['D31'] = { t: 'n', f: 'B31-C31', v: totalDiffAmt, z: numFmt, s: isTotalExcess ? { font: { name: '맑은 고딕', sz: 11.5, bold: true, color: { rgb: 'B91C1C' } }, fill: { fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } : { ...styleGrandTotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ws['E31'] = { t: 's', f: 'IF(D31>10, "● [초과(삭감)]", "● [적합]")', v: isTotalExcess ? "● [초과(삭감)]" : "● [적합]", s: isTotalExcess ? styleRedSignal : styleGreenSignal };
         ['A31', 'F31'].forEach(ref => { if (ws[ref]) ws[ref].s = styleGrandTotal; });
+
+        // Row 33 (1-indexed 33): 하단 공문 통보문 헤더 서식
+        if (ws['A33']) {
+            ws['A33'].s = { font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E3A8A' } }, fill: { fgColor: { rgb: 'F1F5F9' } }, border: borderThin, alignment: { horizontal: 'left', vertical: 'center' } };
+        }
+        // 이후 공문 본문 라인 서식
+        for (let r = 34; r <= aoaData.length; r++) {
+            const ref = `A${r}`;
+            if (ws[ref]) {
+                ws[ref].s = { font: { name: '맑은 고딕', sz: 9.5, color: { rgb: '334155' } }, alignment: { horizontal: 'left', vertical: 'center' } };
+            }
+        }
 
         xlsxLib.utils.book_append_sheet(wb, ws, "감사결과_대차대조표");
         const safeTitle = title.replace(/[\\/:*?"<>|]/g, '_');
