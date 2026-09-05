@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-3.5-flash-lite",
       systemInstruction: "당신은 제공된 PDF 문서를 완벽하게 분석하여 답변하는 행정 전문 AI 비서입니다. 문서의 내용을 바탕으로 정확한 정보를 제공하세요."
     });
 
