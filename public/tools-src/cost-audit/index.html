@@ -3736,6 +3736,7 @@ function downloadAuditResultExcel() {
         };
 
         const numFmt = '#,##0';
+        const isTotalExcess = totalDiffAmt > 10;
 
         // 타이틀 서식 (A1)
         if (ws['A1']) ws['A1'].s = styleTitle;
@@ -3748,7 +3749,6 @@ function downloadAuditResultExcel() {
         if (ws['F2']) ws['F2'].s = { font: { name: '맑은 고딕', sz: 10.5, bold: true, color: isTotalExcess ? { rgb: 'B91C1C' } : { rgb: '15803D' } }, alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: isTotalExcess ? { rgb: 'FEE2E2' } : { rgb: 'DCFCE7' } }, border: borderThin };
 
         // 3행 총도급액 요약 카드 수식 & 고도화 스타일 주입 (Row 3, 1-indexed 3)
-        const isTotalExcess = totalDiffAmt > 10;
         ws['A3'] = { t: 's', v: "■ 총도급액 대차대조:", s: { font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E293B' } }, fill: { fgColor: { rgb: 'F1F5F9' } }, alignment: { horizontal: 'center', vertical: 'center' }, border: borderThin } };
         ws['B3'] = { t: 'n', f: 'B31', v: actualVendorTotal, z: numFmt, s: { font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: 'B45309' } }, fill: { fgColor: { rgb: 'FEF3C7' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } };
         ws['C3'] = { t: 'n', f: 'C31', v: standardTotal, z: numFmt, s: { font: { name: '맑은 고딕', sz: 11, bold: true, color: { rgb: '1E40AF' } }, fill: { fgColor: { rgb: 'DBEAFE' } }, alignment: { horizontal: 'right', vertical: 'center' }, border: borderThin } };
