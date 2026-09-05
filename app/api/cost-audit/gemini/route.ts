@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 
-// 롤백 백업 모델 순서: 3.5 flash-lite 최우선
+// 롤백 백업 모델 순서: 3.5 flash-lite 최우선 (100% Lite 계열 모델만 호출하여 할당량 보호)
 const FALLBACK_MODELS = [
   'gemini-3.5-flash-lite',
   'gemini-3.1-flash-lite',
   'gemini-flash-lite-latest',
-  'gemini-3.6-flash',
+  'gemini-2.5-flash-lite',
 ];
 
 // 1인당 1일 최대 호출 한도 (학교 동일 IP 환경 고려하여 브라우저 사용자 UID 기준)
