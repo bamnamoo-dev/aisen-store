@@ -91,7 +91,7 @@
             color: var(--text-main);
             font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
             min-height: 100vh;
-            padding: 10px 18px 14px;
+            padding: 6px 14px 8px;
             transition: background 0.25s ease, color 0.25s ease;
             -webkit-font-smoothing: antialiased;
             letter-spacing: -0.015em;
@@ -108,45 +108,45 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         /* 헤더 바 (골든 레시오 & 3분할 밸런스) */
         .header-bar {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 14px;
-            padding: 8px 18px;
+            border-radius: 10px;
+            padding: 5px 14px;
             backdrop-filter: blur(16px);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             box-shadow: var(--card-shadow);
-            min-height: 52px;
+            min-height: 44px;
         }
         .logo-title {
             display: flex;
             align-items: center;
-            gap: 11px;
+            gap: 9px;
             flex-shrink: 0;
         }
         .logo-icon {
-            width: 36px;
-            height: 36px;
+            width: 30px;
+            height: 30px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 900;
-            font-size: 19px;
+            font-size: 16px;
             color: white;
-            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
             flex-shrink: 0;
         }
         h1 {
-            font-size: 17.5px;
+            font-size: 15.5px;
             font-weight: 800;
             color: var(--text-main);
             letter-spacing: -0.025em;
@@ -201,10 +201,10 @@
             flex-wrap: nowrap;
         }
         .btn {
-            height: 32px;
-            padding: 0 12px;
-            border-radius: 8px;
-            font-size: 12.5px;
+            height: 28px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
             font-weight: 700;
             cursor: pointer;
             border: none;
@@ -212,7 +212,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
             line-height: 1;
             font-family: inherit;
@@ -315,20 +315,20 @@
         .summary-layout {
             display: grid;
             grid-template-columns: 460px 1fr;
-            gap: 12px;
+            gap: 8px;
             align-items: stretch;
         }
         .summary-audit-card {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-height: 84px;
+            min-height: 64px;
             border-left: 3.5px solid var(--accent-blue);
         }
         .summary-amount-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
         @media (max-width: 1180px) {
             .summary-layout { grid-template-columns: 1fr; }
@@ -337,21 +337,21 @@
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 11px 18px;
+            border-radius: 10px;
+            padding: 7px 12px;
             backdrop-filter: blur(14px);
             box-shadow: var(--card-shadow);
             transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
         }
         .card-title {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             font-weight: 700;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             letter-spacing: -0.01em;
         }
         .card-value {
-            font-size: 25px;
+            font-size: 20.5px;
             font-weight: 900;
             color: var(--text-main);
             font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
@@ -362,11 +362,11 @@
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 5px 13px;
+            gap: 4px;
+            padding: 3.5px 10px;
             border-radius: 9999px;
             font-weight: 800;
-            font-size: 13.5px;
+            font-size: 12px;
             line-height: 1.2;
             letter-spacing: -0.01em;
         }
@@ -415,7 +415,7 @@
         .main-layout {
             display: grid;
             grid-template-columns: 460px 1fr;
-            gap: 12px;
+            gap: 8px;
             align-items: stretch;
         }
         @media (max-width: 1180px) {
@@ -433,8 +433,8 @@
         .form-grid-2col {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 9px 12px;
-            margin-bottom: 8px;
+            gap: 5px 10px;
+            margin-bottom: 5px;
             width: 100%;
         }
         .form-grid-full {
@@ -444,11 +444,11 @@
             margin-bottom: 0;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
             min-width: 0;
         }
         .form-group label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             font-weight: 700;
             white-space: nowrap;
@@ -462,11 +462,11 @@
             box-sizing: border-box;
             background: var(--input-bg);
             border: 1px solid var(--input-border);
-            border-radius: 8px;
-            height: 36px;
-            padding: 0 11px;
+            border-radius: 6px;
+            height: 30px;
+            padding: 0 9px;
             color: var(--text-main);
-            font-size: 13.5px;
+            font-size: 12.5px;
             outline: none;
             transition: border 0.18s, background 0.18s, box-shadow 0.18s;
             font-family: inherit;
@@ -482,7 +482,7 @@
         .form-control.highlight {
             font-weight: 800;
             color: #d97706;
-            font-size: 15px;
+            font-size: 13.5px;
             border-color: rgba(245, 158, 11, 0.4);
             background: rgba(245, 158, 11, 0.04);
         }
@@ -516,28 +516,28 @@
             transform: translateY(-1px);
         }
 
-        /* 테이블 (폰트 및 간격 최적화) */
+        /* 테이블 (폰트 및 간격 최적화 - 원스크린 피팅) */
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12.5px;
+            font-size: 12px;
         }
         th {
             text-align: left;
-            padding: 8px 11px;
+            padding: 4px 8px;
             background: var(--th-bg);
             color: var(--text-muted);
             border-bottom: 1.5px solid var(--card-border);
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11.5px;
             white-space: nowrap;
             letter-spacing: -0.01em;
         }
         td {
-            padding: 6px 11px;
+            padding: 2.5px 8px;
             border-bottom: 1px solid var(--tr-border);
             vertical-align: middle;
-            line-height: 1.3;
+            line-height: 1.25;
         }
         tr:hover td {
             background: var(--tr-hover);
@@ -549,18 +549,18 @@
             font-variant-numeric: tabular-nums;
         }
         .diff-input {
-            width: 118px;
-            height: 28px;
+            width: 112px;
+            height: 24px;
             background: var(--input-bg);
             border: 1px solid var(--input-border);
-            border-radius: 6px;
-            padding: 0 8px;
+            border-radius: 5px;
+            padding: 0 6px;
             color: var(--text-main);
             text-align: right;
             font-family: inherit;
             font-variant-numeric: tabular-nums;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
             outline: none;
             transition: border 0.18s, box-shadow 0.18s, background 0.18s;
         }
@@ -579,20 +579,20 @@
             color: #0f172a;
         }
 
-        /* 공문 상자 (컴팩트 에디터 스타일 & 세로폭 축소 + 스크롤바 탑재로 좌우 균형 일치) */
+        /* 공문 상자 (컴팩트 에디터 스타일 & 세로폭 축소 90px + 스크롤바 탑재로 좌우 균형 일치) */
         .notice-box {
             background: var(--notice-bg);
             border: 1px solid var(--notice-border);
             border-left: 3px solid var(--accent-blue);
-            border-radius: 8px;
-            padding: 8px 10px;
+            border-radius: 6px;
+            padding: 6px 8px;
             font-family: "Pretendard", -apple-system, BlinkMacSystemFont, monospace;
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--notice-text);
             white-space: pre-wrap;
-            line-height: 1.45;
-            height: 115px;
-            max-height: 115px;
+            line-height: 1.4;
+            height: 90px;
+            max-height: 90px;
             overflow-y: auto;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
         }
@@ -989,28 +989,28 @@
     <!-- 2단 레이아웃 -->
     <div class="main-layout">
         <!-- 좌측: 변수 입력 폼 (콤팩트 2열 그리드 & 바닥 끝단 일치) -->
-        <section class="card left-form-card" style="padding:12px 16px;">
+        <section class="card left-form-card" style="padding:8px 12px;">
             <div>
-                <div class="card-title" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="card-title" style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
                     <span>핵심 원가 변수 입력</span>
-                    <span style="font-size:11px; background:rgba(59, 130, 246, 0.1); color:var(--accent-blue); padding:3px 8px; border-radius:6px; font-weight:700;">⚡ Ctrl + V 자동 판독</span>
+                    <span style="font-size:10.5px; background:rgba(59, 130, 246, 0.1); color:var(--accent-blue); padding:2px 6px; border-radius:5px; font-weight:700;">⚡ Ctrl + V 자동 판독</span>
                 </div>
 
                 <!-- 파일 업로드 및 붙여넣기 1행 통합 바 -->
-                <div class="no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
-                    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" style="margin-bottom:0; padding:6px 10px; height:34px;">
-                        <span style="font-size:14px;">📂</span>
-                        <span style="font-size:12px; font-weight:700; color:var(--text-main);">견적서 파일 첨부</span>
+                <div class="no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:5px;">
+                    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" style="margin-bottom:0; padding:4px 8px; height:28px;">
+                        <span style="font-size:13px;">📂</span>
+                        <span style="font-size:11.5px; font-weight:700; color:var(--text-main);">견적서 파일 첨부</span>
                         <input type="file" id="fileInput" accept=".xlsx, .xls, .pdf, image/*" style="display:none;" onchange="handleFile(this.files[0])">
                     </div>
-                    <button type="button" class="btn btn-secondary" style="height:34px; font-size:12px; justify-content:center;" onclick="openPasteModal()">
+                    <button type="button" class="btn btn-secondary" style="height:28px; font-size:11.5px; justify-content:center;" onclick="openPasteModal()">
                         📋 캡처/텍스트 OCR
                     </button>
                 </div>
 
                 <!-- OCR 진행 상태 바 -->
-                <div id="ocrProgressBox" class="no-print" style="display:none; margin-bottom:8px; background:rgba(59, 130, 246, 0.12); border:1px solid var(--accent-blue); border-radius:8px; padding:6px 10px; font-size:11.5px; color:var(--text-main); align-items:center; gap:6px;">
-                    <span style="font-size:13px;">🔍</span>
+                <div id="ocrProgressBox" class="no-print" style="display:none; margin-bottom:5px; background:rgba(59, 130, 246, 0.12); border:1px solid var(--accent-blue); border-radius:6px; padding:4px 8px; font-size:11px; color:var(--text-main); align-items:center; gap:6px;">
+                    <span style="font-size:12px;">🔍</span>
                     <span id="ocrProgressText" style="font-weight:700;">이미지 OCR 텍스트 판독 중...</span>
                 </div>
 
@@ -1023,8 +1023,8 @@
                     <div class="form-group">
                         <label>공사기간 (일)</label>
                         <div style="display:flex; gap:6px; align-items:center; min-width:0;">
-                            <input type="number" id="inPeriodDays" class="form-control" value="0" style="width:64px; flex-shrink:0; text-align:center;" oninput="runCalculation()">
-                            <span id="periodTag" style="font-size:11px; font-weight:700; color:var(--accent-blue); background:var(--th-bg); border:1px solid var(--card-border); padding:3px 6px; border-radius:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; text-align:center;">공기 0일</span>
+                            <input type="number" id="inPeriodDays" class="form-control" value="0" style="width:58px; flex-shrink:0; text-align:center;" oninput="runCalculation()">
+                            <span id="periodTag" style="font-size:10.5px; font-weight:700; color:var(--accent-blue); background:var(--th-bg); border:1px solid var(--card-border); padding:2px 5px; border-radius:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; text-align:center;">공기 0일</span>
                         </div>
                     </div>
 
@@ -1060,31 +1060,31 @@
                 </div>
             </div>
 
-            <!-- 공문 미리보기 (세로폭 컴팩트 축소 115px & 스크롤바로 좌우 균형 일치) -->
-            <div style="border-top:1px solid var(--card-border); padding-top:6px; margin-top:6px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
+            <!-- 공문 미리보기 (세로폭 컴팩트 축소 90px & 스크롤바로 좌우 균형 일치) -->
+            <div style="border-top:1px solid var(--card-border); padding-top:4px; margin-top:4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                    <span style="font-size:11px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
                         <span>📄</span> 수정요청 공문 문구
                     </span>
-                    <button class="btn btn-secondary no-print" style="height:24px; padding:0 8px; font-size:11px;" onclick="copyNotice()">📋 복사</button>
+                    <button class="btn btn-secondary no-print" style="height:21px; padding:0 6px; font-size:10px;" onclick="copyNotice()">📋 복사</button>
                 </div>
                 <div class="notice-box" id="officialNoticeBox"></div>
             </div>
         </section>
 
         <!-- 우측: 대차대조 비교표 (바닥 끝단 동기화) -->
-        <section class="card" style="padding:12px 16px; display:flex; flex-direction:column; justify-content:space-between; height:100%;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+        <section class="card" style="padding:8px 12px; display:flex; flex-direction:column; justify-content:space-between; height:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
                 <div class="card-title" style="margin:0;">세부 비목별 조달청 법정상한 vs 업체 제출액 대차대조표 (Diff)</div>
-                <div class="no-print" style="display:flex; gap:6px; align-items:center;">
-                    <button type="button" class="btn btn-secondary" style="height:27px; padding:0 10px; font-size:11.5px; font-weight:700;" onclick="downloadStandardTemplate()" title="2026 조달청 표준 학교공사 원가계산서 엑셀 양식 다운로드">📥 표준 양식(.xlsx)</button>
-                    <button type="button" class="btn btn-success" style="height:27px; padding:0 10px; font-size:11.5px; font-weight:700;" onclick="downloadAuditResultExcel()" title="현재 감사결과를 조달청 표준 양식 스타일 엑셀로 다운로드">📊 감사결과 엑셀(.xlsx)</button>
-                    <span class="subtitle" style="margin-left:4px;">단위: 원</span>
+                <div class="no-print" style="display:flex; gap:5px; align-items:center;">
+                    <button type="button" class="btn btn-secondary" style="height:24px; padding:0 8px; font-size:11px; font-weight:700;" onclick="downloadStandardTemplate()" title="2026 조달청 표준 학교공사 원가계산서 엑셀 양식 다운로드">📥 표준 양식(.xlsx)</button>
+                    <button type="button" class="btn btn-success" style="height:24px; padding:0 8px; font-size:11px; font-weight:700;" onclick="downloadAuditResultExcel()" title="현재 감사결과를 조달청 표준 양식 스타일 엑셀로 다운로드">📊 감사결과 엑셀(.xlsx)</button>
+                    <span class="subtitle" style="margin-left:2px; font-size:10.5px;">단위: 원</span>
                 </div>
             </div>
 
             <!-- 메인 대시보드 실시간 산술 정합성 배너 -->
-            <div id="mainArithmeticAlert" class="no-print" style="display:none; margin-bottom:10px; border-radius:8px; padding:7px 12px; font-size:11.5px; line-height:1.4;"></div>
+            <div id="mainArithmeticAlert" class="no-print" style="display:none; margin-bottom:6px; border-radius:6px; padding:5px 10px; font-size:11px; line-height:1.35;"></div>
 
             <div style="overflow-x:auto;">
                 <table>
@@ -1103,28 +1103,28 @@
             </div>
 
             <!-- 실시간 감사 지적사항 요약 칩 패널 (우측 하단 배치로 좌우 높이 완벽 일치 & 와이드 2열 그리드) -->
-            <div id="violationSummarySection" style="margin-top:8px; margin-bottom:6px; border-top:1px solid var(--card-border); padding-top:8px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <span style="font-size:11.5px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
+            <div id="violationSummarySection" style="margin-top:5px; margin-bottom:3px; border-top:1px solid var(--card-border); padding-top:5px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                    <span style="font-size:11px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:4px;">
                         <span>⚖️</span> 실시간 감사 지적사항 요약
                     </span>
-                    <span id="violationCountBadge" style="font-size:11px; font-weight:800; padding:1px 7px; border-radius:9999px; background:rgba(148, 163, 184, 0.15); color:var(--text-muted);">대기 중</span>
+                    <span id="violationCountBadge" style="font-size:10.5px; font-weight:800; padding:1px 6px; border-radius:9999px; background:rgba(148, 163, 184, 0.15); color:var(--text-muted);">대기 중</span>
                 </div>
-                <div id="violationChipsArea" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:5px; max-height:115px; overflow-y:auto; padding-right:2px;">
-                    <div style="font-size:11.5px; color:var(--text-muted); padding:6px 8px; background:var(--input-bg); border-radius:6px; border:1px dashed var(--card-border); text-align:center; grid-column:1/-1;">
+                <div id="violationChipsArea" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:4px; max-height:85px; overflow-y:auto; padding-right:2px;">
+                    <div style="font-size:11px; color:var(--text-muted); padding:4px 6px; background:var(--input-bg); border-radius:5px; border:1px dashed var(--card-border); text-align:center; grid-column:1/-1;">
                         견적서 입력 시 위반 항목이 자동 요약됩니다.
                     </div>
                 </div>
             </div>
 
             <!-- 감사관 핵심 팁 (콤팩트 인라인 바) -->
-            <div class="tip-box">
-                <span style="font-weight:bold; font-size:11px; white-space:nowrap;">⚠️ 핵심 체크:</span>
-                <span>• <strong>30일 미만 공사</strong>: 건강·연금·요양 0원 제외</span>
-                <span>• <strong>환경보전비</strong>: 실내보수 준공시 0원 감액</span>
-                <span>• <strong>일반관리비 상한</strong>: 5억 미만 8.0%</span>
-                <span>• <strong>이윤</strong>: 재료비 제외 15.0%</span>
-                <span>• <strong>산안비 캡</strong>: 관급자재 포함 시 120% 한도</span>
+            <div class="tip-box" style="margin-top:2px; padding:2px 7px; font-size:10px; line-height:1.3;">
+                <span style="font-weight:bold; font-size:10px; white-space:nowrap;">⚠️ 핵심 체크:</span>
+                <span>• <strong>30일 미만</strong>: 건강·연금·요양 0원</span>
+                <span>• <strong>환경보전비</strong>: 실내보수 0원</span>
+                <span>• <strong>일반관리비</strong>: 5억 미만 8%</span>
+                <span>• <strong>이윤</strong>: 재료비 제외 15%</span>
+                <span>• <strong>산안비</strong>: 관급 포함 120% 캡</span>
             </div>
         </section>
     </div>
@@ -1856,7 +1856,7 @@ function runCalculation(isFromDiffInput = false) {
             countBadge.style.background = 'rgba(239, 68, 68, 0.15)';
             countBadge.style.color = '#ef4444';
             chipsArea.innerHTML = chipItems.map(item => `
-                <div style="font-size:11.5px; line-height:1.35; padding:5px 8px; border-radius:6px; background:${item.type === 'danger' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)'}; border:1px solid ${item.type === 'danger' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}; color:var(--text-main);">
+                <div style="font-size:11px; line-height:1.25; padding:3px 6px; border-radius:5px; background:${item.type === 'danger' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)'}; border:1px solid ${item.type === 'danger' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}; color:var(--text-main);">
                     ${item.text}
                 </div>
             `).join('');
@@ -1865,7 +1865,7 @@ function runCalculation(isFromDiffInput = false) {
             countBadge.style.background = 'rgba(16, 185, 129, 0.15)';
             countBadge.style.color = '#10b981';
             chipsArea.innerHTML = `
-                <div style="font-size:11.5px; line-height:1.35; padding:6px 9px; border-radius:6px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); color:#10b981; font-weight:600; grid-column:1/-1;">
+                <div style="font-size:11px; line-height:1.25; padding:4px 8px; border-radius:5px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); color:#10b981; font-weight:600; grid-column:1/-1;">
                     🟢 <strong>전 비목 적합</strong>: 조달청 법정 상한 및 제비율을 100% 준수하고 있습니다.
                 </div>
             `;
