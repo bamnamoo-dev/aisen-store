@@ -2150,10 +2150,19 @@ async function analyzeImageWithGemini(base64Data, mimeType = "image/jpeg", fileN
             hideOcrProgress();
             alert(`⚠️ ${errJson.error || "오늘의 1인 무료 AI 판독 한도(30회)를 초과했습니다."}\n\n💡 엑셀(.xlsx)이나 PDF 서류는 무제한으로 계속 감사하실 수 있습니다!`);
             return;
+        } else if (response.status >= 400) {
+            const errJson = await response.json().catch(() => ({}));
+            const errMsg = errJson.error || `서버 응답 오류 (${response.status})`;
+            console.error("[Server Route Error]:", errMsg);
+            hideOcrProgress();
+            throw new Error(`AI 서버 오류: ${errMsg}`);
         }
         console.warn("[Server Route Fallback] 서버 라우트 응답 상태:", response.status);
     } catch (serverErr) {
         console.warn("[Server Route Offline/Local File] 클라이언트 직접 모드로 폴백:", serverErr);
+        if (serverErr.message && serverErr.message.includes("AI 서버 오류")) {
+            throw serverErr;
+        }
     }
 
     // 3. 서버 라우트 부재 시 (단독 file:// 실행 등) 클라이언트 로컬스토리지 키로 폴백

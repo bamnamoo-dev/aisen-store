@@ -125,7 +125,11 @@ export async function POST(req: Request) {
         if (!response.ok) {
           const errText = await response.text();
           console.warn(`[API Gemini ${model} Failed (${response.status})]:`, errText);
-          lastError = new Error(`(${response.status}): ${errText}`);
+          if (errText.includes('reported as leaked') || response.status === 403) {
+            lastError = new Error('Google AI API 키가 비활성화(유출 감지)되었습니다. Google AI Studio에서 새 API 키 발급 및 설정이 필요합니다.');
+          } else {
+            lastError = new Error(`(${response.status}): ${errText}`);
+          }
           continue;
         }
 
