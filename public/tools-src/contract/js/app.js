@@ -668,7 +668,10 @@ class ProgressiveContractCompassApp {
               ${pkg.requiredDocs.map(d => `
                 <tr>
                   <td style="text-align: center; font-weight: bold; background: #f8fafc;">${d.stage}</td>
-                  <td style="font-weight: 800;">${d.name}</td>
+                  <td style="font-weight: 800;">
+                    ${d.name}
+                    ${d.basis ? `<div style="color: #4338ca; font-size: 7.5pt; font-weight: 600; margin-top: 2px;">⚖️ [근거] ${d.basis}</div>` : ''}
+                  </td>
                   <td style="text-align: center;">
                     <span class="p-badge ${d.required ? 'p-req' : 'p-opt'}">
                       ${d.required ? '필수' : '생략가능'}
@@ -795,6 +798,7 @@ class ProgressiveContractCompassApp {
                           <input type="checkbox" id="${chkId}" class="doc-checkbox" />
                           <div>
                             <label for="${chkId}" class="doc-name-label">${doc.name}</label>
+                            ${doc.basis ? `<div class="doc-basis-badge">⚖️ 근거: ${doc.basis}</div>` : ''}
                             ${doc.note ? `<div class="doc-note-text">${doc.note}</div>` : ''}
                             ${doc.exemptible && doc.exemptReason ? `<div class="doc-exempt-hint">💡 ${doc.exemptReason}</div>` : ''}
                           </div>
