@@ -73,9 +73,9 @@ export const CONTRACT_METHODS = {
     platform: 'G2B 나라장터(기본·원칙) / S2B 학교장터(선택)',
     platformBadge: 'G2B 나라장터(기본) · S2B 학교장터',
     legalClause: '「지방계약법 시행령」 제30조 제2항 및 「행정안전부 예규」 제5장 수의계약 운영요령',
-    legalDesc: '추정가격 2천만원 초과 소액계약은 법정 기본 시스템인 국가종합전자조달(G2B 나라장터) 또는 교육기관 전자조달시스템(S2B 학교장터)을 통해 2인 이상 견적서를 제출받아 88% 이상 최저가 제출자를 낙찰자로 결정합니다.',
+    legalDesc: '추정가격 2천만원 초과 소액계약은 법정 기본 시스템인 국가종합전자조달(G2B 나라장터) 또는 교육기관 전자조달시스템(S2B 학교장터)을 통해 2인 이상 견적서를 제출받아 법정 낙찰하한율(공사 89.745%, 용역·물품 88%, 도서 90%) 이상 최저가 제출자를 계약상대자로 결정합니다.',
     noticeDays: '최소 3일 이상 (토·공휴일 제외)',
-    lowerRate: '예정가격 대비 88% 이상 (결격사유 없는 최저가)',
+    lowerRate: '공사 89.745% / 용역·물품 88% (결격사유 없는 최저가)',
     guaranteeRate: '5천만원 이하 면제(지급확약서) / 5천만원 초과 10%',
     signContractRequired: true,
     auditTip: '지정정보처리장치 이용 시 G2B(나라장터)가 법률상 기본 원칙이며, 각급 학교는 조달 편의에 따라 S2B(학교장터)를 선택하여 활용할 수 있습니다. (공고기간 최소 3일 이상 준수)'
@@ -87,13 +87,13 @@ export const CONTRACT_METHODS = {
     title: 'G2B(나라장터) 2인 이상 견적제출 수의계약',
     platform: 'G2B 나라장터 (국가종합전자조달)',
     platformBadge: 'G2B 나라장터 전용',
-    legalClause: '「지방계약법 시행령」 제30조 제2항 및 「행정안전부 예규」',
+    legalClause: '「지방계약법 시행령」 제30조 제2항 및 「행정안전부 예규」 제5장',
     legalDesc: '전문공사 1억원~2억원 이하 등 S2B 허용 범위를 초과하거나 기관 특성상 G2B 전용으로 추진하는 사업은 국가종합전자조달시스템(G2B)을 통해 2인 이상 전자견적 공고를 진행합니다.',
     noticeDays: '최소 3일 이상 (긴급 시) ~ 5일',
-    lowerRate: '예정가격 대비 88% 이상 (전문공사/용역/물품)',
+    lowerRate: '공사 89.745% / 용역·물품 88% (전문공사/용역/물품)',
     guaranteeRate: '10% (계약보증금 납부)',
     signContractRequired: true,
-    auditTip: 'G2B 공고 등록 시 면허코드 및 업종제한을 신중히 선택하고, 적격심사 없는 단순 최저가(88%) 수의계약임을 명시하십시오.'
+    auditTip: 'G2B 공고 등록 시 면허코드 및 업종제한을 신중히 선택하고, 시설공사의 경우 낙찰하한율이 89.745%(A값 감액 산식)임을 공고문에 명시하십시오.'
   },
 
   // 6. 조달청 제3자단가 / 다수공급자계약 (MAS)
@@ -1426,20 +1426,51 @@ function generateRequiredDocsList(category, methodId, price, typeCode) {
   // [4단계: 대가 지급 단계 서류]
   // ==========================================
   const stage4 = '4. 대가 지급 단계';
+  const isTaxExemptItem = ['B18', 'B06'].includes(typeCode); // B18 급식 식재료(농수축산물·김치), B06 도서구매
   docs.push({
     stage: stage4,
-    name: '대가청구서 및 전자세금계산서',
+    name: isTaxExemptItem ? '대가청구서 및 전자계산서 (면세)' : '대가청구서 및 전자세금계산서',
     required: true,
-    exemptible: false
+    exemptible: false,
+    note: isTaxExemptItem
+      ? '농·수·축산물 식재료 및 도서 등 면세 품목은 전자계산서(면세) 징구 (신용카드 결제 시 카드매출전표 대체)'
+      : '전자세금계산서 및 대금청구서 (신용카드 결제 시 카드매출전표 대체 가능)'
   });
+
   docs.push({
     stage: stage4,
     name: '4대 사회보험료 완납증명서',
-    required: true,
+    required: price >= 5000000,
     exemptible: price < 5000000,
-    exemptReason: price < 5000000 ? '계약금액 5백만원 미만 생략 가능 (국민연금법 시행령 제70조의4 등)' : '',
-    note: '5백만원 이상 필수 확인'
+    exemptReason: price < 5000000
+      ? '추정가격(계약금액) 5백만 원 미만 생략 가능 (「서울특별시교육청 각급 학교 및 교육행정기관 계약서류간소화 방안」(교육재정과-18968), 서울특별시교육비특별회계 재무회계규칙 제73조)'
+      : '5백만 원 이상 필수 확인 (G2B 나라장터 또는 행정정보공동이용 연계 확인 시 제출 생략 가능)',
+    note: price < 5000000 ? '5백만 원 미만 서류간소화 생략 가능' : '5백만 원 이상 필수 징구 (전산 확인 시 서류 생략)'
   });
+
+  // 4-2-1. 시설공사 대가지급 단계 특화: 노무비 지급내역서 및 하도급지킴이 이용 증빙 (지침 [붙임 4] p.23)
+  if (category === 'construction') {
+    docs.push({
+      stage: stage4,
+      name: '노무비 지급내역서 (근로자 계좌이체 확인증)',
+      required: price > 5000000,
+      exemptible: price <= 5000000,
+      exemptReason: price <= 5000000
+        ? '추정가격 5백만 원 이하 생략 가능 (「서울특별시교육청 계약서류간소화 방안」(교육재정과-18968))'
+        : '직접노무비 지급대상이 계약상대자의 상용근로자만으로 구성된 경우 제외확인서로 대체 가능 (행안부 예규 제13장)',
+      note: price <= 5000000 ? '5백만 원 이하 생략 가능' : '근로자 계좌이체 확인 (상용근로자는 제외확인서 대체)'
+    });
+
+    if (price >= 30000000) {
+      docs.push({
+        stage: stage4,
+        name: '전자대금시스템(하도급지킴이) 이용 증빙',
+        required: true,
+        exemptible: false,
+        note: '도급금액 3천만 원 이상 & 공사기간 30일 초과 시 필수 (하도급지킴이를 통한 노무비·자재대금 청구/지급 승인 확인, 건산법 제34조)'
+      });
+    }
+  }
 
   if (isSoleSource || isElectronicQuote) {
     docs.push({
@@ -1698,7 +1729,7 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
       tag: '투명성 최우선 (전자공고)',
       tagColor: 'amber',
       conditionText: '2천만원 이하여도 투명한 공개경쟁을 희망할 경우 선택 가능',
-      featureText: 'G2B 나라장터 또는 S2B 학교장터 2인 견적 공고 (낙찰하한율 88% 적용)',
+      featureText: `G2B 나라장터 또는 S2B 학교장터 2인 견적 공고 (낙찰하한율 ${category === 'construction' ? '89.745%' : '90%'} 적용)`,
       isDefault: false,
       badgeText: '전자공고'
     });
@@ -1711,7 +1742,7 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
       tag: '법정 기본 원칙 (전자공고)',
       tagColor: 'blue',
       conditionText: '일반 사업자 누구나 참가 가능 (지역/면허 자격제한 공고 가능)',
-      featureText: 'G2B 나라장터(원칙) 또는 S2B 학교장터 공고 / 공고기간 최소 3일 / 낙찰하한율 88%',
+      featureText: `G2B 나라장터(원칙) 또는 S2B 학교장터 공고 / 공고기간 최소 3일 / 낙찰하한율 ${category === 'construction' ? '89.745%' : (typeCode === 'B06' ? '90%' : '88%')}`,
       isDefault: true,
       badgeText: '법정 원칙'
     });
@@ -1770,7 +1801,7 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
         tag: 'G2B 전자견적 소액수의',
         tagColor: 'blue',
         conditionText: '해당 공종 전문건설업 면허 등록업체',
-        featureText: '나라장터(G2B) 2인 전자견적 공고 / 낙찰하한율 88% / 적격심사 생략',
+        featureText: '나라장터(G2B) 2인 전자견적 공고 / 낙찰하한율 89.745% (A값 감액 산식) / 적격심사 생략',
         isDefault: true,
         badgeText: '소액수의 공고'
       });
@@ -1791,7 +1822,7 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
         tag: '전자견적 수의계약',
         tagColor: 'blue',
         conditionText: '해당 용역/물품 사업자 등록업체 (추정가격 1억원 이하 소액수의)',
-        featureText: 'G2B 나라장터 또는 S2B 학교장터 2인 견적 공고 / 낙찰하한율 88%',
+        featureText: `G2B 나라장터 또는 S2B 학교장터 2인 견적 공고 / 낙찰하한율 ${typeCode === 'B06' ? '90%' : '88%'}`,
         isDefault: true,
         badgeText: '1억 이하 소액수의'
       });
@@ -1868,7 +1899,7 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
           conditionText: isOtherConst
             ? '해당 공종(전기·통신·소방) 면허 등록업체 (기타공사 법정 소액수의 한도 1.6억 원 이하)'
             : '해당 공종 전문건설업(가스·승강기·석면 포함) 면허 등록업체 (전문공사 법정 소액수의 한도 2억 원 이하)',
-          featureText: '나라장터(G2B) 2인 이상 전자견적 공고 / 낙찰하한율 88% / 적격심사 생략',
+          featureText: '나라장터(G2B) 2인 이상 전자견적 공고 / 낙찰하한율 89.745% (A값 감액 산식) / 적격심사 생략',
           isDefault: true,
           badgeText: limitLabel
         });
@@ -1990,7 +2021,7 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
 /**
  * 2) 선택된 계약방법별 실무 진행 절차(Roadmap) 생성
  */
-export function getContractMethodRoadmap(methodId, category, price) {
+export function getContractMethodRoadmap(methodId, category, price, typeCode = '') {
   const isGoods = category === 'goods';
   const isConst = category === 'construction';
   const isSoleSource = methodId.includes('SOLE_SOURCE');
@@ -2085,8 +2116,11 @@ export function getContractMethodRoadmap(methodId, category, price) {
     step3Desc = 'eaT 개찰 및 적격업체 낙찰자 결정 ➔ 2026 수의계약 통합서약서 확인 ➔ eaT 시스템 전자계약 체결 및 전자보증서 접수';
     step3Badge = '낙찰 및 계약';
   } else if (methodId.includes('ELECTRONIC_QUOTATION')) {
+    const quoteRate = category === 'construction'
+      ? '89.745%'
+      : (typeCode === 'B06' || price <= 20000000 ? '90%' : '88%');
     step3Title = '개찰 및 낙찰자 결정 ➔ 전자계약 체결';
-    step3Desc = '전자개찰(낙찰하한율 88% 이상 최저가) ➔ 결격사유 조회 및 2026 수의계약 통합서약서 확인 ➔ G2B/S2B 전자계약 체결 및 보증금 확약';
+    step3Desc = `전자개찰(낙찰하한율 ${quoteRate} 이상 최저가) ➔ 결격사유 조회 및 2026 수의계약 통합서약서 확인 ➔ G2B/S2B 전자계약 체결 및 보증금 확약`;
     step3Badge = '낙찰자 결정';
   } else if (isTwoStage) {
     step3Title = '제안서(규격) 평가 ➔ 가격개찰 ➔ 낙찰자 결정';
@@ -2160,10 +2194,21 @@ export function getContractMethodRoadmap(methodId, category, price) {
  */
 export function getContractPackageDetails({ category, estimatedPrice, methodId, targetPlatform = 'G2B', isFemaleCompany = false, typeCode = '' }) {
   const price = Number(estimatedPrice) || 0;
-  const method = CONTRACT_METHODS[methodId] || CONTRACT_METHODS.SOLE_SOURCE_GENERAL;
+  const baseMethod = CONTRACT_METHODS[methodId] || CONTRACT_METHODS.SOLE_SOURCE_GENERAL;
+  const method = { ...baseMethod };
+
+  if (methodId === 'ELECTRONIC_QUOTATION' || methodId === 'G2B_ELECTRONIC_QUOTATION') {
+    if (category === 'construction') {
+      method.lowerRate = '예정가격 대비 89.745% 이상 (A값 감액 산식 적용, 결격사유 없는 최저가)';
+    } else if (typeCode === 'B06' || price <= 20000000) {
+      method.lowerRate = '예정가격 대비 90% 이상 (2천만 이하 소액견적 또는 도서구매 특례)';
+    } else {
+      method.lowerRate = '예정가격 대비 88% 이상 (결격사유 없는 최저가)';
+    }
+  }
 
   // 1. 진행 절차 로드맵
-  const roadmap = getContractMethodRoadmap(methodId, category, price);
+  const roadmap = getContractMethodRoadmap(methodId, category, price, typeCode);
 
   // 2. 감사 주의사항 및 안전장치 경보
   const auditWarnings = [];
