@@ -561,7 +561,7 @@ export default function HomePage() {
         {/* CARD 13: 스마트 교실배치도 제작기 (2칸 와이드 카드) */}
         <Link 
           href="/tools/classmap" 
-          className="col-span-1 sm:col-span-1 lg:col-span-2 relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-indigo-600 group-hover:h-[5px] transition-all" />
@@ -596,7 +596,7 @@ export default function HomePage() {
         {/* CARD 14: 수박 게임 (2칸 와이드 카드) */}
         <Link 
           href="/tools/watermelon" 
-          className="col-span-1 sm:col-span-1 lg:col-span-2 relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="col-span-2 sm:col-span-1 lg:col-span-2 relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
           {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-rose-500 group-hover:h-[5px] transition-all" />
