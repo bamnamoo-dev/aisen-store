@@ -114,6 +114,12 @@ class ProgressiveContractCompassApp {
 
     window.openManualModal = openManual;
     window.closeManualModal = closeManual;
+    window.toggleContractTheme = () => this.toggleTheme();
+    window.resetContractFlow = () => {
+      if (confirm('모든 입력을 초기화하고 1단계(종류 선택)부터 다시 시작하시겠습니까?')) {
+        this.resetToStep(1);
+      }
+    };
 
     if (btnOpenManual) btnOpenManual.addEventListener('click', openManual);
     if (btnCloseManual) btnCloseManual.addEventListener('click', closeManual);

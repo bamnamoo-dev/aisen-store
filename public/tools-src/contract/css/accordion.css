@@ -1511,6 +1511,20 @@
 }
 
 /* ==========================================================================
+   9-1. AI-SEN Store 등 외부 iframe 임베드 시 최적화 (상단 중복 2줄 헤더 완전 제거)
+   ========================================================================== */
+.in-iframe .aisen-top-nav,
+html.in-iframe .aisen-top-nav,
+body.in-iframe .aisen-top-nav {
+  display: none !important;
+}
+
+.in-iframe .main-wrapper,
+html.in-iframe .main-wrapper {
+  padding-top: 0.75rem !important;
+}
+
+/* ==========================================================================
    10. 인쇄 전용 (Print Stylesheet) - 단정하고 깔끔한 공식 A4 공문서 서식
    ========================================================================== */
 @media print {
