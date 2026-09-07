@@ -280,6 +280,7 @@ export default function ToolsPage() {
                     if (finalUrl?.includes('bamnamoo-dev.github.io/SFD')) finalUrl = '/tools/sfd';
                     if (finalUrl?.includes('project-np0t7.vercel.app')) finalUrl = '/tools/watermelon';
                     if (finalUrl?.includes('cost-audit')) finalUrl = '/tools/cost-audit';
+                    if (finalUrl?.includes('contract')) finalUrl = '/tools/contract';
                     const isInternal = finalUrl?.startsWith('/');
 
                     if (isInternal) {

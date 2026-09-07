@@ -1,0 +1,177 @@
+/* ==========================================================================
+   인터랙티브 의사결정 순서도 (Flowchart & Decision Tree) Styles
+   (중앙 정렬 및 완벽한 반응형 뷰포트 지원)
+   ========================================================================== */
+
+.flowchart-viewport {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  background: radial-gradient(circle, #e2e8f0 1.2px, transparent 1.2px);
+  background-size: 20px 20px;
+  background-color: #f8fafc;
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-lg);
+  overflow: auto;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1.5rem 0;
+}
+
+.flowchart-controls {
+  position: sticky;
+  top: 1rem;
+  right: 1rem;
+  float: right;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  z-index: 20;
+  background: var(--surface-white);
+  padding: 0.35rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--neutral-200);
+  margin-right: 1rem;
+}
+
+.flowchart-ctrl-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--neutral-700);
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all var(--transition-fast);
+}
+
+.flowchart-ctrl-btn:hover {
+  background: var(--neutral-100);
+  color: var(--primary-600);
+}
+
+.flowchart-canvas {
+  width: max-content;
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  transform-origin: top center;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+  padding: 1rem;
+}
+
+/* Tree Structure */
+.fc-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 960px;
+}
+
+.fc-level {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  width: 100%;
+  position: relative;
+}
+
+/* Level Connecting Arrow / Line */
+.fc-level::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 1rem;
+  background: var(--neutral-300);
+}
+
+.fc-level:last-child::after {
+  display: none;
+}
+
+/* Node Cards */
+.fc-node {
+  background: var(--surface-white);
+  border: 2px solid var(--neutral-300);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
+  width: 160px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+  z-index: 2;
+  text-align: left;
+}
+
+.fc-node:hover {
+  border-color: var(--primary-500);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.fc-node.active-path {
+  border-color: var(--primary-600);
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  transform: translateY(-2px);
+}
+
+.fc-node.target-result {
+  border-color: var(--accent-emerald);
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.fc-node-title {
+  font-size: 0.825rem;
+  font-weight: 800;
+  color: var(--neutral-900);
+  line-height: 1.35;
+}
+
+.fc-node-desc {
+  font-size: 0.7rem;
+  color: var(--neutral-500);
+  line-height: 1.3;
+}
+
+.fc-node-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--neutral-100);
+  color: var(--neutral-600);
+  align-self: flex-start;
+}
+
+.fc-node.active-path .fc-node-badge {
+  background: var(--primary-600);
+  color: #ffffff;
+}
+
+.fc-node.target-result .fc-node-badge {
+  background: var(--accent-emerald);
+  color: #ffffff;
+}
