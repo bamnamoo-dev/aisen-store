@@ -54,7 +54,7 @@ function ContractCompassIframe() {
     <div className="w-full flex flex-col h-[calc(100vh-56px)] md:h-screen bg-slate-900 overflow-hidden relative">
       {/* 겹침 없는 통합 스마트 헤더 (1줄 정렬) */}
       <ToolHeader 
-        title="서울교육 계약나침반 (Seoul Education Contract Compass)"
+        title="AI-SEN 계약 (2026 서울교육 계약나침반)"
         icon={<Compass size={15} className="text-blue-500" />}
         themeColor="blue"
         onReload={handleReload}
@@ -94,7 +94,7 @@ function ContractCompassIframe() {
       <iframe
         ref={iframeRef}
         src={iframeSrc}
-        title="서울교육 계약나침반"
+        title="AI-SEN 계약"
         className="w-full flex-1 border-none bg-slate-950"
         allow="clipboard-read; clipboard-write; printing"
       />
