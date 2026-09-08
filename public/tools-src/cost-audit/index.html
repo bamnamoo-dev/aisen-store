@@ -954,6 +954,7 @@
             <button class="btn btn-secondary" onclick="copyNotice()">📋 공문 복사</button>
             <button class="btn btn-success" id="btnCopyImage" onclick="copyAuditDashboardImage()">📸 화면 캡처</button>
             <button class="btn btn-primary" onclick="window.print()">🖨 A4 인쇄/PDF</button>
+            <button class="btn" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; font-weight:800; border:none; box-shadow:0 2px 4px rgba(37,99,235,0.25);" onclick="goToContractCompass()" title="확정 공사비로 AI-SEN 계약에서 계약방법 및 구비서류 즉시 검토">🧭 AI-SEN 계약 연계 ➔</button>
         </div>
     </header>
 
@@ -964,6 +965,10 @@
             <div class="card-title">감사관 종합 판정</div>
             <div id="badgeContainer"><span class="badge badge-idle" id="badgeStatus">⚪ 대기 (견적서 입력 대기)</span></div>
             <div class="subtitle" style="margin-top:6px;">총도급액 및 세부 비목 법정상한 이원화 판정</div>
+            <div id="contractBridgeBox" class="no-print" style="margin-top:8px; padding:5px 8px; background:rgba(37, 99, 235, 0.08); border:1px solid rgba(37, 99, 235, 0.25); border-radius:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                <span style="font-size:11px; font-weight:700; color:var(--text-main);">🧭 확정 공사비로 계약서류 확인</span>
+                <button type="button" class="btn" style="background:#2563eb; color:#fff; font-size:11px; font-weight:800; padding:2px 8px; height:24px; border-radius:4px; border:none; cursor:pointer;" onclick="goToContractCompass()">계약 연계 ➔</button>
+            </div>
         </div>
 
         <!-- 우측: 3대 핵심 금액 비교 (우측 대차대조표 상단에 3분할 칼정렬) -->
@@ -1077,6 +1082,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
                 <div class="card-title" style="margin:0;">세부 비목별 조달청 법정상한 vs 업체 제출액 대차대조표 (Diff)</div>
                 <div class="no-print" style="display:flex; gap:5px; align-items:center;">
+                    <button type="button" class="btn" style="height:26px; padding:0 10px; font-size:11.5px; font-weight:800; background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; border:none; box-shadow:0 2px 4px rgba(37,99,235,0.25);" onclick="goToContractCompass()" title="현재 확정 공사비로 계약나침반에서 구비서류 체크리스트 확인">🧭 AI-SEN 계약 검토 ➔</button>
                     <button type="button" class="btn btn-secondary" style="height:26px; padding:0 9px; font-size:11.5px; font-weight:700;" onclick="downloadStandardTemplate()" title="2026 조달청 표준 학교공사 원가계산서 엑셀 양식 다운로드">📥 표준 양식(.xlsx)</button>
                     <button type="button" class="btn btn-success" style="height:26px; padding:0 9px; font-size:11.5px; font-weight:700;" onclick="downloadAuditResultExcel()" title="현재 감사결과를 조달청 표준 양식 스타일 엑셀로 다운로드">📊 감사결과 엑셀(.xlsx)</button>
                     <span class="subtitle" style="margin-left:2px; font-size:11px;">단위: 원</span>
@@ -1923,6 +1929,47 @@ function copyNotice() {
     const text = document.getElementById("officialNoticeBox").innerText;
     navigator.clipboard.writeText(text);
     alert("공문 문구가 클립보드에 복사되었습니다. K-에듀파인 기안문이나 메일에 바로 붙여넣으세요!");
+}
+
+// AI-SEN 계약나침반으로 확정 공사비 및 공종 원클릭 전송 (Step 2 데이터 파이프라인)
+function goToContractCompass() {
+    var stdEl = document.getElementById('dispStandardTotal');
+    var venEl = document.getElementById('dispVendorTotal');
+    var stdVal = stdEl ? getCleanNumber(stdEl.innerText) : 0;
+    var venVal = venEl ? getCleanNumber(venEl.innerText) : 0;
+
+    var targetAmount = stdVal > 0 ? stdVal : venVal;
+
+    if (!targetAmount || targetAmount <= 0) {
+        alert('먼저 견적서 파일을 첨부하거나 원가계산서 금액을 입력해 주세요.');
+        return;
+    }
+
+    var tradeMapping = {
+        'building': 'B15',
+        'civil': 'B15',
+        'electrical': 'B36_ELEC',
+        'telecom': 'B36_COMM',
+        'fire': 'B36_FIRE',
+        'asbestos': 'B36_ASBESTOS'
+    };
+    var selTradeEl = document.getElementById('selTrade');
+    var selTradeVal = selTradeEl ? selTradeEl.value : 'building';
+    var targetCode = tradeMapping[selTradeVal] || 'B15';
+
+    var projTitleEl = document.getElementById('inProjectTitle');
+    var projTitle = projTitleEl ? projTitleEl.value.trim() : '';
+
+    var url = '/tools/contract?category=construction&typeCode=' + encodeURIComponent(targetCode) + '&amount=' + targetAmount + '&vatIncluded=1&source=cost-audit';
+    if (projTitle) {
+        url += '&title=' + encodeURIComponent(projTitle);
+    }
+
+    if (window.top && window.top !== window.self) {
+        window.top.location.href = url;
+    } else {
+        window.location.href = url;
+    }
 }
 
 // 화면에 보이는 감사 결과 내역을 고해상도 이미지(PNG)로 클립보드에 원클릭 복사

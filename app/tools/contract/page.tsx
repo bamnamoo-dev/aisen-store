@@ -1,15 +1,22 @@
 'use client';
 
 import { Compass, BookOpen, Moon, RotateCcw } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ToolHeader from '@/components/ToolHeader';
 
-export default function ContractCompassPage() {
+function ContractCompassIframe() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const searchParams = useSearchParams();
+
+  const queryString = searchParams ? searchParams.toString() : '';
+  const iframeSrc = queryString 
+    ? `/tools-src/contract/index.html?${queryString}`
+    : '/tools-src/contract/index.html';
 
   const handleReload = () => {
     if (iframeRef.current) {
-      iframeRef.current.src = '/tools-src/contract/index.html';
+      iframeRef.current.src = iframeSrc;
     }
   };
 
@@ -86,7 +93,7 @@ export default function ContractCompassPage() {
       {/* 계약나침반 100% 풀스크린 뷰어 */}
       <iframe
         ref={iframeRef}
-        src="/tools-src/contract/index.html"
+        src={iframeSrc}
         title="서울교육 계약나침반"
         className="w-full flex-1 border-none bg-slate-950"
         allow="clipboard-read; clipboard-write; printing"
@@ -94,3 +101,12 @@ export default function ContractCompassPage() {
     </div>
   );
 }
+
+export default function ContractCompassPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-slate-400">계약나침반 로딩 중...</div>}>
+      <ContractCompassIframe />
+    </Suspense>
+  );
+}
+

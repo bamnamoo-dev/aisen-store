@@ -35,6 +35,79 @@ class ProgressiveContractCompassApp {
     this.bindStep2Events();
     this.bindStep3Events();
     this.bindStep4Events();
+    this.handleUrlParameters();
+  }
+
+  // =========================================================================
+  // URL 파라미터 연계 처리 (AI-SEN 타 프로그램 데이터 자동 수신 파이프라인)
+  // =========================================================================
+  handleUrlParameters() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const amountStr = params.get('amount');
+      const category = params.get('category');
+      const source = params.get('source');
+      const title = params.get('title');
+
+      if (!amountStr && !category) return;
+
+      // 1. 카테고리 (기본: 공사)
+      const targetCat = category || 'construction';
+      const tileBtn = document.querySelector(`.category-tile-btn[data-category="${targetCat}"]`);
+      this.selectCategory(targetCat, tileBtn);
+
+      // 세부 유형 지정 (예: B15, B36_ELEC 등)
+      const typeCode = params.get('typeCode') || '';
+      if (typeCode) {
+        this.state.typeCode = typeCode;
+        const typeBtn = document.querySelector(`.subtype-chip-btn[data-code="${typeCode}"]`);
+        if (typeBtn) {
+          const typeName = typeBtn.dataset.name;
+          this.state.typeName = typeName || '';
+          document.querySelectorAll('.subtype-chip-btn').forEach((c) => c.classList.remove('selected'));
+          typeBtn.classList.add('selected');
+        }
+      }
+      this.confirmStep1Selection();
+
+      // 2. 금액 및 부가세
+      const amountNum = Number(amountStr) || 0;
+      if (amountNum > 0) {
+        this.state.rawAmount = amountNum;
+        this.state.vatIncluded = params.get('vatIncluded') === '1' || params.get('vatIncluded') === 'true' || params.get('vat') === '1';
+
+        const inputAmount = document.getElementById('input-amount');
+        if (inputAmount) {
+          inputAmount.value = amountNum.toLocaleString();
+        }
+
+        const chkVat = document.getElementById('chk-vat-included');
+        if (chkVat) {
+          chkVat.checked = this.state.vatIncluded;
+        }
+
+        // Step 2 완료 및 Step 3 렌더링
+        this.completeStep2();
+
+        // Step 3 권장 방식 자동 선택하여 4단계까지 바로 펼침
+        setTimeout(() => {
+          if (this.state.availableOptions && this.state.availableOptions.length > 0) {
+            const defaultOpt = this.state.availableOptions.find((o) => o.isDefault) || this.state.availableOptions[0];
+            if (defaultOpt) {
+              const cardEl = document.querySelector(`.method-choice-card[data-method-id="${defaultOpt.id}"]`);
+              this.selectMethod(defaultOpt.id, cardEl);
+            }
+          }
+
+          if (source === 'cost-audit') {
+            const displayTitle = title ? `[${decodeURIComponent(title)}] ` : '';
+            this.showToast(`🧭 AI-SEN 공사원가 검증액 ${displayTitle}${amountNum.toLocaleString()}원이 성공적으로 연계되었습니다!`);
+          }
+        }, 120);
+      }
+    } catch (err) {
+      console.error('URL parameter handling error:', err);
+    }
   }
 
   // =========================================================================
