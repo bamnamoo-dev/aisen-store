@@ -6,55 +6,68 @@ import {
   Bot, 
   MessageSquare, 
   Navigation, 
-  FileText, 
-  Zap, 
-  LayoutDashboard, 
+  MessageSquareShare,
+  FileCheck,
+  Compass,
+  Calculator,
+  ChartPie,
+  LayoutDashboard,
+  FolderOpen,
+  UtensilsCrossed,
+  Tag,
+  FileSpreadsheet,
+  LayoutGrid,
   LogIn, 
-  LogOut, 
   Menu, 
   X,
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
-  ChartPie,
-  Tag,
-  LayoutGrid,
-  FileSpreadsheet,
-  UtensilsCrossed,
-  Calculator,
-  Flame,
   House
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useSidebar } from './SidebarContext';
 
-// 1. AI & 특화 솔루션 그룹
-const AI_NAV_ITEMS = [
-  { name: 'AI 행정 챗봇', href: 'https://chatbot.aisen.store', icon: <Bot size={21} className="text-blue-600" />, isExternal: true, badge: '3-Tier' },
-  { name: '구글 챗봇 모음', href: '/chatbot', icon: <MessageSquare size={21} className="text-indigo-600" />, isExternal: false, badge: 'Gemini' },
-  { name: '스마트 여비정산기', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={21} className="text-sky-600" />, isExternal: true, badge: 'v4.9.2' },
-  { name: '행정·민원 서식 68종', href: 'https://chatbot.aisen.store?forms=1', icon: <FileText size={21} className="text-amber-600" />, isExternal: true, badge: '68종' },
-  { name: '학교회계 대시보드', href: '/tools/sfd', icon: <ChartPie size={21} className="text-teal-600" />, isExternal: false, badge: 'SFD' },
+// 1. AI & 포털 허브 (🔵)
+const AI_HUB_ITEMS = [
+  { name: 'AI-SEN 행정챗봇', href: 'https://chatbot.aisen.store', icon: <Bot size={20} className="text-blue-600" />, isExternal: true, badge: '3-Tier' },
+  { name: 'AI-SEN 출장여비', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={20} className="text-blue-600" />, isExternal: true, badge: 'v4.9.2' },
+  { name: 'AI-SEN 소통게시판', href: '/board', icon: <MessageSquareShare size={20} className="text-blue-600" />, isExternal: false, badge: '소통' },
+  { name: 'AI-SEN 행정서식', href: 'https://chatbot.aisen.store?forms=1', icon: <FileCheck size={20} className="text-blue-600" />, isExternal: true, badge: '68종' },
+  { name: '구글 맞춤챗봇', href: '/chatbot', icon: <MessageSquare size={20} className="text-indigo-600" />, isExternal: false, badge: 'Gemini' },
 ];
 
-// 2. 공식 지침서 & 소통 공간 그룹
-const ARCHIVE_NAV_ITEMS = [
-  { name: '행정 자료실', href: '/archive', icon: <FileText size={21} className="text-emerald-600" />, isExternal: false, badge: '102권' },
-  { name: '업무 소통 게시판', href: '/board', icon: <LayoutDashboard size={21} className="text-sky-600" />, isExternal: false, badge: '소통' },
+// 2. 회계 & 계약 & 예산 (🟢)
+const FINANCE_CONTRACT_ITEMS = [
+  { name: 'AI-SEN 계약', href: '/tools/contract', icon: <Compass size={20} className="text-emerald-600" />, isExternal: false, badge: '2026' },
+  { name: 'AI-SEN 공사원가', href: '/tools/cost-audit', icon: <Calculator size={20} className="text-emerald-600" />, isExternal: false, badge: '원가' },
+  { name: 'AI-SEN 학교회계', href: '/tools/sfd', icon: <ChartPie size={20} className="text-emerald-600" />, isExternal: false, badge: 'SFD' },
+  { name: 'AI-SEN 예산정산', href: '/tools/budget-settle', icon: <LayoutDashboard size={20} className="text-emerald-600" />, isExternal: false, badge: '정산' },
 ];
 
-// 3. 행정 실무 툴킷 그룹
-const TOOLKIT_NAV_ITEMS = [
-  { name: '증빙서 측면표지', href: '/tools/label-maker', icon: <Tag size={21} className="text-violet-600" />, isExternal: false, badge: '라벨' },
-  { name: '스마트 교실배치도', href: '/tools/classmap', icon: <LayoutGrid size={21} className="text-cyan-600" />, isExternal: false, badge: '도면' },
-  { name: '엑셀시트 분리기', href: '/tools/sheet-splitter', icon: <FileSpreadsheet size={21} className="text-emerald-700" />, isExternal: false, badge: '분리' },
-  { name: '임금대장 식대분리', href: '/tools/sikdae', icon: <UtensilsCrossed size={21} className="text-orange-600" />, isExternal: false, badge: '식대' },
-  { name: '체육관 사용료', href: '/tools/gym-calc', icon: <Calculator size={21} className="text-pink-600" />, isExternal: false, badge: '조례' },
-  { name: '예산정산 대시보드', href: '/tools/budget-settle', icon: <ChartPie size={21} className="text-rose-600" />, isExternal: false, badge: '정산' },
-  { name: '행정 힐링 수박게임', href: '/tools/watermelon', icon: <span className="text-base">🍉</span>, isExternal: false, badge: '게임' },
+// 3. 행정 실무 & 서고 (🟣)
+const ADMIN_DOC_ITEMS = [
+  { name: 'AI-SEN 행정서고', href: '/archive', icon: <FolderOpen size={20} className="text-purple-600" />, isExternal: false, badge: '102권' },
+  { name: 'AI-SEN 급여식대', href: '/tools/sikdae', icon: <UtensilsCrossed size={20} className="text-purple-600" />, isExternal: false, badge: '식대' },
+  { name: 'AI-SEN 지출바인더', href: '/tools/label-maker', icon: <Tag size={20} className="text-purple-600" />, isExternal: false, badge: '라벨' },
+  { name: 'AI-SEN 엑셀분리', href: '/tools/sheet-splitter', icon: <FileSpreadsheet size={20} className="text-purple-600" />, isExternal: false, badge: '분리' },
 ];
+
+// 4. 공간 & 시설 & 힐링 (🔴)
+const SPACE_HEALING_ITEMS = [
+  { name: 'AI-SEN 시설대관', href: '/tools/gym-calc', icon: <Calculator size={20} className="text-rose-600" />, isExternal: false, badge: '조례' },
+  { name: 'AI-SEN 교실배치', href: '/tools/classmap', icon: <LayoutGrid size={20} className="text-rose-600" />, isExternal: false, badge: '도면' },
+  { name: 'AI-SEN 힐링게임', href: '/tools/watermelon', icon: <span className="text-base">🍉</span>, isExternal: false, badge: '게임' },
+];
+
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+  isExternal: boolean;
+  badge?: string;
+};
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -84,7 +97,7 @@ export default function Sidebar() {
     window.location.href = '/';
   };
 
-  const renderNavList = (items: typeof AI_NAV_ITEMS, isMobile = false) => (
+  const renderNavList = (items: NavItem[], isMobile = false) => (
     <div className="flex flex-col gap-1">
       {items.map((item) => {
         const isActive = !item.isExternal && pathname === item.href;
@@ -98,13 +111,13 @@ export default function Sidebar() {
               if (isMobile) setMobileMenuOpen(false); 
               if (!item.isExternal) setIsCollapsed(true);
             }}
-            className={`flex items-center justify-between px-3.5 py-2 rounded-xl text-sm sm:text-[15px] font-bold transition-all ${
+            className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs sm:text-[13.5px] font-bold transition-all ${
               isActive
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-slate-700 hover:text-blue-600 hover:bg-blue-50/80'
             }`}
           >
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0">
               <span className={`shrink-0 flex items-center justify-center ${isActive ? 'text-white' : ''}`}>
                 {item.icon}
               </span>
@@ -113,7 +126,7 @@ export default function Sidebar() {
 
             <div className="flex items-center gap-1.5 shrink-0">
               {item.badge && (
-                <span className={`text-[11px] font-bold px-2 py-0.5 rounded border ${
+                <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${
                   isActive
                     ? 'bg-white/20 text-white border-white/30'
                     : 'bg-slate-50 text-slate-500 border-slate-200'
@@ -122,7 +135,7 @@ export default function Sidebar() {
                 </span>
               )}
               {item.isExternal && (
-                <ExternalLink size={13} className={isActive ? 'text-white' : 'text-slate-400'} />
+                <ExternalLink size={12} className={isActive ? 'text-white' : 'text-slate-400'} />
               )}
             </div>
           </Link>
@@ -158,7 +171,7 @@ export default function Sidebar() {
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs pt-15">
           <div className="bg-white h-full w-4/5 max-w-[320px] p-4.5 flex flex-col justify-between overflow-y-auto shadow-2xl border-r border-slate-200">
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
               
               <Link 
                 href="/" 
@@ -169,28 +182,36 @@ export default function Sidebar() {
                 <span>메인 포털 홈으로</span>
               </Link>
 
-              {/* Group 1 */}
+              {/* Group 1: 🔵 AI & 포털 허브 */}
               <div>
-                <p className="text-xs font-bold text-slate-400 px-3 uppercase tracking-wider mb-1.5">
-                  🤖 AI &amp; 특화 솔루션
+                <p className="text-xs font-bold text-blue-600 px-3 uppercase tracking-wider mb-1">
+                  🔵 AI &amp; 포털 허브
                 </p>
-                {renderNavList(AI_NAV_ITEMS, true)}
+                {renderNavList(AI_HUB_ITEMS, true)}
               </div>
 
-              {/* Group 2 */}
+              {/* Group 2: 🟢 회계 & 계약 & 예산 */}
               <div>
-                <p className="text-xs font-bold text-slate-400 px-3 uppercase tracking-wider mb-1.5">
-                  🏛️ 지침서 &amp; 소통 서고
+                <p className="text-xs font-bold text-emerald-600 px-3 uppercase tracking-wider mb-1">
+                  🟢 회계 &amp; 계약 &amp; 예산
                 </p>
-                {renderNavList(ARCHIVE_NAV_ITEMS, true)}
+                {renderNavList(FINANCE_CONTRACT_ITEMS, true)}
               </div>
 
-              {/* Group 3 */}
+              {/* Group 3: 🟣 행정 실무 & 서고 */}
               <div>
-                <p className="text-xs font-bold text-slate-400 px-3 uppercase tracking-wider mb-1.5">
-                  ⚡ 6대 행정 실무 툴킷
+                <p className="text-xs font-bold text-purple-600 px-3 uppercase tracking-wider mb-1">
+                  🟣 행정 실무 &amp; 서고
                 </p>
-                {renderNavList(TOOLKIT_NAV_ITEMS, true)}
+                {renderNavList(ADMIN_DOC_ITEMS, true)}
+              </div>
+
+              {/* Group 4: 🔴 공간 & 시설 & 힐링 */}
+              <div>
+                <p className="text-xs font-bold text-rose-600 px-3 uppercase tracking-wider mb-1">
+                  🔴 공간 &amp; 시설 &amp; 힐링
+                </p>
+                {renderNavList(SPACE_HEALING_ITEMS, true)}
               </div>
 
             </div>
@@ -237,7 +258,7 @@ export default function Sidebar() {
       )}
 
       {/* ──────────────────────────────────────────────────────────
-          4. DESKTOP FOLDABLE SIDEBAR (20% 확대 & 12개 카드 동기화)
+          4. DESKTOP FOLDABLE SIDEBAR (메인 4대 행 1:1 완벽 동기화)
       ────────────────────────────────────────────────────────── */}
       <aside 
         className={`hidden md:flex fixed inset-y-0 left-0 bg-white border-r border-slate-200 z-40 flex-col justify-between shadow-sm transition-all duration-300 ease-in-out ${
@@ -247,7 +268,7 @@ export default function Sidebar() {
         {/* Top Header & Scrollable Nav Area */}
         <div className="flex flex-col h-full overflow-hidden">
           
-          {/* Header (20% 확대) */}
+          {/* Header */}
           <div className="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="w-9.5 h-9.5 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform">
@@ -262,65 +283,73 @@ export default function Sidebar() {
                     Live
                   </span>
                 </div>
-                <span className="text-xs font-semibold text-slate-400">AI-SEN HUB v4.9.2</span>
+                <span className="text-xs font-semibold text-slate-400">교육행정 올인원 포털</span>
               </div>
             </Link>
 
             <button
               onClick={toggleSidebar}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
               title="사이드바 접기 (<<)"
             >
               <ChevronLeft size={20} />
             </button>
           </div>
 
-          {/* Scrollable Navigation List (20% 확대) */}
-          <div className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-4.5">
+          {/* Scrollable Navigation List (4대 영역 칼정렬) */}
+          <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3.5">
             
             {/* 홈 바로가기 */}
             <Link 
               href="/" 
-              className={`flex items-center gap-2.5 px-3.5 py-2 rounded-xl font-black text-sm transition-all ${
+              className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl font-black text-xs sm:text-[13.5px] transition-all ${
                 pathname === '/' 
                   ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs' 
                   : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50'
               }`}
             >
-              <House size={17} className={pathname === '/' ? 'text-blue-600' : 'text-slate-500'} />
+              <House size={16} className={pathname === '/' ? 'text-blue-600' : 'text-slate-500'} />
               <span>포털 메인 홈</span>
             </Link>
 
-            {/* 1. AI & 특화 솔루션 */}
-            <div className="flex flex-col gap-1.5">
-              <p className="text-xs font-bold text-slate-400 px-3 uppercase tracking-wider">
-                🤖 AI &amp; 특화 솔루션
+            {/* 1. 🔵 AI & 포털 허브 */}
+            <div className="flex flex-col gap-1">
+              <p className="text-[11px] font-bold text-blue-600 px-2.5 uppercase tracking-wider">
+                🔵 AI &amp; 포털 허브
               </p>
-              {renderNavList(AI_NAV_ITEMS)}
+              {renderNavList(AI_HUB_ITEMS)}
             </div>
 
-            {/* 2. 공식 지침서 & 소통 공간 */}
-            <div className="flex flex-col gap-1.5">
-              <p className="text-xs font-bold text-slate-400 px-3 uppercase tracking-wider">
-                🏛️ 지침서 &amp; 소통 서고
+            {/* 2. 🟢 회계 & 계약 & 예산 */}
+            <div className="flex flex-col gap-1">
+              <p className="text-[11px] font-bold text-emerald-600 px-2.5 uppercase tracking-wider">
+                🟢 회계 &amp; 계약 &amp; 예산
               </p>
-              {renderNavList(ARCHIVE_NAV_ITEMS)}
+              {renderNavList(FINANCE_CONTRACT_ITEMS)}
             </div>
 
-            {/* 3. 6대 행정 실무 툴킷 */}
-            <div className="flex flex-col gap-1.5">
-              <p className="text-xs font-bold text-slate-400 px-3 uppercase tracking-wider">
-                ⚡ 6대 행정 실무 툴킷
+            {/* 3. 🟣 행정 실무 & 서고 */}
+            <div className="flex flex-col gap-1">
+              <p className="text-[11px] font-bold text-purple-600 px-2.5 uppercase tracking-wider">
+                🟣 행정 실무 &amp; 서고
               </p>
-              {renderNavList(TOOLKIT_NAV_ITEMS)}
+              {renderNavList(ADMIN_DOC_ITEMS)}
+            </div>
+
+            {/* 4. 🔴 공간 & 시설 & 힐링 */}
+            <div className="flex flex-col gap-1">
+              <p className="text-[11px] font-bold text-rose-600 px-2.5 uppercase tracking-wider">
+                🔴 공간 &amp; 시설 &amp; 힐링
+              </p>
+              {renderNavList(SPACE_HEALING_ITEMS)}
             </div>
 
           </div>
 
           {/* Bottom Area */}
-          <div className="p-3.5 border-t border-slate-100 flex flex-col gap-2.5 shrink-0 bg-slate-50/50">
+          <div className="p-3 border-t border-slate-100 flex flex-col gap-2 shrink-0 bg-slate-50/50">
             {user ? (
-              <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
+              <div className="p-2 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-2xs">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   <span className="text-xs sm:text-sm font-bold text-slate-800">관리자</span>
@@ -332,15 +361,15 @@ export default function Sidebar() {
             ) : (
               <Link 
                 href="/login" 
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold shadow-2xs transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold shadow-2xs transition-colors"
               >
                 <LogIn size={15} className="text-slate-500" />
                 <span>관리자 로그인</span>
               </Link>
             )}
 
-            <div className="text-[11px] text-slate-400 text-center font-medium">
-              아이센스토어 &copy; 2026
+            <div className="text-[10.5px] text-slate-400 text-center font-medium">
+              AI-SEN 포털 &copy; 2026
             </div>
           </div>
 
