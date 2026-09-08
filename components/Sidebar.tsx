@@ -23,7 +23,8 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  House
+  House,
+  BookOpen
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -182,6 +183,26 @@ export default function Sidebar() {
                 <span>메인 포털 홈으로</span>
               </Link>
 
+              <Link 
+                href="/guide" 
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl font-black text-sm border transition-all ${
+                  pathname === '/guide'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                    : 'bg-indigo-50/70 text-indigo-700 border-indigo-200/80 hover:bg-indigo-100/70'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <BookOpen size={17} />
+                  <span>📖 AI-SEN 이용안내</span>
+                </div>
+                <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded border ${
+                  pathname === '/guide' ? 'bg-white/20 text-white border-white/30' : 'bg-indigo-100 text-indigo-800 border-indigo-300'
+                }`}>
+                  가이드
+                </span>
+              </Link>
+
               {/* Group 1: 🔵 AI & 포털 허브 */}
               <div>
                 <p className="text-xs font-bold text-blue-600 px-3 uppercase tracking-wider mb-1">
@@ -310,6 +331,26 @@ export default function Sidebar() {
             >
               <House size={16} className={pathname === '/' ? 'text-blue-600' : 'text-slate-500'} />
               <span>포털 메인 홈</span>
+            </Link>
+
+            {/* 통합 이용안내 & 실무 가이드 */}
+            <Link 
+              href="/guide" 
+              className={`flex items-center justify-between px-3 py-1.5 rounded-xl font-black text-xs sm:text-[13.5px] border transition-all ${
+                pathname === '/guide' 
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs' 
+                  : 'bg-indigo-50/70 text-indigo-700 border-indigo-200/80 hover:bg-indigo-100/70'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <BookOpen size={16} className={pathname === '/guide' ? 'text-white' : 'text-indigo-600'} />
+                <span>📖 AI-SEN 이용안내</span>
+              </div>
+              <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded border ${
+                pathname === '/guide' ? 'bg-white/20 text-white border-white/30' : 'bg-indigo-100 text-indigo-800 border-indigo-300'
+              }`}>
+                가이드
+              </span>
             </Link>
 
             {/* 1. 🔵 AI & 포털 허브 */}

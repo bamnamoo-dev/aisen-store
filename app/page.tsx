@@ -20,11 +20,14 @@ import {
   FileCheck,
   ChartPie,
   ShieldCheck,
-  Compass
+  Compass,
+  BookOpen
 } from 'lucide-react';
+import IntegratedManualModal from '@/components/IntegratedManualModal';
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [manualOpen, setManualOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,10 +43,21 @@ export default function HomePage() {
       ======================================================== */}
       <section className="flex flex-col items-center text-center pt-0 sm:pt-1">
         
-        {/* Top Branding Pill Badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[12px] font-bold text-blue-700 mb-2 shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-          <span>전국 교육행정 올인원 통합 포털</span>
+        {/* Top Branding Pill Badge & Integrated Manual Launcher */}
+        <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[12px] font-bold text-blue-700 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+            <span>전국 교육행정 올인원 통합 포털</span>
+          </div>
+
+          <button
+            onClick={() => setManualOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-[12px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer group"
+            title="AI-SEN 15대 도구 연계 이용안내 및 감사 치트시트 열기"
+          >
+            <BookOpen size={13} className="text-blue-200 group-hover:scale-110 transition-transform" />
+            <span>📖 AI-SEN 이용안내</span>
+          </button>
         </div>
 
         {/* Headline (대형 44px 폰트 & 그라데이션) */}
@@ -652,6 +666,9 @@ export default function HomePage() {
       <footer className="w-full pt-1.5 pb-1 border-t border-slate-200 flex items-center justify-center text-[10.5px] sm:text-xs text-slate-400 font-medium">
         <span>&copy; 2026 AI-SEN STORE. All rights reserved.</span>
       </footer>
+
+      {/* 5. 통합 이용안내 모달 */}
+      <IntegratedManualModal isOpen={manualOpen} onClose={() => setManualOpen(false)} />
 
     </div>
   );
