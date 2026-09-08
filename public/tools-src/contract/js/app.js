@@ -763,6 +763,7 @@ class ProgressiveContractCompassApp {
                   <td style="text-align: center; font-weight: bold; background: #f8fafc;">${d.stage}</td>
                   <td style="font-weight: 800;">
                     ${d.name}
+                    ${d.downloadUrl ? `<span style="display:inline-block; margin-left:6px; font-size:7pt; color:#4338ca; border:1px solid #c7d2fe; background:#eef2ff; padding:1px 4px; border-radius:3px;">[HWPX 서식 탑재]</span>` : ''}
                     ${d.basis ? `<div style="color: #4338ca; font-size: 7.5pt; font-weight: 600; margin-top: 2px;">⚖️ [근거] ${d.basis}</div>` : ''}
                   </td>
                   <td style="text-align: center;">
@@ -940,7 +941,14 @@ class ProgressiveContractCompassApp {
                         <div class="doc-check-left">
                           <input type="checkbox" id="${chkId}" class="doc-checkbox" />
                           <div>
-                            <label for="${chkId}" class="doc-name-label">${doc.name}</label>
+                            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                              <label for="${chkId}" class="doc-name-label">${doc.name}</label>
+                              ${doc.downloadUrl ? `
+                                <a href="${doc.downloadUrl}" download="${doc.downloadFileName || '서식.hwpx'}" class="doc-download-link" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; font-size: 11px; font-weight: 800; background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; border-radius: 5px; text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.15s ease;" title="2026 서울시교육청 표준 한글(HWPX) 양식 즉시 다운로드">
+                                  📥 <span>한글(HWPX) 양식</span>
+                                </a>
+                              ` : ''}
+                            </div>
                             ${doc.basis ? `<div class="doc-basis-badge">⚖️ 근거: ${doc.basis}</div>` : ''}
                             ${doc.note ? `<div class="doc-note-text">${doc.note}</div>` : ''}
                             ${doc.exemptible && doc.exemptReason ? `<div class="doc-exempt-hint">💡 ${doc.exemptReason}</div>` : ''}

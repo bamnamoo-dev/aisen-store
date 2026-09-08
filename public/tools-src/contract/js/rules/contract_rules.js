@@ -427,6 +427,8 @@ function generateRequiredDocsList(category, methodId, price, typeCode) {
     docs.push({
       stage: stage1,
       name: '수의계약 통합서약서 (청렴·체결제한·결격사유 통합 1종)',
+      downloadUrl: '/forms/contract/수의계약_통합서약서.hwpx',
+      downloadFileName: '2026_수의계약_통합서약서.hwpx',
       basis: '2026 서울특별시교육청 계약업무 경감 및 청렴도 향상 안내(교육재정과-26194)',
       required: true,
       exemptible: false,
