@@ -38,23 +38,23 @@ export default function IntegratedManualModal({ isOpen, onClose }: IntegratedMan
       onClick={onClose}
     >
       <div
-        className="bg-white w-full max-w-[1240px] h-[92vh] max-h-[920px] rounded-2xl shadow-2xl flex flex-col border border-slate-200/80 overflow-hidden"
+        className="bg-white w-full max-w-[960px] max-h-[86vh] rounded-2xl shadow-2xl flex flex-col border border-slate-200/80 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 모달 상단 헤더 */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/70 shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/80 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
               <BookOpen size={18} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-slate-800 tracking-tight">AI-SEN 통합 이용안내 & 실무 가이드</h2>
+                <h2 className="text-base font-bold text-slate-800 tracking-tight">AI-SEN 포털 &amp; 기능별 이용안내</h2>
                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200/60">
-                  2026 실무 규정 완비
+                  간편 가이드
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">15개 교육행정 특화 도구 연계 매뉴얼 · 6대 시나리오 · 감사 방어 치트시트</p>
+              <p className="text-[11px] text-slate-500 font-medium">메인 포털 개요 및 15대 전문 행정 도구 탭별 핵심 안내</p>
             </div>
           </div>
 

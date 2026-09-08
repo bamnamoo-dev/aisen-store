@@ -53,7 +53,7 @@ export default function HomePage() {
           <button
             onClick={() => setManualOpen(true)}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-[12px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer group"
-            title="AI-SEN 15대 도구 연계 이용안내 및 감사 치트시트 열기"
+            title="AI-SEN 포털 및 15개 기능별 이용안내 열기"
           >
             <BookOpen size={13} className="text-blue-200 group-hover:scale-110 transition-transform" />
             <span>📖 AI-SEN 이용안내</span>
