@@ -1784,7 +1784,7 @@ function generateRequiredDocsList(category, methodId, price, typeCode) {
   return docs;
 }
 
-function generateDraftMemoText({ category, typeName, typeCode, estimatedPrice, selectedMethod, targetPlatform = 'G2B', isFemaleCompany, auditWarnings, requiredDocs = [] }) {
+function generateDraftMemoText({ category, typeName, typeCode, projectTitle = '', estimatedPrice, selectedMethod, targetPlatform = 'G2B', isFemaleCompany, auditWarnings, requiredDocs = [] }) {
   const catKorean = category === 'construction' ? '공사' : (category === 'service' ? '용역' : '물품');
   const priceFormatted = estimatedPrice.toLocaleString();
   const today = new Date();
@@ -1793,6 +1793,8 @@ function generateDraftMemoText({ category, typeName, typeCode, estimatedPrice, s
   const platformRationale = targetPlatform === 'G2B'
     ? '지정정보처리장치는 지방계약법령상 공공계약의 기본(원칙) 시스템인 국가종합전자조달시스템(G2B 나라장터)을 이용하여 공정하고 투명하게 추진하고자 합니다.'
     : '지정정보처리장치는 지방계약법령 및 교육기관 조달 편의 지침에 따라 행정안전부 고시 지정정보처리장치인 학교장터(S2B)를 활용하여 추진하고자 합니다.';
+
+  const projectDisplay = projectTitle ? `「${projectTitle}」` : `「${typeName}」`;
 
   // 구비서류 목록 텍스트 생성
   const stageGroups = {};
@@ -1827,8 +1829,8 @@ function generateDraftMemoText({ category, typeName, typeCode, estimatedPrice, s
   다. 2026학년도 서울특별시교육청 계약업무 처리지침${splitLawClause}
 
 2. 사업 개요
-  가. 건    명: 「${typeName}」 계약 집행의 건
-  나. 계약분야: ${catKorean} (계약길잡이 분류: ${typeName} [${typeCode}])
+  가. 건    명: ${projectDisplay} 계약 집행의 건
+  나. 계약분야: ${catKorean} (계약길잡이 분류: ${typeName} [${typeCode || '일반'}])
   다. 추정가격: 금${priceFormatted}원 (부가가치세 제외)
   라. 추정금액: 금${Math.round(estimatedPrice * 1.1).toLocaleString()}원 (부가가치세 10% 포함)
 
@@ -1837,14 +1839,14 @@ function generateDraftMemoText({ category, typeName, typeCode, estimatedPrice, s
   나. 계약 추진 플랫폼: ${selectedMethod.platform}
   다. 관련 법적 근거: ${selectedMethod.legalClause}
   라. 결정 사유:
-    본 건(유형: ${typeName})의 추정가격은 금${priceFormatted}원으로, ${selectedMethod.legalDesc}
+    본 건(${projectTitle ? `${projectTitle}, ` : ''}유형: ${typeName})의 추정가격은 금${priceFormatted}원으로, ${selectedMethod.legalDesc}
     ${selectedMethod.id.includes('QUOTATION') ? platformRationale : ''}
     ${typeCode.startsWith('B36') ? '아울러 본 건은 관계 법령에 따른 법정 의무 분리발주 대상 공사로서, 타 공종(건축·토목 등)과 통합 발주하지 않고 해당 전문등록면허 자격을 갖춘 업체와 개별 분리 계약을 추진하고자 함.' : ''}
     ${['B07', 'B12', 'B13'].includes(typeCode) ? '아울러 본 건은 학생 현장체험학습 관련 용역으로서, 「★2026학년도 서울특별시교육청 현장체험학습 길라잡이」에 의거하여 학생 안전관리 기준(안전요원 연수이수증, TS교통안전정보, 숙박시설 안전점검 등)을 준수하고 90일 이내 분할 수의계약 금지 규정을 철저히 점검하여 추진하고자 함.' : ''}
     ${selectedMethod.id === 'MEAL_SERVICE_EAT' ? '아울러 본 건은 학생 급식 식재료 구매 건으로, 서울특별시교육청 학교급식 기본방향에 따라 안전성과 위생이 검증된 공급업체 조달을 위해 한국농수산식품유통공사(aT) 학교급식전자조달시스템(eaT)을 활용하여 추진하고자 함.' : ''}
     ${selectedMethod.id === 'SOLE_SOURCE_DISABLED_FACILITY' ? '아울러 본 건은 「중증장애인생산품 우선구매 특별법」 제7조 제5항 및 「지방계약법 시행령」 제25조 제1항 제7호의2 나목에 의거 보건복지부 지정 중증장애인생산품 생산시설과의 계약으로서 금액 한도 제한 없이 1인 견적 수의계약 특례를 적용함.' : ''}
     ${isFemaleCompany ? '아울러 계약상대자는 중소벤처기업부 확인을 득한 여성기업으로 확인되어 1인 견적 수의계약 특례를 적용함.' : ''}
-    이에 따라 청렴하고 적법한 학교회계 집행을 위해 상기 계약방법으로 추진하고자 합니다.
+    ${projectTitle ? '공사원가계산서 제비율 및 관련 회계 법령에 따른 역산 검증을 완료하였으며, 동일 회계연도 내 분할 수의계약(일감 쪼개기) 금지 규정을 철저히 점검하여 ' : ''}청렴하고 적법한 학교회계 집행을 위해 상기 계약방법으로 추진하고자 합니다.
 
 4. 낙찰자 결정 및 계약 조건
   - 공고(안내) 기간: ${selectedMethod.noticeDays}
@@ -2396,7 +2398,7 @@ export function getContractMethodRoadmap(methodId, category, price, typeCode = '
 /**
  * 3) 선택된 계약방법의 최종 맞춤형 실무 패키지 정보 일괄 조립
  */
-export function getContractPackageDetails({ category, estimatedPrice, methodId, targetPlatform = 'G2B', isFemaleCompany = false, typeCode = '' }) {
+export function getContractPackageDetails({ category, estimatedPrice, methodId, targetPlatform = 'G2B', isFemaleCompany = false, typeCode = '', projectTitle = '' }) {
   const price = Number(estimatedPrice) || 0;
   const baseMethod = CONTRACT_METHODS[methodId] || CONTRACT_METHODS.SOLE_SOURCE_GENERAL;
   const method = { ...baseMethod };
@@ -2509,11 +2511,15 @@ export function getContractPackageDetails({ category, estimatedPrice, methodId, 
   const requiredDocs = generateRequiredDocsList(category, methodId, price, typeCode);
 
   // 4. K-에듀파인 기안문 사유서
-  const typeName = category === 'construction' ? '시설보수 및 개선공사' : (category === 'service' ? '교육행정 지원용역' : '교육용 기자재 및 물품구매');
+  const baseTypeName = category === 'construction' ? '시설보수 및 개선공사' : (category === 'service' ? '교육행정 지원용역' : '교육용 기자재 및 물품구매');
+  const typeObj = getTypeNameByCode(typeCode);
+  const typeName = typeObj ? typeObj.name : baseTypeName;
+
   const memoText = generateDraftMemoText({
     category,
     typeName,
     typeCode,
+    projectTitle,
     estimatedPrice: price,
     selectedMethod: method,
     targetPlatform,

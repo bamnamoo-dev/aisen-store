@@ -22,7 +22,8 @@ class ProgressiveContractCompassApp {
       totalPrice: 0,             // 계약예정금액 (VAT 포함)
       selectedMethodId: null,    // 선택된 계약방법 ID
       activeStep: 1,             // 현재 활성 스텝 (1 ~ 4)
-      availableOptions: []       // Step 3에서 도출된 계약방법 후보 목록
+      availableOptions: [],      // Step 3에서 도출된 계약방법 후보 목록
+      projectTitle: ''           // 공사명 또는 사업 건명 (공사원가 등에서 연계 수신)
     };
 
     this.init();
@@ -50,6 +51,10 @@ class ProgressiveContractCompassApp {
       const title = params.get('title');
 
       if (!amountStr && !category) return;
+
+      if (title) {
+        this.state.projectTitle = decodeURIComponent(title);
+      }
 
       // 1. 카테고리 (기본: 공사)
       const targetCat = category || 'construction';
@@ -645,12 +650,15 @@ class ProgressiveContractCompassApp {
       category: this.state.category,
       estimatedPrice: this.state.estimatedPrice,
       methodId: this.state.selectedMethodId,
-      typeCode: this.state.typeCode
+      typeCode: this.state.typeCode,
+      projectTitle: this.state.projectTitle || ''
     });
 
     const catKorean = this.state.category === 'construction' ? '공사' : (this.state.category === 'service' ? '용역' : '물품');
     const fullCatKorean = this.state.typeName ? `${catKorean} (${this.state.typeName})` : catKorean;
     const todayStr = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+    const questionText = encodeURIComponent(`서울시교육청 기준, ${this.state.projectTitle || fullCatKorean} (추정가격 ${pkg.estimatedPrice.toLocaleString()}원, ${pkg.method.title}) 계약 시 동일예산 분할수의(쪼개기) 금지 기준과 지침서 쪽수를 알려줘.`);
+    const chatbotAskUrl = `https://chatbot.aisen.store?q=${questionText}`;
 
     container.innerHTML = `
       <!-- ================================================================
@@ -671,6 +679,12 @@ class ProgressiveContractCompassApp {
           <div class="p-sec-header">1. 계약 기본 사항</div>
           <table class="p-table">
             <tbody>
+              ${this.state.projectTitle ? `
+              <tr>
+                <th style="width: 15%;">사업(공사)명</th>
+                <td colspan="3" style="font-weight: bold; color: #1e3a8a; font-size: 1.05em;">${this.state.projectTitle}</td>
+              </tr>
+              ` : ''}
               <tr>
                 <th style="width: 15%;">계약방법</th>
                 <td style="width: 35%; font-weight: bold; color: #1e3a8a;">${pkg.method.title}</td>
@@ -781,7 +795,10 @@ class ProgressiveContractCompassApp {
       <div class="confirmed-method-banner screen-only">
         <div class="confirmed-left">
           <h3>✅ ${pkg.method.title}</h3>
-          <p>분야: <strong>${fullCatKorean}</strong> · 추정가격: 금${pkg.estimatedPrice.toLocaleString()}원 (VAT포함: 금${pkg.totalPrice.toLocaleString()}원)</p>
+          <p>
+            ${this.state.projectTitle ? `<span style="display: inline-block; background: rgba(37,99,235,0.12); color: var(--accent-blue, #2563eb); font-weight: 800; padding: 1px 7px; border-radius: 4px; margin-right: 6px;">${this.state.projectTitle}</span>` : ''}
+            분야: <strong>${fullCatKorean}</strong> · 추정가격: 금${pkg.estimatedPrice.toLocaleString()}원 (VAT포함: 금${pkg.totalPrice.toLocaleString()}원)
+          </p>
         </div>
         <div class="confirmed-specs-pills">
           <span class="spec-pill">공고: ${pkg.method.noticeDays}</span>
@@ -793,30 +810,66 @@ class ProgressiveContractCompassApp {
 
       <!-- 2. 실무 가이드 탭 내비게이션 (화면용) -->
       <div class="guide-tabs-bar screen-only" role="tablist">
-        <button type="button" class="guide-tab-btn active" data-tab="tab-roadmap">🚦 1. 진행 절차</button>
-        <button type="button" class="guide-tab-btn" data-tab="tab-audit">⚖️ 2. 근거 &amp; 주의사항</button>
+        <button type="button" class="guide-tab-btn active" data-tab="tab-memo">📝 1. K-에듀파인 기안문</button>
+        <button type="button" class="guide-tab-btn" data-tab="tab-audit">⚖️ 2. 감사관 핵심 유권해석</button>
         <button type="button" class="guide-tab-btn" data-tab="tab-docs">📑 3. 필수 서류 (${pkg.requiredDocs.length}종)</button>
-        <button type="button" class="guide-tab-btn" data-tab="tab-memo">📝 4. 기안문 사유서</button>
+        <button type="button" class="guide-tab-btn" data-tab="tab-roadmap">🚦 4. 진행 절차</button>
       </div>
 
-      <!-- [화면용] 1. 진행 절차 로드맵 타임라인 -->
-      <div class="guide-tab-pane active" id="tab-roadmap">
-        <div class="roadmap-timeline">
-          ${pkg.roadmap.map((s) => `
-            <div class="timeline-step-item">
-              <div class="timeline-step-bullet"></div>
-              <div class="timeline-header-row">
-                <span class="timeline-step-title"><strong>${s.step}</strong> : ${s.title}</span>
-                <span class="timeline-step-badge">${s.badge}</span>
-              </div>
-              <p class="timeline-step-desc">${s.desc}</p>
+      <!-- [제1구분] K-에듀파인 기안문 사유서 (최우선 활성화) -->
+      <div class="guide-tab-pane active screen-only" id="tab-memo">
+        <div class="memo-output-wrap">
+          <div class="memo-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+            <div style="font-size: 0.85rem; color: var(--neutral-600);">
+              💡 <strong>K-에듀파인 품의 및 계약방법 결정 기안문</strong>에 그대로 복사하여 붙여넣으세요.
             </div>
-          `).join('')}
+            <button type="button" class="btn-action-primary" id="btn-copy-memo-final" style="font-size: 13px; font-weight: 800; padding: 8px 18px; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 3px 10px rgba(16,185,129,0.3); border: none; border-radius: 8px; color: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              📋 사유서 원클릭 복사
+            </button>
+          </div>
+          <pre class="memo-code-box" id="memo-code-text" style="font-size: 12.5px; line-height: 1.6; border-radius: 8px; padding: 14px; background: var(--input-bg, #f8fafc); border: 1px solid var(--card-border, #e2e8f0); white-space: pre-wrap; word-break: break-all;">${pkg.memoText}</pre>
         </div>
       </div>
 
-      <!-- [화면용] 2. 법적 근거 및 실무 감사 주의사항 -->
+      <!-- [제2구분] 법적 근거 및 감사관 핵심 유권해석 (인라인 자문관) -->
       <div class="guide-tab-pane" id="tab-audit">
+        <!-- 3대 핵심 감사 체크포인트 카드 그리드 -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; margin-bottom: 14px;">
+          <!-- 포인트 1: 분할수의 금지 기준 -->
+          <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 12.5px; font-weight: 800; color: #b45309; margin-bottom: 5px; display: flex; align-items: center; gap: 4px;">
+              <span>⚠️</span> 1. 동일예산 분할수의(쪼개기) 금지
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-main); line-height: 1.5; margin: 0;">
+              동일 회계연도 내 동일 세부사업·구조물 공사는 시기·장소를 분할하여 1인 수의계약 체결이 엄격히 금지됩니다. (단, 학생 안전위험 긴급보수나 누수 등 정당한 사유가 공문에 명시된 경우만 인정)
+            </p>
+          </div>
+
+          <!-- 포인트 2: 2026 서류 간소화 지침 -->
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 12.5px; font-weight: 800; color: #047857; margin-bottom: 5px; display: flex; align-items: center; gap: 4px;">
+              <span>💡</span> 2. 2026 최신 서류 간소화 특례
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-main); line-height: 1.5; margin: 0;">
+              • <strong>1,000만 원 이하 공사</strong>: 착공계·준공계 생략 가능 (지출결의서 날인 대체)<br>
+              • <strong>500만 원 이하 공사</strong>: 노무비 구분관리 합의서 및 4대보험 완납증명서 징구 생략 가능<br>
+              • <strong>통합서약서 1종</strong>: 청렴·체결제한 등 10종 서류 일원화
+            </p>
+          </div>
+
+          <!-- 포인트 3: 보증금 및 계약서 작성 기준 -->
+          <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 12.5px; font-weight: 800; color: #1d4ed8; margin-bottom: 5px; display: flex; align-items: center; gap: 4px;">
+              <span>🛡️</span> 3. 계약보증금 &amp; 하자보수 면제
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-main); line-height: 1.5; margin: 0;">
+              • <strong>계약금액 5,000만 원 이하</strong>: 계약보증금 납부 면제 (지급확약서 대체)<br>
+              • <strong>공사금액 3,000만 원 이하</strong>: 하자보수보증금 납부 면제 (지급확약서 징구)<br>
+              • <strong>계약서 작성</strong>: 5,000만 원 이하 승낙사항(주문서) 대체 가능
+            </p>
+          </div>
+        </div>
+
         <!-- 감사 경보 배너들 -->
         ${pkg.auditWarnings.map((w) => `
           <div class="audit-alert-box ${w.level === 'critical' ? 'critical' : ''}">
@@ -839,6 +892,17 @@ class ProgressiveContractCompassApp {
         <div class="legal-box" style="border-left: 4px solid var(--primary-600);">
           <h4>🛡️ 서울시교육청 실무 감사 방어 팁</h4>
           <p>${pkg.method.auditTip}</p>
+        </div>
+
+        <!-- 특수 상황 심층 챗봇 질의 안내 바 -->
+        <div style="background: rgba(37, 99, 235, 0.06); border: 1px dashed rgba(37, 99, 235, 0.35); border-radius: 8px; padding: 12px 16px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div style="font-size: 12.5px; font-weight: 700; color: var(--text-main);">💬 우리 학교만의 특수한 예외 규정이나 102권 공식 지침서 원문 확인이 필요하신가요?</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">현재 계약 조건(금액·공종·계약방법)을 품은 채 행정챗봇으로 즉시 연결됩니다.</div>
+          </div>
+          <a href="${chatbotAskUrl}" target="_blank" rel="noreferrer" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 800; padding: 8px 14px; border-radius: 6px; text-decoration: none; box-shadow: 0 2px 6px rgba(37,99,235,0.25);">
+            <span>🤖 AI-SEN 행정챗봇에 심층 질의하기 ➔</span>
+          </a>
         </div>
       </div>
 
@@ -895,18 +959,19 @@ class ProgressiveContractCompassApp {
         </div>
       </div>
 
-      <!-- [제4구분] K-에듀파인 기안문 사유서 (화면 전용, 인쇄에서 완전 제외) -->
-      <div class="guide-tab-pane screen-only" id="tab-memo">
-        <div class="memo-output-wrap">
-          <div class="memo-toolbar">
-            <span style="font-size: 0.85rem; color: var(--neutral-600);">
-              K-에듀파인 품의 및 계약방법 결정 결재 기안문에 그대로 복사하여 붙여넣으세요.
-            </span>
-            <button type="button" class="btn-action-primary" id="btn-copy-memo-final">
-              📋 사유서 1초 복사하기
-            </button>
-          </div>
-          <pre class="memo-code-box" id="memo-code-text">${pkg.memoText}</pre>
+      <!-- [제4구분] 진행 절차 로드맵 타임라인 -->
+      <div class="guide-tab-pane" id="tab-roadmap">
+        <div class="roadmap-timeline">
+          ${pkg.roadmap.map((s) => `
+            <div class="timeline-step-item">
+              <div class="timeline-step-bullet"></div>
+              <div class="timeline-header-row">
+                <span class="timeline-step-title"><strong>${s.step}</strong> : ${s.title}</span>
+                <span class="timeline-step-badge">${s.badge}</span>
+              </div>
+              <p class="timeline-step-desc">${s.desc}</p>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
@@ -1004,6 +1069,7 @@ class ProgressiveContractCompassApp {
       this.state.category = null;
       this.state.typeCode = '';
       this.state.typeName = '';
+      this.state.projectTitle = '';
       this.state.rawAmount = 0;
       this.state.vatIncluded = false;
       this.state.estimatedPrice = 0;
