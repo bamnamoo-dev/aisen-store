@@ -18,8 +18,9 @@ export default function LabelMakerPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="증빙서 측면표지 라벨 제작기"
-        icon={<Tag size={15} className="text-violet-600" />}
+        title="AI-SEN 지출바인더 (증빙서 측면표지 라벨 제작기)"
+        icon={<Tag size={15} className="text-purple-600" />}
+        themeColor="purple"
         onReload={handleReload}
       />
 

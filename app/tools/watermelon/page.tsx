@@ -17,8 +17,9 @@ export default function WatermelonGamePage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="행정 힐링 수박 게임"
+        title="AI-SEN 힐링게임 (행정 힐링 수박 게임)"
         icon={<span className="text-base">🍉</span>}
+        themeColor="rose"
         onReload={handleReload}
       />
 

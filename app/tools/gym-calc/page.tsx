@@ -18,8 +18,9 @@ export default function GymCalcPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="체육관 시설사용료 계산기"
-        icon={<Calculator size={15} className="text-pink-600" />}
+        title="AI-SEN 시설대관 (체육관·학교시설 사용료 계산기)"
+        icon={<Calculator size={15} className="text-rose-600" />}
+        themeColor="rose"
         onReload={handleReload}
       />
 

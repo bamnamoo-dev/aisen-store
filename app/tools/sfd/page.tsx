@@ -18,8 +18,9 @@ export default function SFDDashboardPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="학교회계 통합 정보 대시보드 (SFD)"
-        icon={<ChartPie size={15} className="text-teal-600" />}
+        title="AI-SEN 학교회계 (학교정보 대시보드 SFD)"
+        icon={<ChartPie size={15} className="text-emerald-600" />}
+        themeColor="emerald"
         onReload={handleReload}
       />
 

@@ -222,8 +222,9 @@ export default function SikdaePage() {
     <div className="w-full flex flex-col min-h-screen">
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="나이스 임금대장 식대분리기"
-        icon={<UtensilsCrossed size={15} className="text-orange-600" />}
+        title="AI-SEN 급여식대 (나이스 임금대장 식대분리기)"
+        icon={<UtensilsCrossed size={15} className="text-purple-600" />}
+        themeColor="purple"
       />
 
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 py-6 flex flex-col gap-6">

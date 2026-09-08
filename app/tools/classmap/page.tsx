@@ -18,8 +18,9 @@ export default function ClassmapPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="스마트 교실 배치도 (Smart Classmap)"
-        icon={<LayoutGrid size={15} className="text-cyan-600" />}
+        title="AI-SEN 교실배치 (스마트 교실배치도 제작기)"
+        icon={<LayoutGrid size={15} className="text-rose-600" />}
+        themeColor="rose"
         onReload={handleReload}
       />
 

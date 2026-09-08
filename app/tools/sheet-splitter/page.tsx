@@ -178,8 +178,9 @@ export default function SheetSplitterPage() {
       <div className="w-full flex flex-col min-h-screen">
         {/* 겹침 없는 통합 스마트 헤더 */}
         <ToolHeader 
-          title="엑셀시트별 분리저장기"
-          icon={<FileSpreadsheet size={15} className="text-emerald-700" />}
+          title="AI-SEN 엑셀분리 (엑셀시트별 분리저장기)"
+          icon={<FileSpreadsheet size={15} className="text-purple-600" />}
+          themeColor="purple"
         />
 
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 py-6 flex flex-col gap-6">
