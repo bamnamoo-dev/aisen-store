@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>스마트 원가계산서 검증기 | AI-SEN Verify Master</title>
+    <title>AI-SEN 공사원가 | 교육행정 공사원가계산서 조달청 역산 검증</title>
     <!-- CDN SheetJS (XLSX 원본 - 견적서 파싱 및 파일 읽기용) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
@@ -912,8 +912,8 @@
         <div class="logo-title">
             <div class="logo-icon">⚖</div>
             <div>
-                <h1>스마트 원가계산서 검증기</h1>
-                <div class="subtitle">조달청 제비율 기준 정밀 역산 & 법정 4대보험·산안비·일반관리비 대차대조</div>
+                <h1>AI-SEN 공사원가</h1>
+                <div class="subtitle">2026 조달청 제비율 기준 정밀 역산 & 법정 4대보험·산안비·일반관리비 대차대조</div>
             </div>
         </div>
 
@@ -1169,11 +1169,16 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">서류 방향 조정:</span>
-                    <div style="display:flex; gap:6px;">
-                        <button type="button" class="btn btn-secondary" style="font-size:12px; font-weight:600;" onclick="rotatePasteCanvas(90)">🔄 90° 시계방향 회전</button>
-                        <button type="button" class="btn btn-secondary" style="font-size:12px;" onclick="rotatePasteCanvas(-90)">↺ 반시계 회전</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <input type="file" id="pasteModalFileInput" accept="image/*" style="display:none;" onchange="if(this.files[0]) loadPastedImageToCanvas(this.files[0])">
+                        <button type="button" class="btn btn-secondary" style="font-size:12px; font-weight:600;" onclick="document.getElementById('pasteModalFileInput').click()">📁 새 이미지 선택/변경</button>
+                        <span style="font-size:11.5px; color:var(--text-muted);">(또는 캡처 후 Ctrl+V)</span>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">서류 방향:</span>
+                        <button type="button" class="btn btn-secondary" style="font-size:12px; font-weight:600;" onclick="rotatePasteCanvas(90)">🔄 90° 회전</button>
+                        <button type="button" class="btn btn-secondary" style="font-size:12px;" onclick="rotatePasteCanvas(-90)">↺ 반시계</button>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px; margin-top:4px;">
@@ -2183,6 +2188,12 @@ function openPasteModal() {
 function closePasteModal() {
     const m = document.getElementById("pasteModal");
     if (m) m.classList.remove("active");
+    const canvas = document.getElementById("pasteCanvas");
+    const emptyMsg = document.getElementById("canvasEmptyMsg");
+    if (canvas) canvas.style.display = "none";
+    if (emptyMsg) emptyMsg.style.display = "block";
+    currentPasteImage = null;
+    currentRotationAngle = 0;
 }
 
 // 사용설명서 모달 열기/닫기
@@ -2419,11 +2430,27 @@ async function analyzeImageWithGemini(base64Data, mimeType = "image/jpeg", fileN
 function applyGeminiResult(res, sourceName = "스캔본 견적서") {
     if (!res) return;
 
-    if (res.projectTitle) {
+    // 유효 금액 검증 (재료비, 노무비, 총도급액, 산출경비 등 원가 항목이 1개라도 있는지 확인)
+    const mat = Number(res.directMaterial) || 0;
+    const lab = Number(res.directLabor) || 0;
+    const tot = Number(res.vendorTotal) || 0;
+    const exp = Number(res.outputExpense) || 0;
+    const waste = Number(res.wasteCost) || 0;
+    const indLab = Number(res.indirectLabor) || 0;
+    const oExp = Number(res.otherExpense) || 0;
+
+    const totalRecognized = mat + lab + tot + exp + waste + indLab + oExp;
+    if (totalRecognized <= 0) {
+        closePasteModal();
+        alert(`⚠️ [${sourceName}]에서 공사원가/견적서 항목(직접재료비, 직접노무비, 총도급액 등)을 감지하지 못했습니다.\n\n재료비·노무비·경비 수치가 적힌 '공사원가계산서' 또는 '견적서' 이미지를 첨부해 주세요.\n(기존 입력된 공사 데이터는 안전하게 보존되었습니다.)`);
+        return;
+    }
+
+    if (res.projectTitle && res.projectTitle !== "해당 없음" && res.projectTitle !== "공사명") {
         document.getElementById("inProjectTitle").value = res.projectTitle;
         autoDetectTrade(res.projectTitle);
     }
-    if (res.periodDays) {
+    if (res.periodDays && Number(res.periodDays) > 0) {
         document.getElementById("inPeriodDays").value = res.periodDays;
     }
 

@@ -42,7 +42,7 @@ export default function CostAuditPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="스마트 원가계산서 검증기 (AI-SEN Cost Audit)"
+        title="AI-SEN 공사원가 (AI-SEN Cost Audit)"
         icon={<Calculator size={15} className="text-blue-500" />}
         themeColor="blue"
         onReload={handleReload}
@@ -73,7 +73,7 @@ export default function CostAuditPage() {
       <iframe
         ref={iframeRef}
         src={iframeSrc}
-        title="스마트 원가계산서 검증기"
+        title="AI-SEN 공사원가"
         className="w-full flex-1 border-none bg-slate-950"
         allow="clipboard-read; clipboard-write; printing"
       />
