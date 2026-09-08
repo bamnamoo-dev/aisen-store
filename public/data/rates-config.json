@@ -1,0 +1,128 @@
+{
+  "_comment": "AI-SEN STORE 중앙 요율 및 계약 기준 통합 설정 파일 (연도별/고시별 시계열 아카이브)",
+  "metadata": {
+    "latestVersion": "2026.04.13",
+    "updatedAt": "2026-09-08",
+    "description": "2026년 조달청 공사 제비율 및 서울특별시교육청 계약업무 처리지침 기준"
+  },
+  "contractLimits": {
+    "soleSourceGeneral": 20000000,
+    "soleSourceAffirmative": 50000000,
+    "contractBondExemption": 50000000,
+    "smallQuoteGeneralConst": 200000000,
+    "smallQuoteOtherConst": 160000000,
+    "goodsSelectionCommittee": 20000000
+  },
+  "costAuditRates": {
+    "2026.04.13": {
+      "building": {
+        "tiers": [
+          { "max": 50000000, "indirectLabor": 0.175, "otherExp": 0.050 },
+          { "max": 300000000, "indirectLabor": 0.160, "otherExp": 0.045 },
+          { "max": null, "indirectLabor": 0.150, "otherExp": 0.040 }
+        ],
+        "fixed": {
+          "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314,
+          "safety": 0.0311, "retire": 0.023, "env": 0.003, "subGuar": 0.00081, "machGuar": 0.0007,
+          "asbestos": 0.00006, "adminCap": 0.080, "profitCap": 0.150
+        }
+      },
+      "civil": {
+        "tiers": [
+          { "max": 1000000000, "indirectLabor": 0.191, "otherExp": 0.055 },
+          { "max": 5000000000, "indirectLabor": 0.189, "otherExp": 0.058 },
+          { "max": null, "indirectLabor": 0.190, "otherExp": 0.064 }
+        ],
+        "fixed": {
+          "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314,
+          "safety": 0.0315, "retire": 0.023, "env": 0.005, "subGuar": 0.00081, "machGuar": 0.0040,
+          "asbestos": 0.00006, "adminCap": 0.080, "profitCap": 0.150
+        }
+      },
+      "electrical": {
+        "tiers": [
+          { "max": 50000000, "indirectLabor": 0.125, "otherExp": 0.060 },
+          { "max": null, "indirectLabor": 0.115, "otherExp": 0.055 }
+        ],
+        "fixed": {
+          "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314,
+          "safety": 0.0207, "retire": 0.023, "liabilityRate": 0.0026477, "liabilityMin": 20000,
+          "adminCap": 0.080, "profitCap": 0.150
+        }
+      },
+      "telecom": {
+        "tiers": [{ "max": null, "indirectLabor": 0.115, "otherExp": 0.050 }],
+        "fixed": { "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314, "safety": 0.0207, "retire": 0.023, "adminCap": 0.080, "profitCap": 0.150 }
+      },
+      "fire": {
+        "tiers": [{ "max": null, "indirectLabor": 0.115, "otherExp": 0.055 }],
+        "fixed": { "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314, "safety": 0.0207, "retire": 0.023, "adminCap": 0.080, "profitCap": 0.150 }
+      },
+      "asbestos": {
+        "tiers": [{ "max": null, "indirectLabor": 0.175, "otherExp": 0.050 }],
+        "fixed": { "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314, "safety": 0.0311, "retire": 0.023, "asbestos": 0.00006, "adminCap": 0.080, "profitCap": 0.150 }
+      }
+    },
+    "2026.03.01": {
+      "building": {
+        "tiers": [
+          { "max": 50000000, "indirectLabor": 0.175, "otherExp": 0.050 },
+          { "max": 300000000, "indirectLabor": 0.160, "otherExp": 0.045 },
+          { "max": null, "indirectLabor": 0.150, "otherExp": 0.040 }
+        ],
+        "fixed": {
+          "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314,
+          "safety": 0.0311, "retire": 0.023, "env": 0.003, "subGuar": 0.00081, "machGuar": 0.0007,
+          "asbestos": 0.00006, "adminCap": 0.080, "profitCap": 0.150
+        }
+      },
+      "civil": {
+        "tiers": [
+          { "max": 1000000000, "indirectLabor": 0.191, "otherExp": 0.055 },
+          { "max": 5000000000, "indirectLabor": 0.189, "otherExp": 0.058 },
+          { "max": null, "indirectLabor": 0.190, "otherExp": 0.064 }
+        ],
+        "fixed": {
+          "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314,
+          "safety": 0.0315, "retire": 0.023, "env": 0.005, "subGuar": 0.00081, "machGuar": 0.0040,
+          "asbestos": 0.00006, "adminCap": 0.080, "profitCap": 0.150
+        }
+      },
+      "electrical": {
+        "tiers": [
+          { "max": 50000000, "indirectLabor": 0.125, "otherExp": 0.060 },
+          { "max": null, "indirectLabor": 0.115, "otherExp": 0.055 }
+        ],
+        "fixed": {
+          "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314,
+          "safety": 0.0207, "retire": 0.023, "liabilityRate": 0.0026477, "liabilityMin": 20000,
+          "adminCap": 0.080, "profitCap": 0.150
+        }
+      },
+      "telecom": {
+        "tiers": [{ "max": null, "indirectLabor": 0.115, "otherExp": 0.050 }],
+        "fixed": { "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314, "safety": 0.0207, "retire": 0.023, "adminCap": 0.080, "profitCap": 0.150 }
+      },
+      "fire": {
+        "tiers": [{ "max": null, "indirectLabor": 0.115, "otherExp": 0.055 }],
+        "fixed": { "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314, "safety": 0.0207, "retire": 0.023, "adminCap": 0.080, "profitCap": 0.150 }
+      },
+      "asbestos": {
+        "tiers": [{ "max": null, "indirectLabor": 0.175, "otherExp": 0.050 }],
+        "fixed": { "indAcc": 0.0356, "empIns": 0.0101, "health": 0.03595, "pension": 0.0475, "care": 0.1314, "safety": 0.0311, "retire": 0.023, "asbestos": 0.00006, "adminCap": 0.080, "profitCap": 0.150 }
+      }
+    },
+    "2025.07.01": {
+      "building": {
+        "tiers": [{ "max": null, "indirectLabor": 0.155, "otherExp": 0.045 }],
+        "fixed": { "indAcc": 0.037, "empIns": 0.0098, "health": 0.03545, "pension": 0.045, "care": 0.1295, "safety": 0.0293, "retire": 0.023, "adminCap": 0.060, "profitCap": 0.150 }
+      }
+    },
+    "2024.07.01": {
+      "building": {
+        "tiers": [{ "max": null, "indirectLabor": 0.145, "otherExp": 0.040 }],
+        "fixed": { "indAcc": 0.037, "empIns": 0.009, "health": 0.03545, "pension": 0.045, "care": 0.1295, "safety": 0.0293, "retire": 0.023, "adminCap": 0.060, "profitCap": 0.150 }
+      }
+    }
+  }
+}

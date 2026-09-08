@@ -5,6 +5,26 @@
 
 import { OFFICIAL_SEN_TYPES } from './items_catalog.js';
 
+// 중앙 요율 및 계약 한도 설정 상수 (Fallback 기본값 안전 보장)
+export const CONTRACT_LIMITS = {
+  soleSourceGeneral: 20000000,
+  soleSourceAffirmative: 50000000,
+  contractBondExemption: 50000000,
+  smallQuoteGeneralConst: 200000000,
+  smallQuoteOtherConst: 160000000,
+  goodsSelectionCommittee: 20000000
+};
+
+export function updateContractLimitsFromCentral(limits) {
+  if (!limits) return;
+  if (limits.soleSourceGeneral) CONTRACT_LIMITS.soleSourceGeneral = limits.soleSourceGeneral;
+  if (limits.soleSourceAffirmative) CONTRACT_LIMITS.soleSourceAffirmative = limits.soleSourceAffirmative;
+  if (limits.contractBondExemption) CONTRACT_LIMITS.contractBondExemption = limits.contractBondExemption;
+  if (limits.smallQuoteGeneralConst) CONTRACT_LIMITS.smallQuoteGeneralConst = limits.smallQuoteGeneralConst;
+  if (limits.smallQuoteOtherConst) CONTRACT_LIMITS.smallQuoteOtherConst = limits.smallQuoteOtherConst;
+  if (limits.goodsSelectionCommittee) CONTRACT_LIMITS.goodsSelectionCommittee = limits.goodsSelectionCommittee;
+}
+
 export const CONTRACT_METHODS = {
   // 1. 일반 소액 1인 견적 수의계약
   SOLE_SOURCE_GENERAL: {

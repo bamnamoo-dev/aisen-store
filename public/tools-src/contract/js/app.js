@@ -5,13 +5,15 @@
 
 import {
   getAvailableContractOptions,
-  getContractPackageDetails
+  getContractPackageDetails,
+  updateContractLimitsFromCentral
 } from './rules/contract_rules.js';
 
 import { OFFICIAL_SEN_TYPES } from './rules/items_catalog.js';
 
 class ProgressiveContractCompassApp {
   constructor() {
+    this.loadCentralContractLimits();
     this.state = {
       category: null,            // 'construction' | 'service' | 'goods'
       typeCode: '',              // 세부 계약유형 코드 (예: B20, B08, B07 등)
@@ -37,6 +39,22 @@ class ProgressiveContractCompassApp {
     this.bindStep3Events();
     this.bindStep4Events();
     this.handleUrlParameters();
+  }
+
+  // =========================================================================
+  // 중앙 요율 및 계약 한도 설정(/data/rates-config.json) 비동기 동기화 (Fallback 안전망)
+  // =========================================================================
+  async loadCentralContractLimits() {
+    try {
+      const res = await fetch('/data/rates-config.json?ts=' + Date.now());
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data && data.contractLimits) {
+        updateContractLimitsFromCentral(data.contractLimits);
+      }
+    } catch (e) {
+      console.warn('Central rates load fallback to built-in contract limits:', e);
+    }
   }
 
   // =========================================================================

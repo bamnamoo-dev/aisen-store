@@ -1581,6 +1581,53 @@ const RATES_DATABASE = {
     }
 };
 
+// =========================================================================
+// 중앙 요율 설정 파일(/data/rates-config.json) 비동기 동기화 및 Fallback 안전망
+// =========================================================================
+async function loadCentralRatesConfig() {
+    try {
+        const res = await fetch('/data/rates-config.json?ts=' + Date.now());
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.costAuditRates) {
+            Object.entries(data.costAuditRates).forEach(([ver, trades]) => {
+                if (!RATES_DATABASE[ver]) RATES_DATABASE[ver] = {};
+                Object.entries(trades).forEach(([trade, spec]) => {
+                    const cloned = JSON.parse(JSON.stringify(spec));
+                    if (cloned.tiers) {
+                        cloned.tiers.forEach(t => {
+                            if (t.max === null) t.max = Infinity;
+                        });
+                    }
+                    RATES_DATABASE[ver][trade] = cloned;
+                });
+            });
+            // 미래 새 버전 자동 확장을 위한 드롭다운 옵션 동적 동기화
+            const selVer = document.getElementById("selVersion");
+            if (selVer) {
+                const currentVal = selVer.value;
+                const versions = Object.keys(data.costAuditRates);
+                const latest = data.metadata?.latestVersion || versions[0];
+                let html = '';
+                versions.forEach(v => {
+                    const label = (v === latest) ? `${v} (최신 고시)` : (v === "2026.03.01" ? `${v} (이전 고시)` : (v.startsWith("2025") ? `${v} (하반기)` : `${v} (과거감사)`));
+                    const isSelected = (currentVal === v) ? 'selected' : '';
+                    html += `<option value="${v}" ${isSelected}>${label}</option>`;
+                });
+                selVer.innerHTML = html;
+                if (versions.includes(currentVal)) {
+                    selVer.value = currentVal;
+                } else {
+                    selVer.value = latest;
+                }
+            }
+            runCalculation();
+        }
+    } catch (e) {
+        console.warn('Central rates load fallback to built-in database:', e);
+    }
+}
+
 let vendorBreakdown = {};
 
 // 숫자 쉼표(,) 파싱 및 자동 포맷팅 헬퍼
@@ -4209,6 +4256,7 @@ window.onload = function() {
     initTheme();
     restoreCostAuditState();
     runCalculation();
+    loadCentralRatesConfig();
 };
 </script>
 
