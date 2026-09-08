@@ -222,7 +222,7 @@ export default function SikdaePage() {
     <div className="w-full flex flex-col min-h-screen">
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 급여식대 (나이스 임금대장 식대분리기)"
+        title="AI-SEN 급여식대"
         icon={<UtensilsCrossed size={15} className="text-purple-600" />}
         themeColor="purple"
       />
@@ -233,12 +233,12 @@ export default function SikdaePage() {
         <div className="flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-xs font-bold text-orange-600 mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-xs font-bold text-purple-600 mb-2">
               <UtensilsCrossed size={14} />
-              <span>급식비·식대 자동 추출 도구 v2.0 (내장형)</span>
+              <span>급식비·식대 자동 추출 도구 (AI-SEN 급여식대)</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              나이스 임금대장 식대분리기
+              AI-SEN 급여식대
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
               나이스(NEIS) 임금대장에서 <span className="font-bold text-slate-700">성명(B열)</span>과 <span className="font-bold text-slate-700">식대 공제금액(D열)</span>을 0.1초 만에 깔끔하게 정제합니다.

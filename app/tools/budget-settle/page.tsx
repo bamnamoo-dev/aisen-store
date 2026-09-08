@@ -18,7 +18,7 @@ export default function BudgetSettlePage() {
       
       {/* 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 예산정산 (수익자부담·목적사업비 예산정산)"
+        title="AI-SEN 예산정산"
         icon={<ChartPie size={15} className="text-emerald-600" />}
         themeColor="emerald"
         onReload={handleReload}
@@ -30,7 +30,7 @@ export default function BudgetSettlePage() {
           ref={iframeRef}
           src="https://bamnamoo-dev.github.io/budget-dashboard/"
           className="w-full h-full border-0"
-          title="예산정산 대시보드"
+          title="AI-SEN 예산정산"
           allow="clipboard-write; clipboard-read"
           loading="eager"
         />

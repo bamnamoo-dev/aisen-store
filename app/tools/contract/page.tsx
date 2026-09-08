@@ -54,7 +54,7 @@ function ContractCompassIframe() {
     <div className="w-full flex flex-col h-[calc(100vh-56px)] md:h-screen bg-slate-900 overflow-hidden relative">
       {/* 겹침 없는 통합 스마트 헤더 (1줄 정렬) */}
       <ToolHeader 
-        title="AI-SEN 계약 (2026 서울교육 계약나침반)"
+        title="AI-SEN 계약"
         icon={<Compass size={15} className="text-blue-500" />}
         themeColor="blue"
         onReload={handleReload}
@@ -63,7 +63,7 @@ function ContractCompassIframe() {
             <button
               onClick={handleOpenManual}
               className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
-              title="계약나침반 실무 사용설명서 열기"
+              title="AI-SEN 계약 실무 사용설명서 열기"
             >
               <BookOpen size={13} className="text-amber-700" />
               <span>사용설명서</span>
@@ -104,7 +104,7 @@ function ContractCompassIframe() {
 
 export default function ContractCompassPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-400">계약나침반 로딩 중...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-slate-400">AI-SEN 계약 로딩 중...</div>}>
       <ContractCompassIframe />
     </Suspense>
   );

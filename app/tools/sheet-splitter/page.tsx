@@ -178,7 +178,7 @@ export default function SheetSplitterPage() {
       <div className="w-full flex flex-col min-h-screen">
         {/* 겹침 없는 통합 스마트 헤더 */}
         <ToolHeader 
-          title="AI-SEN 엑셀분리 (엑셀시트별 분리저장기)"
+          title="AI-SEN 엑셀분리"
           icon={<FileSpreadsheet size={15} className="text-purple-600" />}
           themeColor="purple"
         />
@@ -188,12 +188,12 @@ export default function SheetSplitterPage() {
           {/* 상단 헤더 */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-700 mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-xs font-bold text-purple-700 mb-2">
                 <FileSpreadsheet size={14} />
-                <span>엑셀 다중 탭 분리 도구 v2.0 (내장형)</span>
+                <span>엑셀 다중 탭 분리 도구 (AI-SEN 엑셀분리)</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                엑셀시트별 분리저장기
+                AI-SEN 엑셀분리
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
                 하나의 엑셀 파일 안에 있는 여러 시트(탭)를 <span className="font-bold text-slate-700">개별 엑셀 파일(.xlsx)로 자동 분할하여 ZIP으로 묶어 다운로드</span>합니다.

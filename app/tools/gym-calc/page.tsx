@@ -18,7 +18,7 @@ export default function GymCalcPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 시설대관 (체육관·학교시설 사용료 계산기)"
+        title="AI-SEN 시설대관"
         icon={<Calculator size={15} className="text-rose-600" />}
         themeColor="rose"
         onReload={handleReload}
@@ -28,7 +28,7 @@ export default function GymCalcPage() {
       <iframe
         ref={iframeRef}
         src="https://bamnamoo-dev.github.io/gym/"
-        title="체육관 사용료 계산기"
+        title="AI-SEN 시설대관"
         className="w-full flex-1 border-none bg-slate-50"
         allow="clipboard-read; clipboard-write; printing"
       />

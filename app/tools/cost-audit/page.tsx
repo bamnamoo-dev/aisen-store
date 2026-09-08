@@ -62,7 +62,7 @@ export default function CostAuditPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 공사원가 (2026 조달청 제비율 역산 감사)"
+        title="AI-SEN 공사원가"
         icon={<Calculator size={15} className="text-emerald-500" />}
         themeColor="emerald"
         onReload={handleReload}
@@ -71,7 +71,7 @@ export default function CostAuditPage() {
             <button
               onClick={handleOpenManual}
               className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
-              title="원가계산서 검증기 실무 사용설명서 열기"
+              title="AI-SEN 공사원가 실무 사용설명서 열기"
             >
               <BookOpen size={13} className="text-amber-700" />
               <span>사용설명서</span>

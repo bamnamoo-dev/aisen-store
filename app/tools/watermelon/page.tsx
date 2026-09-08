@@ -17,7 +17,7 @@ export default function WatermelonGamePage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 힐링게임 (행정 힐링 수박 게임)"
+        title="AI-SEN 힐링게임"
         icon={<span className="text-base">🍉</span>}
         themeColor="rose"
         onReload={handleReload}
@@ -27,7 +27,7 @@ export default function WatermelonGamePage() {
       <iframe
         ref={iframeRef}
         src="https://project-np0t7.vercel.app/"
-        title="수박 게임"
+        title="AI-SEN 힐링게임"
         className="w-full flex-1 border-none bg-amber-50"
         allow="clipboard-read; clipboard-write; autoplay"
       />

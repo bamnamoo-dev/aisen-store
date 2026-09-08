@@ -18,7 +18,7 @@ export default function ClassmapPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 교실배치 (스마트 교실배치도 제작기)"
+        title="AI-SEN 교실배치"
         icon={<LayoutGrid size={15} className="text-rose-600" />}
         themeColor="rose"
         onReload={handleReload}
@@ -28,7 +28,7 @@ export default function ClassmapPage() {
       <iframe
         ref={iframeRef}
         src="https://bamnamoo-dev.github.io/classmap/"
-        title="스마트 교실 배치도"
+        title="AI-SEN 교실배치"
         className="w-full flex-1 border-none bg-slate-50"
         allow="clipboard-read; clipboard-write; printing"
       />

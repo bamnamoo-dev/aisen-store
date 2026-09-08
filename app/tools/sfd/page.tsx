@@ -18,7 +18,7 @@ export default function SFDDashboardPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 학교회계 (학교정보 대시보드 SFD)"
+        title="AI-SEN 학교회계"
         icon={<ChartPie size={15} className="text-emerald-600" />}
         themeColor="emerald"
         onReload={handleReload}
@@ -28,7 +28,7 @@ export default function SFDDashboardPage() {
       <iframe
         ref={iframeRef}
         src="https://bamnamoo-dev.github.io/SFD/"
-        title="학교회계 대시보드 (SFD)"
+        title="AI-SEN 학교회계"
         className="w-full flex-1 border-none bg-slate-50"
         allow="clipboard-read; clipboard-write; printing"
       />

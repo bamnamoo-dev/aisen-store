@@ -18,7 +18,7 @@ export default function LabelMakerPage() {
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 지출바인더 (증빙서 측면표지 라벨 제작기)"
+        title="AI-SEN 지출바인더"
         icon={<Tag size={15} className="text-purple-600" />}
         themeColor="purple"
         onReload={handleReload}
@@ -28,7 +28,7 @@ export default function LabelMakerPage() {
       <iframe
         ref={iframeRef}
         src="https://label-maker-two.vercel.app/"
-        title="증빙서 측면표지 제작기"
+        title="AI-SEN 지출바인더"
         className="w-full flex-1 border-none bg-slate-50"
         allow="clipboard-read; clipboard-write; printing"
       />
