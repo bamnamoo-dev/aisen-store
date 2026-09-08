@@ -141,7 +141,7 @@ export default function Sidebar() {
           <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-sm">
             i
           </div>
-          <span className="text-lg font-black text-slate-900">아이센스토어</span>
+          <span className="text-lg font-black text-slate-900">AI-SEN 포털</span>
         </Link>
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -256,7 +256,7 @@ export default function Sidebar() {
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
                   <span className="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight">
-                    아이센스토어
+                    AI-SEN 포털
                   </span>
                   <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
                     Live

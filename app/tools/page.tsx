@@ -173,7 +173,7 @@ export default function ToolsPage() {
                 <span className="text-xs font-semibold text-emerald-600">v4.9.2 최신 버전</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-                공무원 스마트 여비정산기 &amp; 출장 유류비 계산기
+                AI-SEN 출장여비 (스마트 여비정산기)
               </h2>
               <p className="mt-1.5 text-xs text-slate-600 max-w-[650px] leading-relaxed">
                 카카오 실시간 3개 경유지 길찾기와 오피넷 1일 6회 유가 연동 출장비 산출, 19종 법정 감액, A4 1페이지 에코 화이트 인쇄 지원.
@@ -186,7 +186,7 @@ export default function ToolsPage() {
               rel="noopener noreferrer" 
               className="btn-primary py-2.5 px-5 text-xs font-semibold shrink-0"
             >
-              <span>여비정산기 열기</span>
+              <span>출장여비 열기</span>
               <ArrowUpRight size={15} />
             </a>
           </div>

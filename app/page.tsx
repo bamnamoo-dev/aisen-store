@@ -7,7 +7,6 @@ import {
   Navigation, 
   Search, 
   ChevronRight, 
-  Fuel, 
   ArrowRight,
   ArrowUpRight,
   MessageSquareShare,
@@ -18,13 +17,9 @@ import {
   FileSpreadsheet,
   UtensilsCrossed,
   Calculator,
-  Flame,
   FileCheck,
   ChartPie,
   ShieldCheck,
-  Lock,
-  Zap,
-  HardDrive,
   Compass
 } from 'lucide-react';
 
@@ -45,9 +40,15 @@ export default function HomePage() {
       ======================================================== */}
       <section className="flex flex-col items-center text-center pt-0 sm:pt-1">
         
+        {/* Top Branding Pill Badge */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[12px] font-bold text-blue-700 mb-2 shadow-2xs">
+          <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+          <span>전국 교육행정 올인원 통합 포털</span>
+        </div>
+
         {/* Headline (대형 44px 폰트 & 그라데이션) */}
         <h1 className="text-3xl sm:text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-tight">
-          교육행정의 모든 기준과 계산, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">AI-SEN</span>
+          교육행정의 모든 기준과 계산, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">AI-SEN 포털</span>
         </h1>
         <p className="text-[14.5px] sm:text-[15.5px] text-slate-500 mt-2.5 font-medium max-w-[720px]">
           102권 공식 지침서 1:1 쪽수 앵커링 RAG 챗봇과 카카오·오피넷 실시간 연동 스마트 여비정산기
@@ -77,22 +78,21 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================
-          2. CORE 12 SERVICES & MINI PROGRAMS GRID (4 x 3 그리드)
+          2. CORE 15 SERVICES & MINI PROGRAMS GRID (4 x 4 완벽 칼정렬 그리드)
       ======================================================== */}
       <section className="w-full max-w-[1400px] mx-auto flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3" style={{gridAutoRows: '1fr'}}>
         
         {/* =========================================================================
-            ROW 1: AI & 스마트 포털 허브 (Royal Blue Top Accent 🔵)
+            ROW 1: AI & 스마트 포털 허브 (Royal Blue Top Accent 🔵 4칸)
         ========================================================================= */}
         
-        {/* CARD 1: AI 행정 챗봇 */}
+        {/* CARD 1: AI-SEN 행정챗봇 */}
         <a 
           href="https://chatbot.aisen.store" 
           target="_blank" 
           rel="noopener noreferrer"
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -109,7 +109,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              AI 행정 챗봇
+              AI-SEN 행정챗봇
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               102권 서고 지침서 1:1 쪽수 뷰어 및 국가법령 연동
@@ -122,14 +122,13 @@ export default function HomePage() {
           </div>
         </a>
 
-        {/* CARD 2: 스마트 여비정산기 */}
+        {/* CARD 2: AI-SEN 출장여비 */}
         <a 
           href="https://chatbot.aisen.store/travel" 
           target="_blank" 
           rel="noopener noreferrer"
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -146,7 +145,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              스마트 여비정산기
+              AI-SEN 출장여비
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               카카오 3개 경유지 및 오피넷 실시간 유가 연동 산출
@@ -154,17 +153,16 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
-            <span>정산기 열기</span>
+            <span>여비 산출</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </a>
 
-        {/* CARD 3: 업무 소통 게시판 */}
+        {/* CARD 3: AI-SEN 소통게시판 */}
         <Link 
           href="/board" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -181,7 +179,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              소통 게시판
+              AI-SEN 소통게시판
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               가입 없이 4자리 암호로 자유로운 실무 질의 및 공유
@@ -194,14 +192,13 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* CARD 4: 행정·민원 서식 68종 */}
+        {/* CARD 4: AI-SEN 행정서식 */}
         <a 
           href="https://chatbot.aisen.store?forms=1" 
           target="_blank" 
           rel="noopener noreferrer"
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -218,7 +215,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              행정·민원 서식
+              AI-SEN 행정서식
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               인사·복무 및 제증명 서식 실시간 미리보기 및 HWP 다운
@@ -232,120 +229,48 @@ export default function HomePage() {
         </a>
 
         {/* =========================================================================
-            ROW 2: 회계 & 예산 & 계약 (Emerald Green Top Accent 🟢)
+            ROW 2: 회계 & 계약 & 예산 (Emerald Green Top Accent 🟢 4칸 칼정렬)
         ========================================================================= */}
 
-        {/* CARD 5: 학교회계 대시보드 */}
-        <Link 
-          href="/tools/sfd" 
-          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
-        >
-          {/* Top Accent Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
-                <LayoutDashboard size={18} />
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
-                  2026 베타
-                </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
-              </div>
-            </div>
-
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
-              학교회계 대시보드
-            </h2>
-            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              세부사업·추경·지출집행 실시간 모니터링 분석
-            </p>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
-            <span>대시보드 열기</span>
-            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-          </div>
-        </Link>
-
-        {/* CARD 6: 예산정산 대시보드 */}
-        <Link 
-          href="/tools/budget-settle" 
-          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
-        >
-          {/* Top Accent Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
-                <ChartPie size={18} />
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
-                  세입세출 정산
-                </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
-              </div>
-            </div>
-
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
-              예산정산 대시보드
-            </h2>
-            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              수익자부담·목적사업비 세입세출 정산 및 잔액 분석
-            </p>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
-            <span>정산 분석</span>
-            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-          </div>
-        </Link>
-
-        {/* CARD: 서울교육 계약나침반 (계약 의사결정 & 서류간소화 맞춤 패키지 ⭐) */}
+        {/* CARD 5: AI-SEN 계약 (계약 의사결정 & 맞춤 서류간소화 팩 - 에메랄드 교정 ⭐) */}
         <Link 
           href="/tools/contract" 
-          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-blue-600 group-hover:h-[5px] transition-all" />
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
                 <Compass size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 whitespace-nowrap">
+                <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
                   2026 지침
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              서울교육 계약나침반
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
+              AI-SEN 계약
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              금액·유형별 계약방법 의사결정 &amp; 서류간소화 맞춤 패키지
+              2026 계약방법 의사결정 &amp; 맞춤 서류간소화 편철
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-blue-600 font-bold">
-            <span>나침반 열기</span>
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
+            <span>계약 검토</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 7: 스마트 원가계산서 검증기 (회계·계약 전진 배치 ⭐) */}
+        {/* CARD 6: AI-SEN 공사원가 (조달청 간접공사비 1원 역산 감사 ⭐) */}
         <Link 
           href="/tools/cost-audit" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -362,7 +287,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
-              스마트 원가계산서 검증기
+              AI-SEN 공사원가
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               조달청 법정 제비율 역산 대차대조 &amp; AI 서류판단 기능
@@ -370,56 +295,88 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
-            <span>검증기 열기</span>
+            <span>원가 검증</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 8: 체육관 사용료 계산기 */}
+        {/* CARD 7: AI-SEN 학교회계 (SFD 대시보드) */}
         <Link 
-          href="/tools/gym-calc" 
+          href="/tools/sfd" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
-                <Calculator size={18} />
+                <LayoutDashboard size={18} />
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
-                  조례 자동산출
+                  2026 베타
                 </span>
                 <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </div>
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
-              체육관 사용료
+              AI-SEN 학교회계
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              시설개방 조례 기준 대관료 및 냉난방비 자동 산출
+              세부사업·추경·지출집행 실시간 모니터링 분석
             </p>
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
-            <span>사용료 계산</span>
+            <span>대시보드 열기</span>
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </Link>
+
+        {/* CARD 8: AI-SEN 예산정산 (K-Edu 대시보드) */}
+        <Link 
+          href="/tools/budget-settle" 
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white"
+        >
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-emerald-600 group-hover:h-[5px] transition-all" />
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
+                <ChartPie size={18} />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[11.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 whitespace-nowrap">
+                  세입세출 정산
+                </span>
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
+              </div>
+            </div>
+
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
+              AI-SEN 예산정산
+            </h2>
+            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
+              수익자부담·목적사업비 세입세출 정산 및 잔액 분석
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-emerald-600 font-bold">
+            <span>정산 분석</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
         {/* =========================================================================
-            ROW 3: 행정 실무 자료실 & 문서 툴킷 (Purple Top Accent 🟣)
+            ROW 3: 행정 실무 자료실 & 문서 툴킷 (Purple Top Accent 🟣 4칸 칼정렬)
         ========================================================================= */}
 
-        {/* CARD 9: 행정 자료실 */}
+        {/* CARD 9: AI-SEN 행정서고 */}
         <Link 
           href="/archive" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -436,7 +393,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
-              행정 자료실
+              AI-SEN 행정서고
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               28개 분야 102권 공식 지침서 스트리밍 서고
@@ -444,17 +401,16 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
-            <span>자료실 보기</span>
+            <span>서고 열람</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 10: 나이스 임금대장 식대 분리기 */}
+        {/* CARD 10: AI-SEN 급여식대 */}
         <Link 
           href="/tools/sikdae" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -471,7 +427,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
-              임금대장 식대분리
+              AI-SEN 급여식대
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               나이스 임금대장 (이름-식대) 공제내역 간편 추출
@@ -479,17 +435,16 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
-            <span>공제내역 추출</span>
+            <span>식대 분리</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 11: 증빙서 측면표지 제작기 */}
+        {/* CARD 11: AI-SEN 지출바인더 */}
         <Link 
           href="/tools/label-maker" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -506,7 +461,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
-              증빙서 측면표지
+              AI-SEN 지출바인더
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               지출증빙서 측면 라벨 양식 자동 생성 및 규격 인쇄
@@ -514,17 +469,16 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
-            <span>표지 만들기</span>
+            <span>바인더 라벨</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 12: 엑셀시트 분리기 (실무 유틸리티 도메인 연계 ⭐) */}
+        {/* CARD 12: AI-SEN 엑셀분리 */}
         <Link 
           href="/tools/sheet-splitter" 
           className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-purple-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-purple-600 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -541,7 +495,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate">
-              엑셀시트 분리기
+              AI-SEN 엑셀분리
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장
@@ -549,56 +503,88 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-purple-600 font-bold">
-            <span>시트 분리하기</span>
+            <span>시트 분리</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
         {/* =========================================================================
-            ROW 4: 시즌 도면 & 힐링 (와이드 2x2 균형 배치 꽉 찬 그리드)
+            ROW 4: 공간 & 시설 & 힐링 (Rose Top Accent 🔴 4칸 칼정렬: 1칸 + 1칸 + 2칸 와이드)
         ========================================================================= */}
 
-        {/* CARD 13: 스마트 교실배치도 제작기 (2칸 와이드 카드) */}
+        {/* CARD 13: AI-SEN 시설대관 (구: 체육관 사용료 ➔ 4행 1칸 정렬) */}
         <Link 
-          href="/tools/classmap" 
-          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer bg-white"
+          href="/tools/gym-calc" 
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-indigo-600 group-hover:h-[5px] transition-all" />
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-rose-500 group-hover:h-[5px] transition-all" />
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 group-hover:scale-105 transition-transform">
-                <LayoutGrid size={18} />
+              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100 group-hover:scale-105 transition-transform">
+                <Calculator size={18} />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200 whitespace-nowrap">
-                  도면제작 &amp; 인쇄
+                <span className="text-[11.5px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200 whitespace-nowrap">
+                  조례 자동산출
                 </span>
-                <ArrowRight size={14} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
               </div>
             </div>
 
-            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
-              스마트 교실배치도 제작기
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
+              AI-SEN 시설대관
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
-              층별·특별실 평면도 시각화, 학년도별 교실배치 JSON 백업 및 A4 고화질 도면 출력
+              시설개방 조례 기준 체육관 대관료·냉난방비 자동 산출
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-indigo-600 font-bold">
-            <span>배치도 제작하기</span>
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-rose-600 font-bold">
+            <span>사용료 계산</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
 
-        {/* CARD 14: 수박 게임 (2칸 와이드 카드) */}
+        {/* CARD 14: AI-SEN 교실배치 (구: 교실배치도 ➔ 4행 1칸 정렬) */}
+        <Link 
+          href="/tools/classmap" 
+          className="relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
+        >
+          <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-rose-500 group-hover:h-[5px] transition-all" />
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100 group-hover:scale-105 transition-transform">
+                <LayoutGrid size={18} />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[11.5px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200 whitespace-nowrap">
+                  도면제작
+                </span>
+                <ArrowRight size={14} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
+              </div>
+            </div>
+
+            <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
+              AI-SEN 교실배치
+            </h2>
+            <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
+              본관·신관 층별 평면도 시각화 및 학년도별 교실 도면 출력
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-rose-600 font-bold">
+            <span>도면 제작</span>
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </Link>
+
+        {/* CARD 15: AI-SEN 힐링게임 (구: 수박 게임 ➔ 4행 2칸 와이드 정렬) */}
         <Link 
           href="/tools/watermelon" 
           className="col-span-2 sm:col-span-1 lg:col-span-2 relative overflow-hidden glass-card p-3.5 pt-4 flex flex-col justify-between h-[145px] group hover:border-rose-400 hover:shadow-md transition-all cursor-pointer bg-white"
         >
-          {/* Top Accent Stripe */}
           <div className="absolute top-0 left-0 right-0 h-[3.5px] bg-rose-500 group-hover:h-[5px] transition-all" />
 
           <div>
@@ -615,7 +601,7 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-[15.5px] font-bold text-slate-900 group-hover:text-rose-600 transition-colors truncate">
-              행정 힐링 수박 게임
+              AI-SEN 힐링게임
             </h2>
             <p className="text-[12.5px] text-slate-500 mt-1 line-clamp-1 font-medium">
               3D 물리엔진 과일 합성 진화 게임 &amp; 실시간 전국 랭킹 Top 10 (보스키 ` 탑재)
@@ -623,7 +609,7 @@ export default function HomePage() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[12px] text-rose-600 font-bold">
-            <span>게임 시작하기</span>
+            <span>게임 시작</span>
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </Link>
@@ -670,4 +656,3 @@ export default function HomePage() {
     </div>
   );
 }
-

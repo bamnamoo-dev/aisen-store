@@ -53,7 +53,7 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight">
-              아이센스토어
+              AI-SEN 포털
             </span>
             <span className="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
               Live
