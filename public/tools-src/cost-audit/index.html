@@ -949,6 +949,7 @@
             </button>
             <button class="btn btn-manual" onclick="openManualModal()" title="원가계산서 검증기 실무 사용설명서 열기">✨ 📖 사용설명서</button>
             <button class="btn btn-secondary" onclick="window.open('/board', '_blank')" title="실무 질의응답 및 서식 제보 소통 게시판">💬 소통 게시판</button>
+            <button class="btn btn-secondary" onclick="resetCostAuditData()" title="모든 입력값 초기화 및 새로 작성">🔄 새로 작성</button>
             <button class="btn btn-secondary" onclick="downloadStandardTemplate()" title="2026 조달청 표준 학교공사 원가계산서 엑셀 양식 다운로드">📥 표준 서식</button>
             <button class="btn btn-success" onclick="downloadAuditResultExcel()" title="현재 감사결과를 조달청 표준 스타일 엑셀로 다운로드">📊 결과 엑셀</button>
             <button class="btn btn-secondary" onclick="copyNotice()">📋 공문 복사</button>
@@ -1914,6 +1915,7 @@ function runCalculation(isFromDiffInput = false) {
     );
 
     document.getElementById("officialNoticeBox").innerText = notice.join("\n");
+    saveCostAuditState();
 }
 
 function updateVendorBreakdown(id, val) {
@@ -1933,6 +1935,7 @@ function copyNotice() {
 
 // AI-SEN 계약나침반으로 확정 공사비 및 공종 원클릭 전송 (Step 2 데이터 파이프라인)
 function goToContractCompass() {
+    saveCostAuditState();
     var stdEl = document.getElementById('dispStandardTotal');
     var venEl = document.getElementById('dispVendorTotal');
     var stdVal = stdEl ? getCleanNumber(stdEl.innerText) : 0;
@@ -1969,6 +1972,76 @@ function goToContractCompass() {
         window.top.location.href = url;
     } else {
         window.location.href = url;
+    }
+}
+
+// =========================================================================
+// 원가계산서 입력 데이터 로컬 자동저장 & 복원 (페이지 이동 시 휘발 방지)
+// =========================================================================
+function saveCostAuditState() {
+    try {
+        const state = {
+            title: document.getElementById("inProjectTitle") ? document.getElementById("inProjectTitle").value : "",
+            period: document.getElementById("inPeriodDays") ? document.getElementById("inPeriodDays").value : "0",
+            vendorTotal: document.getElementById("inVendorTotal") ? document.getElementById("inVendorTotal").value : "0",
+            directMat: document.getElementById("inDirectMat") ? document.getElementById("inDirectMat").value : "0",
+            directLab: document.getElementById("inDirectLab") ? document.getElementById("inDirectLab").value : "0",
+            outputExp: document.getElementById("inOutputExp") ? document.getElementById("inOutputExp").value : "0",
+            clientMat: document.getElementById("inClientMat") ? document.getElementById("inClientMat").value : "0",
+            wasteCost: document.getElementById("inWasteCost") ? document.getElementById("inWasteCost").value : "0",
+            trade: document.getElementById("selTrade") ? document.getElementById("selTrade").value : "building",
+            version: document.getElementById("selVersion") ? document.getElementById("selVersion").value : "2026.04.13",
+            vendorBreakdown: vendorBreakdown || {}
+        };
+        const hasData = state.title || getCleanNumber(state.vendorTotal) > 0 || getCleanNumber(state.directMat) > 0 || getCleanNumber(state.directLab) > 0 || getCleanNumber(state.wasteCost) > 0;
+        if (hasData) {
+            localStorage.setItem("cost_audit_saved_state", JSON.stringify(state));
+        }
+    } catch (e) {
+        console.warn("Autosave failed:", e);
+    }
+}
+
+function restoreCostAuditState() {
+    try {
+        const savedStr = localStorage.getItem("cost_audit_saved_state");
+        if (!savedStr) return false;
+        const s = JSON.parse(savedStr);
+        if (!s) return false;
+
+        if (s.title && document.getElementById("inProjectTitle")) document.getElementById("inProjectTitle").value = s.title;
+        if (s.period !== undefined && document.getElementById("inPeriodDays")) document.getElementById("inPeriodDays").value = s.period;
+        if (s.vendorTotal && document.getElementById("inVendorTotal")) document.getElementById("inVendorTotal").value = s.vendorTotal;
+        if (s.directMat && document.getElementById("inDirectMat")) document.getElementById("inDirectMat").value = s.directMat;
+        if (s.directLab && document.getElementById("inDirectLab")) document.getElementById("inDirectLab").value = s.directLab;
+        if (s.outputExp && document.getElementById("inOutputExp")) document.getElementById("inOutputExp").value = s.outputExp;
+        if (s.clientMat && document.getElementById("inClientMat")) document.getElementById("inClientMat").value = s.clientMat;
+        if (s.wasteCost && document.getElementById("inWasteCost")) document.getElementById("inWasteCost").value = s.wasteCost;
+        if (s.trade && document.getElementById("selTrade")) document.getElementById("selTrade").value = s.trade;
+        if (s.version && document.getElementById("selVersion")) document.getElementById("selVersion").value = s.version;
+        if (s.vendorBreakdown && typeof s.vendorBreakdown === 'object') {
+            vendorBreakdown = s.vendorBreakdown;
+        }
+        return true;
+    } catch (e) {
+        console.warn("Autorestore failed:", e);
+        return false;
+    }
+}
+
+function resetCostAuditData() {
+    if (confirm('현재 입력된 모든 원가계산서 데이터를 초기화하고 새로 작성하시겠습니까?')) {
+        localStorage.removeItem("cost_audit_saved_state");
+        if (document.getElementById("inProjectTitle")) document.getElementById("inProjectTitle").value = "";
+        if (document.getElementById("inPeriodDays")) document.getElementById("inPeriodDays").value = "0";
+        if (document.getElementById("inVendorTotal")) document.getElementById("inVendorTotal").value = "0";
+        if (document.getElementById("inDirectMat")) document.getElementById("inDirectMat").value = "0";
+        if (document.getElementById("inDirectLab")) document.getElementById("inDirectLab").value = "0";
+        if (document.getElementById("inOutputExp")) document.getElementById("inOutputExp").value = "0";
+        if (document.getElementById("inClientMat")) document.getElementById("inClientMat").value = "0";
+        if (document.getElementById("inWasteCost")) document.getElementById("inWasteCost").value = "0";
+        vendorBreakdown = {};
+        runCalculation();
     }
 }
 
@@ -4068,6 +4141,7 @@ function downloadAuditResultExcel() {
 // 초기 실행
 window.onload = function() {
     initTheme();
+    restoreCostAuditState();
     runCalculation();
 };
 </script>
