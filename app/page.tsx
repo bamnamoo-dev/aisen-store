@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[12px] font-bold text-blue-700 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-            <span>전국 교육행정 올인원 통합 포털</span>
+            <span>서울특별시교육청 올인원 통합 포털</span>
           </div>
 
           <button
@@ -56,7 +56,7 @@ export default function HomePage() {
             title="AI-SEN 포털 및 15개 기능별 이용안내 열기"
           >
             <BookOpen size={13} className="text-blue-200 group-hover:scale-110 transition-transform" />
-            <span>📖 AI-SEN 이용안내</span>
+            <span>AI-SEN 이용안내</span>
           </button>
         </div>
 
@@ -608,7 +608,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[11.5px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200 whitespace-nowrap">
-                  전국 교직원 랭킹
+                  서울 교직원 랭킹
                 </span>
                 <ArrowRight size={14} className="text-slate-400 group-hover:text-rose-600 transition-colors" />
               </div>

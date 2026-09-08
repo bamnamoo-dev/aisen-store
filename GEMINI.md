@@ -10,7 +10,7 @@
 - **로컬 경로**: `G:\내 드라이브\antigravity\asisen-store\`
 - **GitHub**: `https://github.com/bamnamoo-dev/aisen-store.git`
 - **주요 기술 스택**: Next.js 14/15 (App Router), React, TypeScript, Tailwind CSS, Supabase, Lucide React
-- **역할**: 전국의 모든 교육행정 실무 도구, 102권 공식 지침서 서고, RAG 챗봇, 스마트 여비정산기, 소통 게시판을 원스톱으로 제공하는 통합 관제 허브
+- **역할**: 서울특별시교육청 산하 모든 교육행정 실무 도구, 102권 공식 지침서 서고, RAG 챗봇, 스마트 여비정산기, 소통 게시판을 원스톱으로 제공하는 통합 관제 허브
 
 ### 주요 라우트 구조
 - `/` : 대형 스마트 검색 옴니바 + 15개 핵심 서비스 인터랙티브 그리드 카드 (4 × 4 행별 컬러/업무 완벽 칼정렬)

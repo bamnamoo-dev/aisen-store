@@ -194,7 +194,7 @@ export default function Sidebar() {
               >
                 <div className="flex items-center gap-2.5">
                   <BookOpen size={17} />
-                  <span>📖 AI-SEN 이용안내</span>
+                  <span>AI-SEN 이용안내</span>
                 </div>
                 <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded border ${
                   pathname === '/guide' ? 'bg-white/20 text-white border-white/30' : 'bg-indigo-100 text-indigo-800 border-indigo-300'
@@ -344,7 +344,7 @@ export default function Sidebar() {
             >
               <div className="flex items-center gap-2">
                 <BookOpen size={16} className={pathname === '/guide' ? 'text-white' : 'text-indigo-600'} />
-                <span>📖 AI-SEN 이용안내</span>
+                <span>AI-SEN 이용안내</span>
               </div>
               <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded border ${
                 pathname === '/guide' ? 'bg-white/20 text-white border-white/30' : 'bg-indigo-100 text-indigo-800 border-indigo-300'

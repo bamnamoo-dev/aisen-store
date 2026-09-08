@@ -238,7 +238,7 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 mb-3">
-                  복잡한 회원가입 없이 4자리 간이 비밀번호만으로 전국의 교육행정 실무자들과 자유롭게 질문하고 노하우를 공유합니다.
+                  복잡한 회원가입 없이 4자리 간이 비밀번호만으로 서울특별시교육청 및 학교 교육행정 실무자들과 자유롭게 질문하고 노하우를 공유합니다.
                 </p>
                 <div className="flex flex-wrap gap-1 text-[11px] text-slate-500 font-medium">
                   <span className="bg-slate-100 px-2 py-0.5 rounded">가입 없는 4자리 핀</span>
@@ -693,11 +693,11 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 mb-3">
-                  과일을 떨어뜨려 합치는 2D 물리 퍼즐 게임으로, 전국 교직원 실시간 랭킹과 긴급 엑셀 위장 보스키(`` ` `` 백틱 키)를 제공합니다.
+                  과일을 떨어뜨려 합치는 2D 물리 퍼즐 게임으로, 서울 교직원 실시간 랭킹과 긴급 엑셀 위장 보스키(`` ` `` 백틱 키)를 제공합니다.
                 </p>
                 <div className="flex flex-wrap gap-1 text-[11px] text-slate-500 font-medium">
                   <span className="bg-slate-100 px-2 py-0.5 rounded">물리 퍼즐 힐링</span>
-                  <span className="bg-slate-100 px-2 py-0.5 rounded">전국 랭킹 Top 10</span>
+                  <span className="bg-slate-100 px-2 py-0.5 rounded">서울 랭킹 Top 10</span>
                   <span className="bg-slate-100 px-2 py-0.5 rounded">엑셀 위장 보스키</span>
                 </div>
               </div>
