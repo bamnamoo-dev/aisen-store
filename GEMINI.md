@@ -19,7 +19,7 @@
   - **3행 (행정 실무 & 서고 🟣 4칸)**: AI-SEN 행정서고(102권), AI-SEN 급여식대, AI-SEN 지출바인더, AI-SEN 엑셀분리
   - **4행 (공간 & 시설 & 힐링 🔴 4칸)**: AI-SEN 시설대관(1칸), AI-SEN 교실배치(1칸), AI-SEN 힐링게임(2칸 와이드)
 - `/archive` : 28개 분야 102권 공식 지침서 스트리밍 서고
-- `/guide` : AI-SEN 통합 이용안내 & 실무 가이드 (상황별 6대 빠른 길찾기, 2026 감사 방어 치트시트, A4 2장 인쇄 완비)
+- `/guide` : AI-SEN 포털 & 기능별 이용안내 (메인 포털 개요 및 15대 전문 행정 도구 5대 탭별 핵심 안내, 1360px 대형 와이드 뷰어)
 - `/tools` : 행정 미니프로그램 모음 및 관리자 등록/수정/삭제 포털
 - `/board` : 회원가입 없이 4자리 암호로 질의/공유하는 실무 소통 게시판
 - `/chatbot` : Gemini 기반 맞춤 챗봇 모음
@@ -87,7 +87,7 @@
   - `tools` : 미니프로그램 목록 (id, title, description, url, category, icon_type)
   - `posts` / `comments` : 소통 게시판 익명 게시글 및 댓글 (password 해시 또는 4자리 핀)
   - `documents` / `guidelines` : 102권 서고 스트리밍 메타데이터
-  - `watermelon_rankings` : 수박 게임 전국 실시간 랭킹 기록 (name, score, created_at)
+  - `watermelon_rankings` : 수박 게임 서울 실시간 랭킹 기록 (name, score, created_at)
 
 ---
 
