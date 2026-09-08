@@ -1,6 +1,6 @@
 'use client';
 
-import { Calculator, MessageSquare, BookOpen } from 'lucide-react';
+import { Calculator, MessageSquare, BookOpen, Moon, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState, useEffect } from 'react';
 import ToolHeader from '@/components/ToolHeader';
@@ -37,14 +37,34 @@ export default function CostAuditPage() {
     }
   };
 
+  const handleToggleTheme = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      try {
+        (iframeRef.current.contentWindow as any).toggleTheme?.();
+      } catch (e) {
+        console.error('Failed to toggle theme:', e);
+      }
+    }
+  };
+
+  const handleResetCostAudit = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      try {
+        (iframeRef.current.contentWindow as any).resetCostAuditData?.();
+      } catch (e) {
+        console.error('Failed to reset cost audit data:', e);
+      }
+    }
+  };
+
   return (
     <div className="w-full flex flex-col h-[calc(100vh-56px)] md:h-screen bg-slate-900 overflow-hidden relative">
       
       {/* 겹침 없는 통합 스마트 헤더 */}
       <ToolHeader 
-        title="AI-SEN 공사원가 (AI-SEN Cost Audit)"
-        icon={<Calculator size={15} className="text-blue-500" />}
-        themeColor="blue"
+        title="AI-SEN 공사원가 (2026 조달청 제비율 역산 감사)"
+        icon={<Calculator size={15} className="text-emerald-500" />}
+        themeColor="emerald"
         onReload={handleReload}
         extraAction={
           <div className="flex items-center gap-1.5 sm:gap-2">
@@ -55,6 +75,24 @@ export default function CostAuditPage() {
             >
               <BookOpen size={13} className="text-amber-700" />
               <span>사용설명서</span>
+            </button>
+
+            <button
+              onClick={handleToggleTheme}
+              className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              title="화면 테마 전환 (다크/라이트)"
+            >
+              <Moon size={13} className="text-slate-600" />
+              <span className="hidden sm:inline">테마</span>
+            </button>
+
+            <button
+              onClick={handleResetCostAudit}
+              className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              title="모든 입력값 초기화 및 새로 작성"
+            >
+              <RotateCcw size={13} className="text-emerald-600" />
+              <span className="hidden sm:inline">새로 작성</span>
             </button>
 
             <Link
