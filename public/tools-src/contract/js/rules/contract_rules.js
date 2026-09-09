@@ -1878,8 +1878,7 @@ function generateDraftMemoText({ category, typeName, typeCode, projectTitle = ''
 5. 단계별 주요 구비 서류 (서울시교육청 지침 [붙임 4] 준수)
 ${docsText}
 
-작성일자: ${dateStr}
-작성자: 행정실 계약담당자 (인)`;
+작성일자: ${dateStr}`;
 }
 
 // =============================================================================
