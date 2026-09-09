@@ -1843,6 +1843,32 @@ function generateDraftMemoText({ category, typeName, typeCode, projectTitle = ''
     else if (typeCode === 'B13') splitLawClause = '\n  라. 「청소년활동진흥법」 및 ★2026학년도 서울특별시교육청 현장체험학습 길라잡이';
   }
 
+  // 결정 사유 문안 동적 구성 (빈 줄 공백 방지)
+  const reasonLines = [
+    `본 건(${projectTitle ? `${projectTitle}, ` : ''}유형: ${typeName})의 추정가격은 금${priceFormatted}원으로, ${selectedMethod.legalDesc}`
+  ];
+
+  if (selectedMethod.id.includes('QUOTATION')) {
+    reasonLines.push(platformRationale);
+  }
+  if (typeCode.startsWith('B36')) {
+    reasonLines.push('아울러 본 건은 관계 법령에 따른 법정 의무 분리발주 대상 공사로서, 타 공종(건축·토목 등)과 통합 발주하지 않고 해당 전문등록면허 자격을 갖춘 업체와 개별 분리 계약을 추진하고자 함.');
+  }
+  if (['B07', 'B12', 'B13'].includes(typeCode)) {
+    reasonLines.push('아울러 본 건은 학생 현장체험학습 관련 용역으로서, 「★2026학년도 서울특별시교육청 현장체험학습 길라잡이」에 의거하여 학생 안전관리 기준(안전요원 연수이수증, TS교통안전정보, 숙박시설 안전점검 등)을 준수하고 90일 이내 분할 수의계약 금지 규정을 철저히 점검하여 추진하고자 함.');
+  }
+  if (selectedMethod.id === 'MEAL_SERVICE_EAT') {
+    reasonLines.push('아울러 본 건은 학생 급식 식재료 구매 건으로, 서울특별시교육청 학교급식 기본방향에 따라 안전성과 위생이 검증된 공급업체 조달을 위해 한국농수산식품유통공사(aT) 학교급식전자조달시스템(eaT)을 활용하여 추진하고자 함.');
+  }
+  if (selectedMethod.id === 'SOLE_SOURCE_DISABLED_FACILITY') {
+    reasonLines.push('아울러 본 건은 「중증장애인생산품 우선구매 특별법」 제7조 제5항 및 「지방계약법 시행령」 제25조 제1항 제7호의2 나목에 의거 보건복지부 지정 중증장애인생산품 생산시설과의 계약으로서 금액 한도 제한 없이 1인 견적 수의계약 특례를 적용함.');
+  }
+  if (isFemaleCompany) {
+    reasonLines.push('아울러 계약상대자는 중소벤처기업부 확인을 득한 여성기업으로 확인되어 1인 견적 수의계약 특례를 적용함.');
+  }
+
+  const reasonsText = reasonLines.map(line => `    ${line}`).join('\n');
+
   return `[계약방법 결정 사유서 (내부결재용)]
 
 1. 관련
@@ -1861,14 +1887,7 @@ function generateDraftMemoText({ category, typeName, typeCode, projectTitle = ''
   나. 계약 추진 플랫폼: ${selectedMethod.platform}
   다. 관련 법적 근거: ${selectedMethod.legalClause}
   라. 결정 사유:
-    본 건(${projectTitle ? `${projectTitle}, ` : ''}유형: ${typeName})의 추정가격은 금${priceFormatted}원으로, ${selectedMethod.legalDesc}
-    ${selectedMethod.id.includes('QUOTATION') ? platformRationale : ''}
-    ${typeCode.startsWith('B36') ? '아울러 본 건은 관계 법령에 따른 법정 의무 분리발주 대상 공사로서, 타 공종(건축·토목 등)과 통합 발주하지 않고 해당 전문등록면허 자격을 갖춘 업체와 개별 분리 계약을 추진하고자 함.' : ''}
-    ${['B07', 'B12', 'B13'].includes(typeCode) ? '아울러 본 건은 학생 현장체험학습 관련 용역으로서, 「★2026학년도 서울특별시교육청 현장체험학습 길라잡이」에 의거하여 학생 안전관리 기준(안전요원 연수이수증, TS교통안전정보, 숙박시설 안전점검 등)을 준수하고 90일 이내 분할 수의계약 금지 규정을 철저히 점검하여 추진하고자 함.' : ''}
-    ${selectedMethod.id === 'MEAL_SERVICE_EAT' ? '아울러 본 건은 학생 급식 식재료 구매 건으로, 서울특별시교육청 학교급식 기본방향에 따라 안전성과 위생이 검증된 공급업체 조달을 위해 한국농수산식품유통공사(aT) 학교급식전자조달시스템(eaT)을 활용하여 추진하고자 함.' : ''}
-    ${selectedMethod.id === 'SOLE_SOURCE_DISABLED_FACILITY' ? '아울러 본 건은 「중증장애인생산품 우선구매 특별법」 제7조 제5항 및 「지방계약법 시행령」 제25조 제1항 제7호의2 나목에 의거 보건복지부 지정 중증장애인생산품 생산시설과의 계약으로서 금액 한도 제한 없이 1인 견적 수의계약 특례를 적용함.' : ''}
-    ${isFemaleCompany ? '아울러 계약상대자는 중소벤처기업부 확인을 득한 여성기업으로 확인되어 1인 견적 수의계약 특례를 적용함.' : ''}
-    ${projectTitle ? '공사원가계산서 제비율 및 관련 회계 법령에 따른 역산 검증을 완료하였으며, 동일 회계연도 내 분할 수의계약(일감 쪼개기) 금지 규정을 철저히 점검하여 ' : ''}청렴하고 적법한 학교회계 집행을 위해 상기 계약방법으로 추진하고자 합니다.
+${reasonsText}
 
 4. 낙찰자 결정 및 계약 조건
   - 공고(안내) 기간: ${selectedMethod.noticeDays}
