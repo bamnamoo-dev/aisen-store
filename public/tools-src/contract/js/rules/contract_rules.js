@@ -1818,12 +1818,12 @@ function generateDraftMemoText({ category, typeName, typeCode, projectTitle = ''
 
   const projectDisplay = projectTitle ? `「${projectTitle}」` : `「${typeName}」`;
 
-  // 구비서류 목록 텍스트 생성
+  // 구비서류 목록 텍스트 생성 (기안문 가독성을 위해 불필요하게 길어지는 법적 근거 표시는 제외)
   const stageGroups = {};
   requiredDocs.forEach(d => {
     const st = d.stage || '기타';
     if (!stageGroups[st]) stageGroups[st] = [];
-    stageGroups[st].push(`    - ${d.name}${d.exemptible ? ' [생략 가능]' : ' [필수 징구]'}${d.basis ? ` [근거: ${d.basis}]` : ''}${d.note ? ` (${d.note})` : ''}`);
+    stageGroups[st].push(`    - ${d.name}${d.exemptible ? ' [생략 가능]' : ' [필수 징구]'}${d.note ? ` (${d.note})` : ''}`);
   });
   const docsText = Object.entries(stageGroups)
     .map(([st, items]) => `  가. ${st}\n${items.join('\n')}`)
