@@ -315,6 +315,7 @@ export class WizardComponent {
               </div>
             </label>
 
+            ${this.state.category !== 'construction' ? `
             <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem; border: 1.5px solid #6ee7b7; border-radius: var(--radius-md); background: #f0fdf4; cursor: pointer;">
               <input type="checkbox" id="chk-severe-disabled" ${this.state.isSevereDisabledFacility ? 'checked' : ''} style="width: 18px; height: 18px;" />
               <div>
@@ -322,6 +323,7 @@ export class WizardComponent {
                 <p style="font-size: 0.775rem; color: #047857;">「중증장애인생산품 특별법」 제7조제5항 및 시행령 제25조제1항제7호의2: <b>금액 한도 없는 수의계약 특례</b> (연간 4회 제한 제외)</p>
               </div>
             </label>
+            ` : ''}
 
             <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem; border: 1px solid var(--neutral-200); border-radius: var(--radius-md); background: var(--surface-white); cursor: pointer;">
               <input type="checkbox" id="chk-social" ${this.state.isSocialEnterprise ? 'checked' : ''} style="width: 18px; height: 18px;" />
@@ -429,6 +431,9 @@ export class WizardComponent {
         const validCodes = OFFICIAL_SEN_TYPES[cat].map(t => t.code);
         this.state.category = cat;
         this.state.typeCode = validCodes[0];
+        if (cat === 'construction') {
+          this.state.isSevereDisabledFacility = false;
+        }
 
         this.render();
         this.bindEvents();

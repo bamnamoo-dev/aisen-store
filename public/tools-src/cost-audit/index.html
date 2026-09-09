@@ -1162,7 +1162,7 @@
             <div class="tip-box" style="margin-top:4px; padding:3px 9px; font-size:10.5px; line-height:1.35;">
                 <span style="font-weight:bold; font-size:10.5px; white-space:nowrap;">⚠️ 핵심 체크:</span>
                 <span>• <strong>30일 미만</strong>: 건강·연금·요양 0원</span>
-                <span>• <strong>환경보전비</strong>: 실내보수 0원</span>
+                <span>• <strong>환경보전비</strong>: 건축 0.3%·토목 0.5% (실내 0원)</span>
                 <span>• <strong>일반관리비</strong>: 5억 미만 8%</span>
                 <span>• <strong>이윤</strong>: 재료비 제외 15%</span>
                 <span>• <strong>산안비</strong>: 관급 포함 120% 캡</span>
@@ -1776,7 +1776,8 @@ function runCalculation(isFromDiffInput = false) {
 
     const otherExpCap = floor((directMat + laborTotal) * otherExpRate);
     // 조달청 기준: 환경보전비 및 보증수수료 대상액은 직접공사비(directBase)
-    const envCap = floor(directBase * (fixed.env || 0.003));
+    const envRate = fixed.env !== undefined ? fixed.env : (trade === 'civil' ? 0.005 : (trade === 'building' ? 0.003 : 0));
+    const envCap = floor(directBase * envRate);
     const subGuarCap = floor(directBase * (fixed.subGuar || 0.00081));
     const machGuarCap = floor(directBase * (fixed.machGuar || 0.0018));
     const asbestosCap = floor(indAccCap * (fixed.asbestos || 0.00006));
@@ -1807,7 +1808,7 @@ function runCalculation(isFromDiffInput = false) {
         { id: 'elderly_care', name: '노인장기요양보험', std: careCap, desc: period < 30 ? '30일 미만 제외(0원)' : '의무 계상' },
         { id: 'safety_management', name: '산업안전보건관리비', std: safetyCap, desc: safetyNote },
         { id: 'retirement_deduction', name: '퇴직공제부금비', std: retireCap, desc: directBase < retireThreshold ? '의무금액 미달(0원)' : '의무 계상' },
-        { id: 'environment_preservation', name: '환경보전비', std: envCap, desc: `상한 ${((fixed.env||0.003)*100).toFixed(1)}% (실내보수 준공시 0원 감액)` },
+        { id: 'environment_preservation', name: '환경보전비', std: envCap, desc: envRate > 0 ? `상한 ${(envRate*100).toFixed(1)}% (${trade === 'civil' ? '조달청 토목 기준 실비정산' : '실내보수 준공시 0원 감액'})` : '해당 공종 법적 계상 제외 (0원)' },
         { id: 'other_expense', name: '기타경비', std: otherExpCap, desc: `상한 ${(otherExpRate*100).toFixed(1)}%` },
         { id: 'wage_claim', name: '임금채권부담금', std: wageClaimCap, desc: '요율 0.09% (노무비 합계)' },
         { id: 'asbestos_relief', name: '석면분담금', std: asbestosReliefCap, desc: '요율 0.006% (노무비 합계)' },
@@ -3266,38 +3267,39 @@ function downloadStandardTemplate() {
         };
         const tradeName = tradeNames[trade] || "건축공사";
 
-        // 공종별 안전 요율 매핑
+        // 공종별 안전 요율 매핑 (2026 조달청 최신 제비율 100% 동기화)
         const tradeRatesMap = {
-            building: { indLab: 0.145, otherExp: 0.0535, safety: 0.0293 },
-            civil: { indLab: 0.191, otherExp: 0.055, safety: 0.0315 },
-            electrical: { indLab: 0.125, otherExp: 0.060, safety: 0.0207 },
-            telecom: { indLab: 0.115, otherExp: 0.050, safety: 0.0207 },
-            fire: { indLab: 0.115, otherExp: 0.055, safety: 0.0207 },
-            asbestos: { indLab: 0.175, otherExp: 0.050, safety: 0.0311 }
+            building: { indLab: 0.175, otherExp: 0.050, safety: 0.0311, env: 0.003 },
+            civil: { indLab: 0.191, otherExp: 0.055, safety: 0.0315, env: 0.005 },
+            electrical: { indLab: 0.125, otherExp: 0.060, safety: 0.0207, env: 0 },
+            telecom: { indLab: 0.115, otherExp: 0.050, safety: 0.0207, env: 0 },
+            fire: { indLab: 0.115, otherExp: 0.055, safety: 0.0207, env: 0 },
+            asbestos: { indLab: 0.175, otherExp: 0.050, safety: 0.0311, env: 0 }
         };
         const curRates = tradeRatesMap[trade] || tradeRatesMap.building;
         const indLabRate = curRates.indLab;
         const otherExpRate = curRates.otherExp;
         const safetyRate = curRates.safety;
+        const envRate = curRates.env;
 
-        // 기본 예시 수치
+        // 기본 예시 수치 (2026 조달청 최신 법정 요율)
         const baseMat = 5000000;
         const baseLab = 4000000;
         const calcIndLab = Math.round(baseLab * indLabRate);
         const calcLabTotal = baseLab + calcIndLab;
         const calcOtherExp = Math.round((baseMat + calcLabTotal) * otherExpRate);
-        const calcAccident = Math.round(calcLabTotal * 0.037);
-        const calcEmploy = Math.round(calcLabTotal * 0.0098);
-        const calcHealth = Math.round(baseLab * 0.03545);
-        const calcPension = Math.round(baseLab * 0.045);
-        const calcCare = Math.round(calcHealth * 0.1295);
+        const calcAccident = Math.round(calcLabTotal * 0.0356);
+        const calcEmploy = Math.round(calcLabTotal * 0.0101);
+        const calcHealth = Math.round(baseLab * 0.03595);
+        const calcPension = Math.round(baseLab * 0.0475);
+        const calcCare = Math.round(calcHealth * 0.1314);
         const calcSafety = (baseMat + baseLab) >= 20000000 ? Math.round((baseMat + baseLab) * safetyRate) : 0;
-        const calcEnv = Math.round((baseMat + calcLabTotal) * 0.003);
+        const calcEnv = Math.round((baseMat + calcLabTotal) * envRate);
         const calcWage = Math.round(calcLabTotal * 0.0009);
         const calcAsbestos = Math.round(calcLabTotal * 0.00006);
         const calcExpTotal = calcOtherExp + calcAccident + calcEmploy + calcHealth + calcPension + calcCare + calcSafety + calcEnv + calcWage + calcAsbestos;
         const calcNetCost = baseMat + calcLabTotal + calcExpTotal;
-        const calcAdmin = Math.round(calcNetCost * 0.06);
+        const calcAdmin = Math.round(calcNetCost * 0.08);
         const calcProfit = Math.round((calcLabTotal + calcExpTotal + calcAdmin) * 0.15);
         const calcTotalCost = calcNetCost + calcAdmin + calcProfit;
         const calcVat = Math.round(calcTotalCost * 0.10);
@@ -3318,19 +3320,19 @@ function downloadStandardTemplate() {
             ["[노무비 소계]", calcLabTotal, "-", "직접노무비 + 간접노무비", "-"],
             ["기계경비 (산출경비)", 0, "-", "중장비 임대료 및 유류대 등 품셈 실비", "● [정상] 품셈 기준 실비"],
             ["기타경비", calcOtherExp, otherExpRate, "(재료비 소계 + 노무비 소계) × 기타경비율", "● [적합] 법정 요율 이내"],
-            ["산재보험료", calcAccident, 0.037, "노무비 소계 × 3.70% (1일 이상 공사 의무 계상)", "● [의무] 1일 이상 의무 계상"],
-            ["고용보험료", calcEmploy, 0.0098, "노무비 소계 × 0.98% (1일 이상 공사 의무 계상)", "● [의무] 1일 이상 의무 계상"],
-            ["국민건강보험료", calcHealth, 0.03545, "직접노무비 × 3.545% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
-            ["국민연금보험료", calcPension, 0.045, "직접노무비 × 4.500% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
-            ["노인장기요양보험", calcCare, 0.1295, "국민건강보험료 × 12.95% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
-            ["산업안전보건관리비", calcSafety, safetyRate, "(직접재료비 + 직접노무비) × 2.93% (2천만 이상 의무)", (baseMat + baseLab) >= 20000000 ? "● [적합] 대상액 2천만 이상 의무 계상" : "● [오류] 대상액 2천만 미만 의무면제(0원)"],
+            ["산재보험료", calcAccident, 0.0356, "노무비 소계 × 3.56% (1일 이상 공사 의무 계상)", "● [의무] 1일 이상 의무 계상"],
+            ["고용보험료", calcEmploy, 0.0101, "노무비 소계 × 1.01% (1일 이상 공사 의무 계상)", "● [의무] 1일 이상 의무 계상"],
+            ["국민건강보험료", calcHealth, 0.03595, "직접노무비 × 3.595% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
+            ["국민연금보험료", calcPension, 0.0475, "직접노무비 × 4.750% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
+            ["노인장기요양보험", calcCare, 0.1314, "국민건강보험료 × 13.14% (※ 30일 이상 의무 계상)", "● [적합] 30일 이상 의무 계상"],
+            ["산업안전보건관리비", calcSafety, safetyRate, `(직접재료비 + 직접노무비) × ${(safetyRate * 100).toFixed(2)}% (2천만 이상 의무)`, (baseMat + baseLab) >= 20000000 ? "● [적합] 대상액 2천만 이상 의무 계상" : "● [오류] 대상액 2천만 미만 의무면제(0원)"],
             ["퇴직공제부금비", 0, 0.023, "직접노무비 × 2.30% (순공사 1억 이상 의무 계상)", "● [정상] 1억 원 미만 공사 0원"],
-            ["환경보전비", calcEnv, 0.003, "직접공사비(재료+노무+기계) × 0.30%", "● [주의] 실내보수 등 미발생시 준공 감액"],
+            ["환경보전비", calcEnv, envRate, envRate > 0 ? `직접공사비 × ${(envRate * 100).toFixed(2)}%` : "해당 공종 계상 제외 (0원)", envRate > 0 ? (trade === 'civil' ? "● [주의] 조달청 토목 기준 실비 정산" : "● [주의] 실내보수 등 미발생시 준공 감액") : "● [정상] 계상 제외 대상"],
             ["임금채권부담금", calcWage, 0.0009, "노무비 소계 × 0.09%", "● [적합] 법정 요율 이내"],
             ["석면분담금", calcAsbestos, 0.00006, "노무비 소계 × 0.006%", "● [적합] 법정 요율 이내"],
             ["[경비 소계]", calcExpTotal, "-", "기타경비 + 4대보험 + 산안비 + 환경보전비 등 일체 경비 합계", "-"],
             ["[순공사원가]", calcNetCost, "-", "재료비 소계 + 노무비 소계 + 경비 소계", "-"],
-            ["일반관리비", calcAdmin, 0.06, "순공사원가 × 6.00% (기재부 계약예규 상한)", "● [적합] 법정 상한(6%) 이내"],
+            ["일반관리비", calcAdmin, 0.08, "순공사원가 × 8.00% (기재부 계약예규 5억 미만 상한)", "● [적합] 법정 상한(8%) 이내"],
             ["이윤", calcProfit, 0.15, "(노무비 소계 + 경비 소계 + 일반관리비) × 15.00% (※ 재료비 제외)", "● [적합] 법정 상한(15%) 이내 (재료비 제외)"],
             ["폐기물처리비", 0, "-", "폐기물처리 실비 (별도 정산)", "● [정상] 폐기물 실비 별도정산"],
             ["[총원가]", calcTotalCost, "-", "순공사원가 + 일반관리비 + 이윤 + 폐기물처리비", "-"],
@@ -3340,7 +3342,7 @@ function downloadStandardTemplate() {
             ["■ 2026 조달청 간접공사비 작성 핵심 수칙 안내:", "", "", "", ""],
             ["  1. [30일 미만 단기공사]: 공사기간이 30일 미만(D2셀)인 경우 국민건강, 국민연금, 노인장기요양보험료는 법적으로 반드시 0원으로 계상해야 합니다.", "", "", "", ""],
             ["  2. [산업안전보건관리비]: 대상액(직접재료비+직접노무비) 2천만 원 미만 공사는 의무 계상 대상에서 제외됩니다.", "", "", "", ""],
-            ["  3. [일반관리비 및 이윤]: 일반관리비는 순공사원가의 6.0%(5억 미만), 이윤은 (노무비+경비+일반관리비)의 15.0%를 절대 초과할 수 없습니다.", "", "", "", ""],
+            ["  3. [일반관리비 및 이윤]: 일반관리비는 순공사원가의 8.0%(5억 미만 / 기재부 계약예규 상한), 이윤은 (노무비+경비+일반관리비)의 15.0%를 절대 초과할 수 없습니다.", "", "", "", ""],
             ["  4. [사후정산제도]: 국민건강, 국민연금, 노인장기요양, 퇴직공제, 환경보전비는 준공 시 납부확인서 증빙 실비로 사후 정산됩니다.", "", "", "", ""]
         ];
 
@@ -3577,7 +3579,7 @@ function downloadStandardTemplate() {
 
         // 환경보전비, 임금채권, 석면
         ws['B21'] = { t: 'n', f: 'ROUND((B8+B11+B12)*C21, 0)', v: calcEnv, z: numFmt, s: styleAlignRight };
-        ws['E21'] = { t: 's', v: "● [주의] 실내보수 등 미발생시 준공 감액", s: styleAmberSignal };
+        ws['E21'] = { t: 's', v: envRate > 0 ? (trade === 'civil' ? "● [주의] 조달청 토목 기준 실비 정산" : "● [주의] 실내보수 등 미발생시 준공 감액") : "● [정상] 계상 제외 대상", s: envRate > 0 ? styleAmberSignal : styleGreenSignal };
 
         ws['B22'] = { t: 'n', f: 'ROUND(B11*C22, 0)', v: calcWage, z: numFmt, s: styleAlignRight };
         ws['E22'] = { t: 's', v: "● [적합] 법정 요율 이내", s: styleGreenSignal };
@@ -3592,9 +3594,9 @@ function downloadStandardTemplate() {
         ws['B25'] = { t: 'n', f: 'B8+B11+B24', v: calcNetCost, z: numFmt, s: { ...styleSubtotal, alignment: { horizontal: 'right', vertical: 'center' } } };
         ['A25', 'C25', 'D25', 'E25'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
-        // 일반관리비 (6% 상한 감지 신호등)
+        // 일반관리비 (8% 상한 감지 신호등)
         ws['B26'] = { t: 'n', f: 'ROUND(B25*C26, 0)', v: calcAdmin, z: numFmt, s: styleAlignRight };
-        ws['E26'] = { t: 's', f: 'IF(C26>0.06, "● [초과] 기재부 상한(6%) 초과", "● [적합] 법정 상한(6%) 이내")', v: "● [적합] 법정 상한(6%) 이내", s: styleGreenSignal };
+        ws['E26'] = { t: 's', f: 'IF(C26>0.08, "● [초과] 기재부 상한(8%) 초과", "● [적합] 법정 상한(8%) 이내")', v: "● [적합] 법정 상한(8%) 이내", s: styleGreenSignal };
 
         // 이윤 (15% 상한 감지 및 재료비 제외 법정 공식 엄수 신호등)
         ws['B27'] = { t: 'n', f: 'ROUND((B11+B24+B26)*C27, 0)', v: calcProfit, z: numFmt, s: styleAlignRight };
@@ -3694,21 +3696,22 @@ function downloadAuditResultExcel() {
             return fallback;
         };
 
-        // 공종별 안전 요율 매핑
+        // 공종별 안전 요율 매핑 (2026 조달청 최신 제비율 100% 동기화)
         const tradeRatesMap = {
-            building: { indLab: 0.145, otherExp: 0.0535, safety: 0.0293 },
-            civil: { indLab: 0.191, otherExp: 0.055, safety: 0.0315 },
-            electrical: { indLab: 0.125, otherExp: 0.060, safety: 0.0207 },
-            telecom: { indLab: 0.115, otherExp: 0.050, safety: 0.0207 },
-            fire: { indLab: 0.115, otherExp: 0.055, safety: 0.0207 },
-            asbestos: { indLab: 0.175, otherExp: 0.050, safety: 0.0311 }
+            building: { indLab: 0.175, otherExp: 0.050, safety: 0.0311, env: 0.003 },
+            civil: { indLab: 0.191, otherExp: 0.055, safety: 0.0315, env: 0.005 },
+            electrical: { indLab: 0.125, otherExp: 0.060, safety: 0.0207, env: 0 },
+            telecom: { indLab: 0.115, otherExp: 0.050, safety: 0.0207, env: 0 },
+            fire: { indLab: 0.115, otherExp: 0.055, safety: 0.0207, env: 0 },
+            asbestos: { indLab: 0.175, otherExp: 0.050, safety: 0.0311, env: 0 }
         };
         const curRates = tradeRatesMap[trade] || tradeRatesMap.building;
         const indLabRate = curRates.indLab;
         const otherExpRate = curRates.otherExp;
         const safetyRate = curRates.safety;
+        const envRate = curRates.env;
 
-        // 업체 제출값 세부 추출
+        // 업체 제출값 세부 추출 (2026 최신 조달청 기준)
         const vIndLab = getVal('indirect_labor', Math.round(directLab * indLabRate));
         const sIndLab = getStd('indirect_labor', Math.round(directLab * indLabRate));
         const vLabTotal = directLab + vIndLab;
@@ -3717,20 +3720,20 @@ function downloadAuditResultExcel() {
         const vOther = getVal('other_expense', Math.round((directMat + sLabTotal) * otherExpRate));
         const sOther = getStd('other_expense', Math.round((directMat + sLabTotal) * otherExpRate));
 
-        const vAccident = getVal('industrial_accident', Math.round(sLabTotal * 0.037));
-        const sAccident = getStd('industrial_accident', Math.round(sLabTotal * 0.037));
+        const vAccident = getVal('industrial_accident', Math.round(sLabTotal * 0.0356));
+        const sAccident = getStd('industrial_accident', Math.round(sLabTotal * 0.0356));
 
-        const vEmploy = getVal('employment_insurance', Math.round(sLabTotal * 0.0098));
-        const sEmploy = getStd('employment_insurance', Math.round(sLabTotal * 0.0098));
+        const vEmploy = getVal('employment_insurance', Math.round(sLabTotal * 0.0101));
+        const sEmploy = getStd('employment_insurance', Math.round(sLabTotal * 0.0101));
 
-        const vHealth = getVal('health_insurance', period < 30 ? 0 : Math.round(directLab * 0.03545));
-        const sHealth = getStd('health_insurance', period < 30 ? 0 : Math.round(directLab * 0.03545));
+        const vHealth = getVal('health_insurance', period < 30 ? 0 : Math.round(directLab * 0.03595));
+        const sHealth = getStd('health_insurance', period < 30 ? 0 : Math.round(directLab * 0.03595));
 
-        const vPension = getVal('pension', period < 30 ? 0 : Math.round(directLab * 0.045));
-        const sPension = getStd('pension', period < 30 ? 0 : Math.round(directLab * 0.045));
+        const vPension = getVal('pension', period < 30 ? 0 : Math.round(directLab * 0.0475));
+        const sPension = getStd('pension', period < 30 ? 0 : Math.round(directLab * 0.0475));
 
-        const vCare = getVal('elderly_care', period < 30 ? 0 : Math.round(sHealth * 0.1295));
-        const sCare = getStd('elderly_care', period < 30 ? 0 : Math.round(sHealth * 0.1295));
+        const vCare = getVal('elderly_care', period < 30 ? 0 : Math.round(sHealth * 0.1314));
+        const sCare = getStd('elderly_care', period < 30 ? 0 : Math.round(sHealth * 0.1314));
 
         const vSafety = getVal('safety_management', (directMat + directLab) >= 20000000 ? Math.round((directMat + directLab) * safetyRate) : 0);
         const sSafety = getStd('safety_management', (directMat + directLab) >= 20000000 ? Math.round((directMat + directLab) * safetyRate) : 0);
@@ -3738,8 +3741,8 @@ function downloadAuditResultExcel() {
         const vRetire = getVal('retirement_deduction', 0);
         const sRetire = getStd('retirement_deduction', 0);
 
-        const vEnv = getVal('environment_preservation', Math.round((directMat + sLabTotal + outputExp) * 0.003));
-        const sEnv = getStd('environment_preservation', Math.round((directMat + sLabTotal + outputExp) * 0.003));
+        const vEnv = getVal('environment_preservation', Math.round((directMat + sLabTotal + outputExp) * envRate));
+        const sEnv = getStd('environment_preservation', Math.round((directMat + sLabTotal + outputExp) * envRate));
 
         const vWage = getVal('wage_claim', Math.round(sLabTotal * 0.0009));
         const sWage = getStd('wage_claim', Math.round(sLabTotal * 0.0009));
@@ -3753,8 +3756,8 @@ function downloadAuditResultExcel() {
         const vNetCost = directMat + vLabTotal + vExpSum;
         const sNetCost = directMat + sLabTotal + sExpSum;
 
-        const vAdmin = getVal('general_admin', Math.round(sNetCost * 0.06));
-        const sAdmin = getStd('general_admin', Math.round(sNetCost * 0.06));
+        const vAdmin = getVal('general_admin', Math.round(sNetCost * 0.08));
+        const sAdmin = getStd('general_admin', Math.round(sNetCost * 0.08));
 
         const vProfit = getVal('profit', Math.round((sLabTotal + sExpSum + sAdmin) * 0.15));
         const sProfit = getStd('profit', Math.round((sLabTotal + sExpSum + sAdmin) * 0.15));
@@ -3813,7 +3816,7 @@ function downloadAuditResultExcel() {
             // Row 19 (20행): 퇴직공제부금비
             ["퇴직공제부금비", vRetire, sRetire, vRetire - sRetire, vRetire - sRetire > 10 ? "● [초과(삭감)]" : "● [적합]", "순공사원가 1억 원 이상 의무 계상 (미만 0원)"],
             // Row 20 (21행): 환경보전비
-            ["환경보전비", vEnv, sEnv, vEnv - sEnv, vEnv - sEnv > 10 ? "● [초과(삭감)]" : "● [적합]", "직접공사비 × 0.30% (실내보수 준공 감액 대상)"],
+            ["환경보전비", vEnv, sEnv, vEnv - sEnv, vEnv - sEnv > 10 ? "● [초과(삭감)]" : "● [적합]", envRate > 0 ? `직접공사비 × ${(envRate * 100).toFixed(2)}% (${trade === 'civil' ? '토목 실비정산 대상' : '실내보수 준공 감액 대상'})` : "해당 공종 법적 계상 제외 (0원)"],
             // Row 21 (22행): 임금채권부담금
             ["임금채권부담금", vWage, sWage, vWage - sWage, vWage - sWage > 10 ? "● [초과(삭감)]" : "● [적합]", "노무비 소계 × 0.09%"],
             // Row 22 (23행): 석면분담금
@@ -3825,7 +3828,7 @@ function downloadAuditResultExcel() {
             ["[순공사원가]", vNetCost, sNetCost, vNetCost - sNetCost, vNetCost - sNetCost > 10 ? "● [초과]" : "● [적합]", "재료비 소계 + 노무비 소계 + 경비 소계"],
             
             // Row 25 (26행): 일반관리비
-            ["일반관리비", vAdmin, sAdmin, vAdmin - sAdmin, vAdmin - sAdmin > 10 ? "● [초과(삭감)]" : "● [적합]", "순공사원가 × 6.00% (기재부 계약예규 상한 이내)"],
+            ["일반관리비", vAdmin, sAdmin, vAdmin - sAdmin, vAdmin - sAdmin > 10 ? "● [초과(삭감)]" : "● [적합]", "순공사원가 × 8.00% (기재부 계약예규 5억 미만 상한 이내)"],
             // Row 26 (27행): 이윤
             ["이윤", vProfit, sProfit, vProfit - sProfit, vProfit - sProfit > 10 ? "● [초과(삭감)]" : "● [적합]", "(노무비 + 경비 + 일반관리비) × 15.00% (※ 재료비 제외)"],
             // Row 27 (28행): 폐기물처리비
@@ -4104,7 +4107,7 @@ function downloadAuditResultExcel() {
         // 퇴직공제부금비
         setDiffRow(20, 'IF((C6+C9)<70000000, 0, ROUND(C9*0.023, 0))', sRetire);
         // 환경보전비, 임금채권, 석면
-        setDiffRow(21, 'ROUND((C8+C11+C12)*0.003, 0)', sEnv);
+        setDiffRow(21, `ROUND((C8+C11+C12)*${envRate}, 0)`, sEnv);
         setDiffRow(22, 'ROUND(C11*0.0009, 0)', sWage);
         setDiffRow(23, 'ROUND(C11*0.00006, 0)', sAsbestos);
 
@@ -4125,7 +4128,7 @@ function downloadAuditResultExcel() {
         ['A25', 'F25'].forEach(ref => { if (ws[ref]) ws[ref].s = styleSubtotal; });
 
         // Row 26 ~ 28: 일반관리비, 이윤, 폐기물
-        setDiffRow(26, 'ROUND(C25*0.06, 0)', sAdmin);
+        setDiffRow(26, 'ROUND(C25*0.08, 0)', sAdmin);
         setDiffRow(27, 'ROUND((C11+C24+C26)*0.15, 0)', sProfit);
         setDiffRow(28, null, wasteCost);
 

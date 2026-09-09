@@ -564,6 +564,9 @@ class ProgressiveContractCompassApp {
     });
 
     this.state.availableOptions = options;
+    if (this.state.selectedMethodId && !options.some((o) => o.id === this.state.selectedMethodId)) {
+      this.state.selectedMethodId = null;
+    }
 
     const catKorean = this.state.category === 'construction' ? '공사' : (this.state.category === 'service' ? '용역' : '물품');
     if (introText) {

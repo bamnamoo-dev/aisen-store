@@ -233,8 +233,8 @@ export function evaluateContractMethod(params) {
     });
   }
 
-  // 2. 계약길잡이 공식 특화 유형 룰 우선 적용
-  if (isSevereDisabledFacility) {
+  // 2. 계약길잡이 공식 특화 유형 룰 우선 적용 (중증장애인생산시설 특례는 물품·용역 한정, 공사 제외)
+  if (isSevereDisabledFacility && category !== 'construction') {
     // 중증장애인생산품 우선구매 특별법 제7조제5항 및 지방계약법 시행령 제25조제1항제7호의2: 금액 한도 없는 수의계약
     selectedMethod = CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY;
   } else if (typeCode === 'B02') {
@@ -1940,16 +1940,18 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
       });
     }
 
-    // 1-4. 중증장애인생산품 생산시설 특례
-    options.push({
-      ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
-      tag: '법정의무구매 1% 달성',
-      tagColor: 'purple',
-      conditionText: '보건복지부장관 지정 중증장애인생산품 생산시설 직접생산 제품/용역',
-      featureText: '금액 한도 무제한 / 동일업체 연간 4회 제한 적용 제외 / 교육청 기관평가 가점',
-      isDefault: false,
-      badgeText: '금액 무제한'
-    });
+    // 1-4. 중증장애인생산품 생산시설 특례 (물품·용역 한정, 공사 제외)
+    if (category !== 'construction') {
+      options.push({
+        ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
+        tag: '법정의무구매 1% 달성',
+        tagColor: 'purple',
+        conditionText: '보건복지부장관 지정 중증장애인생산품 생산시설 직접생산 제품/용역',
+        featureText: '금액 한도 무제한 / 동일업체 연간 4회 제한 적용 제외 / 교육청 기관평가 가점',
+        isDefault: false,
+        badgeText: '금액 무제한'
+      });
+    }
 
     // 1-5. 2인 이상 전자견적 공고 (투명성 제고를 위해 원할 경우)
     options.push({
@@ -2009,16 +2011,18 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
       });
     }
 
-    // 2-4. 중증장애인생산품 생산시설 특례
-    options.push({
-      ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
-      tag: '금액 무제한 특례',
-      tagColor: 'purple',
-      conditionText: '보건복지부 지정시설 직접생산 제품/용역',
-      featureText: '금액 한도 제한 없이 1인 견적 수의계약 / 동일업체 연간 4회 제한 적용 제외',
-      isDefault: false,
-      badgeText: '금액 무제한'
-    });
+    // 2-4. 중증장애인생산품 생산시설 특례 (물품·용역 한정, 공사 제외)
+    if (category !== 'construction') {
+      options.push({
+        ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
+        tag: '금액 무제한 특례',
+        tagColor: 'purple',
+        conditionText: '보건복지부 지정시설 직접생산 제품/용역',
+        featureText: '금액 한도 제한 없이 1인 견적 수의계약 / 동일업체 연간 4회 제한 적용 제외',
+        isDefault: false,
+        badgeText: '금액 무제한'
+      });
+    }
   }
   // 3. 추정가격 5,000만 원 초과 ~ 1억 원 이하 / 2억 원 이하
   else if (price <= 100000000) {
@@ -2098,16 +2102,18 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
       });
     }
 
-    // 공통 중증장애인 특례
-    options.push({
-      ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
-      tag: '금액 무제한 특례',
-      tagColor: 'purple',
-      conditionText: '보건복지부 지정시설 직접생산 제품/용역',
-      featureText: '1억원 이하도 금액 제한 없이 1인 견적 수의계약 가능',
-      isDefault: false,
-      badgeText: '금액 무제한'
-    });
+    // 공통 중증장애인 특례 (물품·용역 한정, 공사 제외)
+    if (category !== 'construction') {
+      options.push({
+        ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
+        tag: '금액 무제한 특례',
+        tagColor: 'purple',
+        conditionText: '보건복지부 지정시설 직접생산 제품/용역',
+        featureText: '1억원 이하도 금액 제한 없이 1인 견적 수의계약 가능',
+        isDefault: false,
+        badgeText: '금액 무제한'
+      });
+    }
   }
   // 4. 추정가격 1억 원 초과 (고액 계약)
   else {
@@ -2231,16 +2237,18 @@ export function getAvailableContractOptions({ category, estimatedPrice, typeCode
       });
     }
 
-    // 중증장애인은 1억 초과도 무제한 특례!
-    options.push({
-      ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
-      tag: '금액 무제한 특례',
-      tagColor: 'purple',
-      conditionText: '보건복지부 지정시설 직접생산 제품/용역',
-      featureText: '1억 초과 고액이어도 법률상 금액한도 없이 1인 견적 수의계약 가능 (특별법 제7조)',
-      isDefault: false,
-      badgeText: '금액 무제한'
-    });
+    // 중증장애인은 1억 초과도 무제한 특례! (물품·용역 한정, 공사 제외)
+    if (category !== 'construction') {
+      options.push({
+        ...CONTRACT_METHODS.SOLE_SOURCE_DISABLED_FACILITY,
+        tag: '금액 무제한 특례',
+        tagColor: 'purple',
+        conditionText: '보건복지부 지정시설 직접생산 제품/용역',
+        featureText: '1억 초과 고액이어도 법률상 금액한도 없이 1인 견적 수의계약 가능 (특별법 제7조)',
+        isDefault: false,
+        badgeText: '금액 무제한'
+      });
+    }
   }
 
   return options;
