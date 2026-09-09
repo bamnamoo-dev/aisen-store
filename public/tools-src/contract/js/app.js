@@ -657,40 +657,6 @@ class ProgressiveContractCompassApp {
     }
   }
 
-  formatMemoHtml(text) {
-    if (!text) return '';
-    const lines = text.split('\n');
-    return lines.map(line => {
-      if (!line.trim()) {
-        return '<div style="min-height: 0.85em;"></div>';
-      }
-      const escaped = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-      // 1. 대제목 (1. 관련, 2. 사업 개요 등)
-      if (/^\d+\.\s/.test(line)) {
-        return `<div style="font-weight: 700; margin-top: 10px; margin-bottom: 3px; color: var(--primary-700, #1d4ed8);">${escaped}</div>`;
-      }
-      // 2. 중분류 (  가. 나. 다. 등)
-      if (/^\s{2}[가-힣]\.\s/.test(line)) {
-        return `<div style="padding-left: 1.5rem; text-indent: -1.5rem; font-weight: 600; margin-top: 6px; margin-bottom: 2px;">${line.trim()}</div>`;
-      }
-      // 3. 소분류 구비서류 목록 (    - 서류명 [필수 징구] ...)
-      // 핵심: 2.8rem 들여쓰기 후 대시(- )만 -1.3rem 내어쓰기 -> 줄바꿈된 둘째 줄이 첫 줄 시작선(2.8rem)을 절대 안 넘음
-      if (/^\s{4}-\s/.test(line) || /^\s{2}-\s/.test(line)) {
-        return `<div style="padding-left: 2.8rem; text-indent: -1.3rem; margin-bottom: 3px; word-break: keep-all; overflow-wrap: break-word;">${line.trim()}</div>`;
-      }
-      // 4. 대시 항목 (  - 공고(안내) 기간: 등)
-      if (/^\s*-\s/.test(line)) {
-        return `<div style="padding-left: 1.8rem; text-indent: -1.0rem; margin-bottom: 3px; word-break: keep-all; overflow-wrap: break-word;">${line.trim()}</div>`;
-      }
-      // 5. 4칸 들여쓰기 서술문 (    본 건... 등)
-      if (/^\s{4}/.test(line)) {
-        return `<div style="padding-left: 1.5rem; text-indent: 0; margin-bottom: 4px; line-height: 1.65; word-break: keep-all; overflow-wrap: break-word;">${line.trim()}</div>`;
-      }
-      return `<div style="margin-bottom: 2px; word-break: keep-all; overflow-wrap: break-word;">${escaped}</div>`;
-    }).join('');
-  }
-
   renderStep4Guide() {
     const container = document.getElementById('guide-output-wrap');
     const btnPrintGuide = document.getElementById('btn-print-guide');
@@ -883,7 +849,7 @@ class ProgressiveContractCompassApp {
               📋 사유서 원클릭 복사
             </button>
           </div>
-          <div class="memo-code-box" id="memo-code-text" style="font-size: 12.5px; line-height: 1.65; border-radius: 8px; padding: 16px; background: var(--input-bg, #f8fafc); border: 1px solid var(--card-border, #e2e8f0); max-height: 480px; overflow-y: auto; font-family: 'Pretendard', -apple-system, sans-serif; white-space: normal;">${this.formatMemoHtml(pkg.memoText)}</div>
+          <pre class="memo-code-box" id="memo-code-text" style="font-size: 12.5px; line-height: 1.6; border-radius: 8px; padding: 14px; background: var(--input-bg, #f8fafc); border: 1px solid var(--card-border, #e2e8f0); white-space: pre-wrap; word-break: break-all;">${pkg.memoText}</pre>
         </div>
       </div>
 
