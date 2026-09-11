@@ -51,7 +51,7 @@ function ContractCompassIframe() {
   };
 
   return (
-    <div className="w-full flex flex-col h-[calc(100vh-56px)] md:h-screen bg-slate-900 overflow-hidden relative">
+    <div className="w-full flex flex-col h-[calc(100dvh-56px)] md:h-screen bg-slate-900 overflow-hidden relative">
       {/* 겹침 없는 통합 스마트 헤더 (1줄 정렬) */}
       <ToolHeader 
         title="AI-SEN 계약"
@@ -59,31 +59,31 @@ function ContractCompassIframe() {
         themeColor="blue"
         onReload={handleReload}
         extraAction={
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={handleOpenManual}
-              className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 sm:px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
               title="AI-SEN 계약 실무 사용설명서 열기"
             >
-              <BookOpen size={13} className="text-amber-700" />
-              <span>사용설명서</span>
+              <BookOpen size={12} className="text-amber-700" />
+              <span>설명서</span>
             </button>
 
             <button
               onClick={handleToggleTheme}
-              className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2 sm:px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
               title="화면 테마 전환 (다크/라이트)"
             >
-              <Moon size={13} className="text-slate-600" />
+              <Moon size={12} className="text-slate-600" />
               <span className="hidden sm:inline">테마</span>
             </button>
 
             <button
               onClick={handleResetFlow}
-              className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 sm:px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
               title="모든 입력 초기화 및 1단계로 이동"
             >
-              <RotateCcw size={13} className="text-blue-600" />
+              <RotateCcw size={12} className="text-blue-600" />
               <span className="hidden sm:inline">처음부터</span>
             </button>
           </div>

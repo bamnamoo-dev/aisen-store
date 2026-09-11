@@ -9,11 +9,12 @@ import {
   updateContractLimitsFromCentral
 } from './rules/contract_rules.js';
 
-import { OFFICIAL_SEN_TYPES } from './rules/items_catalog.js';
+import { OFFICIAL_SEN_TYPES, QUICK_PRESETS } from './rules/items_catalog.js';
 
 class ProgressiveContractCompassApp {
   constructor() {
     this.loadCentralContractLimits();
+    this.currentMemoText = '';
     this.state = {
       category: null,            // 'construction' | 'service' | 'goods'
       typeCode: '',              // 세부 계약유형 코드 (예: B20, B08, B07 등)
@@ -34,6 +35,8 @@ class ProgressiveContractCompassApp {
   init() {
     this.initTheme();
     this.bindGlobalActions();
+    this.renderQuickPresets();
+    this.bindMobileStickyBar();
     this.bindStep1Events();
     this.bindStep2Events();
     this.bindStep3Events();
@@ -54,6 +57,112 @@ class ProgressiveContractCompassApp {
       }
     } catch (e) {
       console.warn('Central rates load fallback to built-in contract limits:', e);
+    }
+  }
+
+  // =========================================================================
+  // 학교 다빈도 1초 프리셋 빠른선택 (모바일/데스크톱 원클릭 가동)
+  // =========================================================================
+  renderQuickPresets() {
+    const container = document.getElementById('quick-presets-container');
+    if (!container || !QUICK_PRESETS) return;
+
+    container.innerHTML = QUICK_PRESETS.map((p) => `
+      <button type="button" class="preset-chip-btn" data-id="${p.id}" title="${p.desc || p.title}">
+        <span class="p-cat">${p.category === 'construction' ? '🏗️ 공사' : (p.category === 'service' ? '💼 용역' : '📦 물품')}</span>
+        <span>${p.title}</span>
+        <span class="p-price">${(p.price / 10000).toLocaleString()}만원</span>
+      </button>
+    `).join('');
+
+    container.querySelectorAll('.preset-chip-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const preset = QUICK_PRESETS.find((p) => p.id === btn.dataset.id);
+        if (preset) this.applyQuickPreset(preset);
+      });
+    });
+  }
+
+  applyQuickPreset(preset) {
+    this.state.category = preset.category;
+    this.state.typeCode = preset.typeCode || '';
+    this.state.projectTitle = preset.title || '';
+
+    // 세부 유형명 도출
+    const catList = OFFICIAL_SEN_TYPES[preset.category] || [];
+    const foundType = catList.find((t) => t.code === preset.typeCode);
+    this.state.typeName = foundType ? foundType.name : '';
+
+    // 1단계 타일 UI 활성화
+    document.querySelectorAll('.category-tile-btn').forEach((b) => {
+      b.classList.toggle('selected', b.dataset.category === preset.category);
+    });
+
+    // 2단계 금액 및 부가세 세팅
+    this.state.rawAmount = preset.price;
+    this.state.vatIncluded = !!preset.vatIncluded;
+    const inputAmount = document.getElementById('input-amount');
+    const chkVat = document.getElementById('chk-vat-included');
+    if (inputAmount) inputAmount.value = preset.price.toLocaleString();
+    if (chkVat) chkVat.checked = !!preset.vatIncluded;
+
+    this.recalculatePrices();
+
+    // 1단계, 2단계 확정 및 3단계 렌더링
+    this.confirmStep1Selection();
+    this.completeStep2();
+
+    // 3단계 추천 1순위 카드 자동 선택 후 4단계로 직행
+    setTimeout(() => {
+      const firstMethodCard = document.querySelector('.method-choice-card');
+      if (firstMethodCard) {
+        firstMethodCard.click();
+      }
+    }, 200);
+
+    this.showToast(`⚡ ${preset.title} 프리셋이 적용되었습니다!`);
+  }
+
+  // 모바일 전용 축약 공종명 반환 (헤더 1줄 방어용)
+  getShortTypeName(name) {
+    if (!name) return '';
+    if (name.includes('통신')) return '통신공사';
+    if (name.includes('전기')) return '전기공사';
+    if (name.includes('소방')) return '소방공사';
+    if (name.includes('가스')) return '가스공사';
+    if (name.includes('승강기')) return '승강기';
+    if (name.includes('석면')) return '석면제거';
+    if (name.includes('건설') || name.includes('실내건축')) return '건설공사';
+    if (name.includes('방과후')) return '방과후학교';
+    if (name.includes('늘봄')) return '늘봄학교';
+    if (name.includes('전세버스')) return '전세버스';
+    if (name.includes('소규모테마') || name.includes('수학여행')) return '수학여행';
+    if (name.includes('수련')) return '수련활동';
+    if (name.includes('청소')) return '청소용역';
+    if (name.includes('경비')) return '유인경비';
+    if (name.includes('급식') || name.includes('배식')) return '급식배식';
+    if (name.includes('우유')) return '우유급식';
+    if (name.includes('교복')) return '교복구매';
+    return name.length > 5 ? name.slice(0, 5) : name;
+  }
+
+  // 모바일 전용 하단 고정 스티키 기안문 복사 바
+  bindMobileStickyBar() {
+    const btnSticky = document.getElementById('btn-sticky-copy-draft');
+    if (btnSticky) {
+      btnSticky.addEventListener('click', () => {
+        if (!this.currentMemoText) {
+          const memoEl = document.getElementById('memo-code-text');
+          if (memoEl) this.currentMemoText = memoEl.textContent;
+        }
+        if (this.currentMemoText) {
+          navigator.clipboard.writeText(this.currentMemoText).then(() => {
+            this.showToast('📋 K-에듀파인 기안문 사유서가 클립보드에 복사되었습니다!');
+          }).catch(() => {
+            alert('복사에 실패했습니다. 본문 텍스트를 직접 복사해 주세요.');
+          });
+        }
+      });
     }
   }
 
@@ -366,7 +475,11 @@ class ProgressiveContractCompassApp {
     const detailText = this.state.typeName ? ` > ${this.state.typeName}` : '';
 
     if (summaryChip) {
-      summaryChip.textContent = `선택: ${catMeta.icon} ${catMeta.name}${detailText}`;
+      const shortTypeName = this.getShortTypeName(this.state.typeName);
+      summaryChip.innerHTML = `
+        <span class="desktop-text">선택: ${catMeta.icon} ${catMeta.name}${detailText}</span>
+        <span class="mobile-text">${catMeta.icon} ${shortTypeName || catMeta.name}</span>
+      `;
       summaryChip.style.display = 'inline-flex';
     }
     if (btnEdit) btnEdit.style.display = 'inline-block';
@@ -514,7 +627,10 @@ class ProgressiveContractCompassApp {
 
     const estText = (this.state.estimatedPrice / 10000).toLocaleString();
     if (summaryChip) {
-      summaryChip.textContent = `추정가격: ${this.state.estimatedPrice.toLocaleString()}원 (${estText}만원)`;
+      summaryChip.innerHTML = `
+        <span class="desktop-text">추정가격: ${this.state.estimatedPrice.toLocaleString()}원 (${estText}만원)</span>
+        <span class="mobile-text">추정 ${estText}만</span>
+      `;
       summaryChip.style.display = 'inline-flex';
     }
     if (btnEdit) btnEdit.style.display = 'inline-block';
@@ -629,7 +745,11 @@ class ProgressiveContractCompassApp {
     const card3 = document.getElementById('card-step3');
 
     if (summaryChip) {
-      summaryChip.textContent = `선택: ${title}`;
+      const shortMethod = title.replace('이상 ', '').replace('계약', '').slice(0, 8);
+      summaryChip.innerHTML = `
+        <span class="desktop-text">선택: ${title}</span>
+        <span class="mobile-text">${shortMethod}</span>
+      `;
       summaryChip.style.display = 'inline-flex';
     }
     if (btnEdit) btnEdit.style.display = 'inline-block';
@@ -1005,6 +1125,8 @@ class ProgressiveContractCompassApp {
       </div>
     `;
 
+    this.currentMemoText = pkg.memoText;
+
     // 탭 전환 이벤트 바인딩
     container.querySelectorAll('.guide-tab-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -1046,6 +1168,12 @@ class ProgressiveContractCompassApp {
   openStep(stepNum) {
     this.state.activeStep = stepNum;
 
+    // 모바일 스티키 복사 바 제어
+    const stickyBar = document.getElementById('mobile-sticky-bar');
+    if (stickyBar) {
+      stickyBar.style.display = stepNum === 4 ? 'block' : 'none';
+    }
+
     // 해당 스텝 열기
     for (let i = 1; i <= 4; i++) {
       const card = document.getElementById(`card-step${i}`);
@@ -1056,7 +1184,7 @@ class ProgressiveContractCompassApp {
           card.classList.remove('locked');
           card.classList.add('active');
           setTimeout(() => {
-            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }, 150);
         }
         if (pstep) pstep.classList.add('active');
@@ -1093,6 +1221,9 @@ class ProgressiveContractCompassApp {
       if (bubble) bubble.textContent = i;
       if (pstep) pstep.classList.remove('active', 'completed');
     }
+
+    const stickyBar = document.getElementById('mobile-sticky-bar');
+    if (stickyBar) stickyBar.style.display = 'none';
 
     if (stepNum === 1) {
       this.state.category = null;

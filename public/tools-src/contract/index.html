@@ -107,6 +107,19 @@
       </section>
 
       <!-- ====================================================================
+           학교 다빈도 1초 프리셋 (가로 스크롤 빠른선택 바)
+           ==================================================================== -->
+      <section class="quick-presets-section" id="quick-presets-section">
+        <div class="quick-presets-header">
+          <span class="presets-badge">⚡ 1초 프리셋</span>
+          <span class="presets-title">학교 다빈도 계약 빠른선택</span>
+        </div>
+        <div class="quick-presets-scroll" id="quick-presets-container">
+          <!-- JS에서 QUICK_PRESETS 동적 렌더링 -->
+        </div>
+      </section>
+
+      <!-- ====================================================================
            Step 1: 계약 종류 선택 (공사 / 용역 / 물품)
            ==================================================================== -->
       <section class="accordion-step-card active" id="card-step1">
@@ -277,6 +290,14 @@
 
     </div>
   </main>
+
+  <!-- 모바일 전용 하단 고정 기안문 1초 복사 바 -->
+  <div class="contract-mobile-sticky-bar" id="mobile-sticky-bar" style="display: none;">
+    <button type="button" class="btn-sticky-copy" id="btn-sticky-copy-draft">
+      <span class="sticky-copy-icon">📋</span>
+      <span class="sticky-copy-text">K-에듀파인 기안문 1초 복사</span>
+    </button>
+  </div>
 
   <!-- 토스트 알림 (기안문 복사 완료 등) -->
   <div class="toast-notice" id="toast-flow-notice">
