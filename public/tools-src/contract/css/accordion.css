@@ -2296,12 +2296,22 @@ html.in-iframe .main-wrapper {
   .subtype-chip-btn {
     padding: 0.42rem 0.5rem !important;
     font-size: 0.76rem !important;
-    min-height: 40px !important;
+    min-height: 38px !important;
     gap: 0.3rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
   }
   .subtype-chip-btn .subtype-code-badge {
-    font-size: 0.65rem !important;
+    font-size: 0.62rem !important;
     padding: 0.08rem 0.25rem !important;
+    flex-shrink: 0 !important;
+  }
+  .subtype-btn-label {
+    display: inline-block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
   }
 
   /* Step 2 금액 입력 */
@@ -2312,40 +2322,56 @@ html.in-iframe .main-wrapper {
     font-size: 1.15rem !important;
     padding: 0.55rem 2.2rem 0.55rem 0.75rem !important;
   }
+  .vat-mode-toggle span {
+    white-space: nowrap !important;
+  }
   .amount-quick-chips {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 0.3rem !important;
+    gap: 0.35rem !important;
   }
   .quick-amount-chip {
-    padding: 0.38rem 0.2rem !important;
-    font-size: 0.74rem !important;
+    padding: 0.45rem 0.2rem !important;
+    font-size: 0.78rem !important;
     text-align: center !important;
     border-radius: var(--radius-md) !important;
     white-space: nowrap !important;
   }
+  .quick-amount-chip.chip-over {
+    font-size: 0.76rem !important;
+  }
+  .quick-amount-chip.reset {
+    grid-column: span 2 !important; /* 4칸 그리드를 완벽하게 채움 */
+    font-weight: 900 !important;
+  }
   .calc-price-summary-box {
-    padding: 0.65rem 0.75rem !important;
+    padding: 0.65rem 0.85rem !important;
     grid-template-columns: 1fr !important;
-    gap: 0.35rem !important;
+    gap: 0.4rem !important;
   }
   .calc-price-summary-box .calc-item {
     font-size: 0.82rem !important;
+    display: flex !important;
     justify-content: space-between !important;
+    align-items: center !important;
     width: 100% !important;
+    white-space: nowrap !important;
   }
   .calc-price-summary-box .calc-val {
     font-size: 1.05rem !important;
+    white-space: nowrap !important;
   }
   .btn-proceed-step {
     padding: 0.7rem 1rem !important;
     font-size: 0.95rem !important;
+    white-space: nowrap !important;
   }
 
   /* Step 3 계약방법 카드 컴팩트화 */
   .methods-candidate-intro {
     font-size: 0.88rem !important;
     margin-bottom: 0.65rem !important;
+    word-break: keep-all !important;
   }
   .method-choice-card {
     padding: 0.85rem 0.95rem !important;
@@ -2357,17 +2383,49 @@ html.in-iframe .main-wrapper {
   }
   .method-card-title {
     font-size: 1.05rem !important;
+    word-break: keep-all !important;
+    line-height: 1.35 !important;
   }
   .method-desc-text {
     font-size: 0.82rem !important;
     line-height: 1.4 !important;
+    word-break: keep-all !important;
   }
   .method-meta-chips {
-    gap: 0.35rem !important;
+    gap: 0.3rem !important;
+    flex-wrap: wrap !important;
   }
   .meta-chip {
     font-size: 0.72rem !important;
     padding: 0.15rem 0.45rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Step 4 확정 계약방법 히어로 바 */
+  .confirmed-method-banner {
+    padding: 0.85rem 0.95rem !important;
+    border-radius: var(--radius-lg) !important;
+  }
+  .confirmed-left h3 {
+    font-size: 1.05rem !important;
+    word-break: keep-all !important;
+    line-height: 1.35 !important;
+  }
+  .confirmed-left p {
+    font-size: 0.78rem !important;
+    word-break: keep-all !important;
+    line-height: 1.4 !important;
+  }
+  .confirmed-specs-pills {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.3rem !important;
+    margin-top: 0.4rem !important;
+  }
+  .spec-pill {
+    font-size: 0.72rem !important;
+    padding: 0.15rem 0.45rem !important;
+    white-space: nowrap !important;
   }
 
   /* Step 4 4개 탭 모바일 2열 2행 균등 그리드 */
@@ -2384,6 +2442,21 @@ html.in-iframe .main-wrapper {
     border-radius: var(--radius-md) !important;
     gap: 0.25rem !important;
     justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* 전면적인 한글 어색한 줄바꿈 방어 */
+  .hero-main-title,
+  .hero-sub-text,
+  .step-title-text,
+  .method-card-title,
+  .method-desc-text,
+  .legal-box h4,
+  .legal-box p,
+  .audit-alert-body h4,
+  .audit-alert-body p,
+  .doc-name-label {
+    word-break: keep-all !important;
   }
 }
 

@@ -433,12 +433,18 @@ class ProgressiveContractCompassApp {
       ...types
     ];
 
-    container.innerHTML = allOptions.map((t) => `
-      <button type="button" class="subtype-chip-btn ${this.state.typeCode === t.code ? 'selected' : ''}" data-code="${t.code}" data-name="${t.name}" title="${t.desc || t.name}">
-        ${t.code ? `<span class="subtype-code-badge">${t.code}</span>` : '<span>✨</span>'}
-        <span>${t.name}</span>
-      </button>
-    `).join('');
+    container.innerHTML = allOptions.map((t) => {
+      const mobileName = t.name.replace(/\s*\([^)]*\)/g, '').trim();
+      return `
+        <button type="button" class="subtype-chip-btn ${this.state.typeCode === t.code ? 'selected' : ''}" data-code="${t.code}" data-name="${t.name}" title="${t.desc || t.name}">
+          ${t.code ? `<span class="subtype-code-badge">${t.code}</span>` : '<span>✨</span>'}
+          <span class="subtype-btn-label">
+            <span class="desktop-text">${t.name}</span>
+            <span class="mobile-text">${mobileName}</span>
+          </span>
+        </button>
+      `;
+    }).join('');
 
     panel.style.display = 'block';
 
@@ -952,10 +958,22 @@ class ProgressiveContractCompassApp {
 
       <!-- 2. 실무 가이드 탭 내비게이션 (화면용) -->
       <div class="guide-tabs-bar screen-only" role="tablist">
-        <button type="button" class="guide-tab-btn active" data-tab="tab-memo">📝 1. K-에듀파인 기안문</button>
-        <button type="button" class="guide-tab-btn" data-tab="tab-audit">⚖️ 2. 감사관 핵심 유권해석</button>
-        <button type="button" class="guide-tab-btn" data-tab="tab-docs">📑 3. 필수 서류 (${pkg.requiredDocs.length}종)</button>
-        <button type="button" class="guide-tab-btn" data-tab="tab-roadmap">🚦 4. 진행 절차</button>
+        <button type="button" class="guide-tab-btn active" data-tab="tab-memo">
+          <span class="desktop-text">📝 1. K-에듀파인 기안문</span>
+          <span class="mobile-text">📝 기안문 사유서</span>
+        </button>
+        <button type="button" class="guide-tab-btn" data-tab="tab-audit">
+          <span class="desktop-text">⚖️ 2. 감사관 핵심 유권해석</span>
+          <span class="mobile-text">⚖️ 감사 유권해석</span>
+        </button>
+        <button type="button" class="guide-tab-btn" data-tab="tab-docs">
+          <span class="desktop-text">📑 3. 필수 서류 (${pkg.requiredDocs.length}종)</span>
+          <span class="mobile-text">📑 필수서류 (${pkg.requiredDocs.length}종)</span>
+        </button>
+        <button type="button" class="guide-tab-btn" data-tab="tab-roadmap">
+          <span class="desktop-text">🚦 4. 진행 절차</span>
+          <span class="mobile-text">🚦 진행 절차</span>
+        </button>
       </div>
 
       <!-- [제1구분] K-에듀파인 기안문 사유서 (최우선 활성화) -->

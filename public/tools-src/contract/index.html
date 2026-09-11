@@ -86,22 +86,22 @@
         <div class="flow-progress-steps">
           <div class="progress-step-item active" id="pstep-1">
             <div class="progress-step-circle">1</div>
-            <span>종류 선택</span>
+            <span><span class="desktop-text">종류 선택</span><span class="mobile-text">종류</span></span>
           </div>
           <div class="progress-step-divider"></div>
           <div class="progress-step-item" id="pstep-2">
             <div class="progress-step-circle">2</div>
-            <span>금액 입력</span>
+            <span><span class="desktop-text">금액 입력</span><span class="mobile-text">금액</span></span>
           </div>
           <div class="progress-step-divider"></div>
           <div class="progress-step-item" id="pstep-3">
             <div class="progress-step-circle">3</div>
-            <span>방법 선택</span>
+            <span><span class="desktop-text">방법 선택</span><span class="mobile-text">방법</span></span>
           </div>
           <div class="progress-step-divider"></div>
           <div class="progress-step-item" id="pstep-4">
             <div class="progress-step-circle">4</div>
-            <span>실무 가이드</span>
+            <span><span class="desktop-text">실무 가이드</span><span class="mobile-text">가이드</span></span>
           </div>
         </div>
       </section>
@@ -200,29 +200,29 @@
               </div>
               <label class="vat-mode-toggle" title="체크 시 부가가치세 10%를 역산하여 추정가격을 자동 도출합니다">
                 <input type="checkbox" id="chk-vat-included" />
-                <span>부가가치세(VAT) 포함</span>
+                <span><span class="desktop-text">부가가치세(VAT) 포함</span><span class="mobile-text">VAT 포함</span></span>
               </label>
             </div>
 
             <!-- 퀵 금액 추가 칩 -->
             <div class="amount-quick-chips">
-              <button type="button" class="quick-amount-chip" data-add="10000000">+ 1,000만</button>
-              <button type="button" class="quick-amount-chip" data-add="20000000">+ 2,000만</button>
-              <button type="button" class="quick-amount-chip" data-add="50000000">+ 5,000만</button>
-              <button type="button" class="quick-amount-chip" data-add="100000000">+ 1억</button>
-              <button type="button" class="quick-amount-chip" data-add="200000000">+ 2억</button>
-              <button type="button" class="quick-amount-chip chip-over" data-set="230000000" data-add="230000000">2억 초과(2.3억)</button>
+              <button type="button" class="quick-amount-chip" data-add="10000000"><span class="desktop-text">+ 1,000만</span><span class="mobile-text">+1천만</span></button>
+              <button type="button" class="quick-amount-chip" data-add="20000000"><span class="desktop-text">+ 2,000만</span><span class="mobile-text">+2천만</span></button>
+              <button type="button" class="quick-amount-chip" data-add="50000000"><span class="desktop-text">+ 5,000만</span><span class="mobile-text">+5천만</span></button>
+              <button type="button" class="quick-amount-chip" data-add="100000000"><span class="desktop-text">+ 1억</span><span class="mobile-text">+1억</span></button>
+              <button type="button" class="quick-amount-chip" data-add="200000000"><span class="desktop-text">+ 2억</span><span class="mobile-text">+2억</span></button>
+              <button type="button" class="quick-amount-chip chip-over" data-set="230000000" data-add="230000000"><span class="desktop-text">2억 초과(2.3억)</span><span class="mobile-text">+2.3억</span></button>
               <button type="button" class="quick-amount-chip reset" id="btn-clear-amount">지우기</button>
             </div>
 
             <!-- 실시간 계산 요약 박스 -->
             <div class="calc-price-summary-box">
               <div class="calc-item">
-                <span>기준 추정가격 (VAT 제외):</span>
+                <span><span class="desktop-text">기준 추정가격 (VAT 제외):</span><span class="mobile-text">추정가격 (VAT제외)</span></span>
                 <span class="calc-val" id="disp-estimated-price">0원</span>
               </div>
               <div class="calc-item">
-                <span>총 계약예정금액 (VAT 포함):</span>
+                <span><span class="desktop-text">총 계약예정금액 (VAT 포함):</span><span class="mobile-text">예정금액 (VAT포함)</span></span>
                 <span class="calc-val" id="disp-total-price">0원</span>
               </div>
             </div>
