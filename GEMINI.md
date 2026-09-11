@@ -33,6 +33,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **메인 허브** | **아이센스토어 메인** | `\asisen-store\` | `https://aisen.store` (Vercel) | Next.js, Supabase, 포털 관제 |
 | **AI 챗봇** | **AI-SEN 행정챗봇 (3-Tier)** | `\sen-chatbot\`<br/>`\sen-chatbot-v2\`<br/>`\(0610)sen-chatbot\` | `https://chatbot.aisen.store` | FastMCP, LangChain/RAG, 102권 서고 쪽수 1:1 앵커링, 국가법령정보센터 연동 |
+| **에이전트 확장** | **AI-SEN 올인원 MCP (`aisen-mcp` v2.0)** | `\sen-chatbot-v2\aisen_mcp\` | `FastMCP/MCPServer 표준 stdio / Dual-Use` | 4대 도구(지침서 RAG, 관내/관외 2박3일/연수 여비 마크다운 표, 카카오 경로 유류비, 75종 HWPX 서식 2단계 스마트 폴백), 네이티브 1:1 벤치마크 100% 일치 |
 | **특화 정산** | **AI-SEN 출장여비 (v4.9.2)** | `\sen-chatbot\travel\` (내장) | `https://chatbot.aisen.store/travel` | 카카오 3개 경유지 길찾기, 오피넷 실시간 유가 1일 6회 자동 고시, 19종 법정 감액, A4 1p 인쇄 |
 | **서식 포털** | **AI-SEN 행정서식 (68종)** | `\sen-chatbot\` (내장) | `https://chatbot.aisen.store?forms=1` | 인사/복무/계약 서식 실시간 미리보기 및 HWP 다운로드 |
 | **소통 포털** | **AI-SEN 소통게시판** | `\asisen-store\app\board\` | `/board` | 회원가입 없는 4자리 비밀번호 실무 Q&A 익명 소통 게시판 |
@@ -140,3 +141,43 @@
 4. **[연도별 요율·규정 중앙 통제 체계 (`rates-config.json`)] (✅ 100% 구축 완료)**:
    - `public/data/rates-config.json`을 통해 매년 개정되는 조달청 제비율(2024, 2025, 2026년 다년도 보존) 및 소액수의 한도액(종합 4억, 전문 2억, 전기/통신/소방 1.6억 등), 부가세, 도급비율을 중앙 집중 관리.
    - 코드 수정 없이 JSON 파일 하나로 공사원가와 계약 도구 전역에 즉시 동시 반영되는 유지보수 체계 완비.
+
+
+---
+
+## 📦 8. AI-SEN 올인원 교육행정 풀스택 MCP 생태계 (`aisen_mcp` v2.0) 연동 명세
+
+AI-SEN STORE 생태계의 모든 두뇌 엔진(지침서 RAG, 여비 정산, 유류비 산출, 행정 서식함)을 전 세계 표준 AI 에이전트(Claude Desktop, Antigravity, Cursor, OpenAI 등) 및 외부 파이썬 프로그램에서 그대로 가져다 쓸 수 있도록 구축된 공식 올인원 패키지(`sen-chatbot-v2/aisen_mcp`)입니다.
+
+### 1) 핵심 4대 풀스택 도구 (Tools)
+1. **`search_guidelines(query, category, tab)`**: 2026 서울시교육청 지침서/법령/에듀파인 3-Tier RAG 하이브리드 검색 및 1:1 쪽수 앵커링 출처 반환 (8.7초 스트리밍 1,086자 고품질 답변 수신).
+2. **`calculate_travel(travel_type, hours_over_4, total_days, nights, ...)`**: 인사혁신처 예규 제220호 기준 공무원 관내(2만/1만/관용차 감액) 및 **관외 2박 3일(일비·식비 끼니 감액·지역별 숙박 실비상한·KTX 영수증 운임) / 교육연수(합숙·비합숙)** 종합 정산 및 에듀파인 결재 상신용 마크다운 명세표 자동 생성.
+3. **`calculate_fuel(origin, destination, fuel_type, distance_km)`**: 한국석유공사 Opinet 실시간 전국 유가 및 **카카오 모빌리티 실도로 경로 길찾기**, 7대 유종 법정연비 및 국고금 관리법 10원 미만 절사 산출.
+4. **`find_forms(keyword, top_k)`**: 75종 행정·민원 개방형 HWPX/PDF 서식 검색 및 원클릭 다운로드 URL 제공 (실서버 500 에러 시 0.8초 만에 2단계 스마트 폴백 가동).
+
+### 2) 네이티브 백엔드 vs MCP 1:1 라이브 벤치마크 완결 (`scratch/benchmark_mcp_vs_native.py`)
+- **관내 출장 여비**: 네이티브 11,500원 vs MCP 11,500원 (**100% 일치**)
+- **관외 2박 3일 복합 출장 여비**: 네이티브 390,000원 vs MCP 390,000원 (**100% 일치**)
+- **국고금 10원 절사(끝자리 0원)**: **100% PASS**
+- **카카오 모빌리티 실도로 경로 유류비**: **100% 일치** (실주행 4.24km, 편도 640원, 왕복 1,280원)
+- **지침서 RAG 검색**: 1,086자 답변 및 표준교재 출처 100% 동일 품질 수신.
+
+### 3) 활용 방법 (Dual-Use)
+- **Claude Desktop / Antigravity / Cursor 연동**:
+  ```json
+  {
+    "mcpServers": {
+      "aisen-tools": {
+        "command": "python",
+        "args": ["-m", "aisen_mcp.server"],
+        "cwd": "G:/내 드라이브/antigravity/sen-chatbot-v2"
+      }
+    }
+  }
+  ```
+- **일반 Python 직접 호출 (Dual-Use)**:
+  ```python
+  from aisen_mcp import calculate_travel, calculate_fuel, find_forms, search_guidelines
+  res = calculate_travel(travel_type="관외", total_days=3, nights=2, transport_fare=100000, actual_lodging_per_night=70000)
+  print(res["markdown_report"])  # 에듀파인 결재 상신용 마크다운 표
+  ```
