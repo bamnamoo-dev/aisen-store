@@ -70,11 +70,11 @@ export default function CostAuditPage() {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={handleOpenManual}
-              className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 sm:px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
               title="AI-SEN 공사원가 실무 사용설명서 열기"
             >
               <BookOpen size={13} className="text-amber-700" />
-              <span>사용설명서</span>
+              <span className="hidden sm:inline">사용설명서</span>
             </button>
 
             <button
