@@ -271,30 +271,28 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                     <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정서식</h4>
                   </div>
                   <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
-                    68종
+                    71종+
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  계약, 인사, 복무, 보안 등 일선 학교 행정실에서 매일 사용하는 필수 법정 서식 68종의 미리보기와 원클릭 HWP 다운로드를 제공합니다.
+                  인사, 복무, 계약, 학교 제증명 등 일선 교육행정 실무에서 매일 사용하는 필수 법정 서식 71종의 실시간 미리보기와 원클릭 HWPX/PDF 다운로드를 제공합니다.
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">필수 서식 68종</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">필수 서식 71종+</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">실시간 미리보기</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">HWP 즉시 다운</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">0초 즉시 다운</span>
                 </div>
               </div>
 
               <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
-                <a
-                  href="https://chatbot.aisen.store?forms=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/forms"
                   onClick={onToolClick}
                   className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl transition-colors"
                 >
-                  <span>행정서식 바로가기</span>
-                  <ExternalLink size={14} />
-                </a>
+                  <span>행정서식 서고 바로가기</span>
+                  <ArrowRight size={14} />
+                </Link>
               </div>
             </div>
 

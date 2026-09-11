@@ -35,7 +35,7 @@ const AI_HUB_ITEMS = [
   { name: 'AI-SEN 행정챗봇', href: 'https://chatbot.aisen.store', icon: <Bot size={20} className="text-blue-600" />, isExternal: true, badge: '3-Tier' },
   { name: 'AI-SEN 출장여비', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={20} className="text-blue-600" />, isExternal: true, badge: 'v4.9.2' },
   { name: 'AI-SEN 소통게시판', href: '/board', icon: <MessageSquareShare size={20} className="text-blue-600" />, isExternal: false, badge: '소통' },
-  { name: 'AI-SEN 행정서식', href: 'https://chatbot.aisen.store?forms=1', icon: <FileCheck size={20} className="text-blue-600" />, isExternal: true, badge: '68종' },
+  { name: 'AI-SEN 행정서식', href: '/forms', icon: <FileCheck size={20} className="text-blue-600" />, isExternal: false, badge: '71종' },
   { name: '구글 맞춤챗봇', href: '/chatbot', icon: <MessageSquare size={20} className="text-indigo-600" />, isExternal: false, badge: 'Gemini' },
 ];
 
