@@ -402,9 +402,16 @@ export default function FormsPage() {
                         <span>HWP 받기</span>
                       </a>
 
-                      {/* 2. PDF 미리보기 */}
+                      {/* 2. PDF 미리보기 (모바일 네이티브 새 탭 / PC 인라인 모달 스마트 분기) */}
                       <button
-                        onClick={() => setPreviewModal(item)}
+                        onClick={() => {
+                          const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+                          if (isMobile) {
+                            window.open(pdfUrl, '_blank');
+                          } else {
+                            setPreviewModal(item);
+                          }
+                        }}
                         className="flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold py-1.5 px-2 rounded-lg transition-colors shadow-2xs cursor-pointer"
                         title="PDF 서식 미리보기"
                       >
@@ -475,11 +482,23 @@ export default function FormsPage() {
               </div>
             </div>
 
-            {/* 모달 본문: PDF 뷰어 */}
-            <div className="flex-1 bg-slate-100 relative">
+            {/* 모달 본문: PDF 뷰어 및 모바일 폴백 */}
+            <div className="flex-1 bg-slate-100 relative flex flex-col">
+              <div className="sm:hidden bg-blue-50 px-3 py-2 text-xs text-blue-700 flex items-center justify-between border-b border-blue-100">
+                <span>모바일에서는 전체화면 뷰어로 최적화됩니다.</span>
+                <a
+                  href={`/forms/${encodeURIComponent(previewModal.category)}/${encodeURIComponent(previewModal.pdf_file)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold underline text-blue-700 flex items-center gap-0.5"
+                >
+                  <span>전체화면 열기</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
               <iframe
                 src={`/forms/${encodeURIComponent(previewModal.category)}/${encodeURIComponent(previewModal.pdf_file)}#toolbar=1`}
-                className="w-full h-full border-none"
+                className="w-full flex-1 border-none"
                 title={previewModal.title}
               />
             </div>
