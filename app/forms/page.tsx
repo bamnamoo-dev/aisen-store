@@ -340,6 +340,7 @@ export default function FormsPage() {
             {filteredItems.map((item) => {
               // 실제 정적 파일 경로 생성 (/forms/공무원/[서식 1] 휴직원.hwpx)
               const hwpxUrl = `/forms/${encodeURIComponent(item.category)}/${encodeURIComponent(item.hwp_file)}`;
+              const pdfUrl = `/forms/${encodeURIComponent(item.category)}/${encodeURIComponent(item.pdf_file)}`;
               const isCopied = copiedId === item.id;
 
               return (
@@ -395,35 +396,36 @@ export default function FormsPage() {
                       <a
                         href={hwpxUrl}
                         download={item.hwp_file}
-                        className="flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-colors shadow-2xs cursor-pointer"
+                        className="flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-colors shadow-2xs cursor-pointer active:scale-95"
                         title="한글(HWPX) 원클릭 즉시 다운로드"
                       >
                         <Download size={13} />
                         <span>HWP 받기</span>
                       </a>
 
-                      {/* 2. PDF 미리보기 (모바일 네이티브 새 탭 / PC 인라인 모달 스마트 분기) */}
-                      <button
-                        onClick={() => {
-                          const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-                          if (isMobile) {
-                            window.open(pdfUrl, '_blank');
-                          } else {
+                      {/* 2. PDF 미리보기 (모바일: 100% 팝업차단 없는 네이티브 새 탭 / PC: 편리한 인라인 모달) */}
+                      <a
+                        href={pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+                            e.preventDefault();
                             setPreviewModal(item);
                           }
                         }}
-                        className="flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold py-1.5 px-2 rounded-lg transition-colors shadow-2xs cursor-pointer"
+                        className="flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold py-1.5 px-2 rounded-lg transition-colors shadow-2xs cursor-pointer active:scale-95"
                         title="PDF 서식 미리보기"
                       >
                         <Eye size={13} className="text-slate-500" />
                         <span>미리보기</span>
-                      </button>
+                      </a>
                     </div>
 
                     {/* 3. 서식명 복사 버튼 (공문서 기안용) */}
                     <button
                       onClick={() => handleCopyTitle(item.id, item.title, item.form_no)}
-                      className="w-full flex items-center justify-center gap-1 text-[11px] font-bold text-slate-600 hover:text-blue-600 py-1 rounded transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-center gap-1 text-[11px] font-bold text-slate-600 hover:text-blue-600 py-1 rounded transition-colors cursor-pointer active:scale-95"
                       title="공문 기안용 서식명 클립보드 복사"
                     >
                       {isCopied ? (
