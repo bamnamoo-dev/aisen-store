@@ -104,6 +104,11 @@ export default function ExcelMergePage() {
   const [copiedNotification, setCopiedNotification] = useState(false);
   const [templateFile, setTemplateFile] = useState<File | null>(null);
 
+  // 엑셀 시트 상단 미리보기 & 시각적 헤더 선택기 상태
+  const [previewRows, setPreviewRows] = useState<Array<{ rowNum: number; cells: string[] }>>([]);
+  const [previewSheetName, setPreviewSheetName] = useState<string>('');
+  const [isPreviewOpen, setIsPreviewOpen] = useState(true);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 학교 명부 불러오기
@@ -210,6 +215,65 @@ export default function ExcelMergePage() {
     }
     setFiles(prev => [...prev, ...valid]);
     setMergedBlob(null);
+  };
+
+  // 첫 번째 파일의 상단 25행을 읽어 시각적 미리보기 구성
+  const loadSheetPreview = async (file: File) => {
+    try {
+      const ExcelJS = (window as any).ExcelJS;
+      if (!ExcelJS) return;
+      const buffer = await file.arrayBuffer();
+      const wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(buffer);
+
+      let ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
+      if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
+      if (!ws) return;
+
+      setPreviewSheetName(ws.name);
+
+      const rows: Array<{ rowNum: number; cells: string[] }> = [];
+      const maxRowsToPreview = Math.min(30, ws.rowCount || 30);
+
+      for (let r = 1; r <= maxRowsToPreview; r++) {
+        const row = ws.getRow(r);
+        const cellVals: string[] = [];
+        for (let c = 1; c <= 12; c++) {
+          const val = row.getCell(c).value;
+          let text = '';
+          if (val === null || val === undefined) text = '';
+          else if (typeof val === 'object') {
+            if (val.result !== undefined) text = String(val.result);
+            else if (val.formula) text = `=${val.formula}`;
+            else text = String(val);
+          } else {
+            text = String(val);
+          }
+          cellVals.push(text.trim());
+        }
+        rows.push({ rowNum: r, cells: cellVals });
+      }
+      setPreviewRows(rows);
+    } catch (e) {
+      console.error('시트 미리보기 파싱 실패:', e);
+    }
+  };
+
+  // files 또는 sheetKeyword 변경 시 미리보기 갱신
+  useEffect(() => {
+    if (files.length > 0 && typeof window !== 'undefined' && (window as any).ExcelJS) {
+      loadSheetPreview(files[0]);
+    } else if (files.length === 0) {
+      setPreviewRows([]);
+      setPreviewSheetName('');
+    }
+  }, [files, sheetKeyword, excelJsLoaded]);
+
+  // 마우스 클릭으로 헤더 끝 행 및 본문 시작행 1초 지정
+  const handleSelectHeaderEndRow = (rowNum: number) => {
+    setHeaderEndRow(rowNum);
+    setBlockStartRow(rowNum + 1);
+    setActivePreset('custom');
   };
 
   // 136개교 가상 샘플 파일 원클릭 로드
@@ -738,6 +802,122 @@ export default function ExcelMergePage() {
                 <span>ZIP 다운 (136개교)</span>
               </a>
             </div>
+
+            {/* 👀 업로드 즉시 엑셀 상단 미리보기 & 마우스 1클릭 헤더 선택기 */}
+            {files.length > 0 && previewRows.length > 0 && (
+              <div className="bg-white rounded-2xl border-2 border-blue-300 p-4 space-y-3 shadow-md transition-all animate-in fade-in duration-300">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                      👀
+                    </span>
+                    <div>
+                      <span className="font-bold text-slate-800 text-sm block">
+                        신청서 상단 미리보기 ({files[0].name.length > 25 ? files[0].name.slice(0, 25) + '...' : files[0].name})
+                      </span>
+                      <span className="text-[11px] text-slate-400">시트명: [{previewSheetName || '기본시트'}]</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full font-bold border border-blue-200">
+                      💡 원하는 행을 클릭하면 헤더 끝이 1초 만에 변경됩니다!
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsPreviewOpen(!isPreviewOpen)}
+                      className="text-xs text-slate-500 hover:text-slate-800 font-semibold px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+                    >
+                      {isPreviewOpen ? '미리보기 접기 ▲' : '미리보기 펼치기 ▼'}
+                    </button>
+                  </div>
+                </div>
+
+                {isPreviewOpen && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+                      <span>🔵 1행 ~ <strong>{headerEndRow}행</strong>: 공통 헤더로 1회 유지</span>
+                      <span>🟢 <strong>{headerEndRow + 1}행</strong>부터: 각 학교별 본문 결합 시작</span>
+                    </div>
+
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl max-h-[340px] overflow-y-auto shadow-inner bg-slate-50/50">
+                      <table className="w-full text-xs text-left border-collapse select-none bg-white">
+                        <thead className="bg-slate-100 text-slate-600 sticky top-0 z-10 shadow-2xs">
+                          <tr>
+                            <th className="py-1.5 px-2 border-b border-r border-slate-300 w-14 text-center font-bold bg-slate-200">행</th>
+                            <th className="py-1.5 px-2 border-b border-r border-slate-300 w-32 text-center font-bold bg-slate-100">헤더/본문 지정</th>
+                            {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'].map(col => (
+                              <th key={col} className="py-1.5 px-2 border-b border-r border-slate-300 min-w-[70px] text-center font-bold bg-slate-100">
+                                {col}열
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {previewRows.map(row => {
+                            const isHeader = row.rowNum <= headerEndRow;
+                            const isHeaderEdge = row.rowNum === headerEndRow;
+                            const isStartData = row.rowNum === headerEndRow + 1;
+
+                            return (
+                              <tr
+                                key={row.rowNum}
+                                onClick={() => handleSelectHeaderEndRow(row.rowNum)}
+                                title={`${row.rowNum}행을 헤더 끝으로 지정하려면 클릭하세요`}
+                                className={`border-b border-slate-200 transition-colors cursor-pointer group ${
+                                  isHeaderEdge
+                                    ? 'bg-blue-100 hover:bg-blue-150 border-b-2 border-b-blue-600 font-semibold'
+                                    : isHeader
+                                      ? 'bg-blue-50/70 hover:bg-blue-100/70'
+                                      : isStartData
+                                        ? 'bg-emerald-50 hover:bg-emerald-100/70'
+                                        : 'hover:bg-slate-50'
+                                }`}
+                              >
+                                <td className={`py-1.5 px-2 text-center border-r border-slate-200 font-mono font-bold ${
+                                  isHeaderEdge ? 'text-blue-700 bg-blue-200/50' : 'text-slate-500'
+                                }`}>
+                                  {row.rowNum}
+                                </td>
+                                <td className="py-1 px-2 text-center border-r border-slate-200 whitespace-nowrap">
+                                  {isHeaderEdge ? (
+                                    <span className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-xs flex items-center justify-center gap-1">
+                                      ✂️ 헤더 끝 ({row.rowNum}행)
+                                    </span>
+                                  ) : isHeader ? (
+                                    <span className="text-blue-600 text-[10px] font-semibold flex items-center justify-center gap-1">
+                                      🔵 헤더 영역
+                                    </span>
+                                  ) : isStartData ? (
+                                    <span className="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-xs flex items-center justify-center gap-1">
+                                      🟢 본문 시작 ({row.rowNum}행)
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-400 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-0.5">
+                                      여기를 클릭 ➔
+                                    </span>
+                                  )}
+                                </td>
+                                {row.cells.map((cellText, cIdx) => (
+                                  <td
+                                    key={cIdx}
+                                    className={`py-1 px-2 border-r border-slate-200 truncate max-w-[130px] ${
+                                      isHeaderEdge ? 'text-blue-950 font-medium' : isHeader ? 'text-blue-900' : 'text-slate-700'
+                                    }`}
+                                    title={cellText}
+                                  >
+                                    {cellText || <span className="text-slate-300 font-normal">-</span>}
+                                  </td>
+                                ))}
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* 범용 수합 3원칙 설정 패널 */}
             <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-sm">
