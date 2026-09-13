@@ -714,7 +714,11 @@ export default function ExcelMergePage() {
       return;
     }
 
-    setFiles(prev => [...prev, ...cleaned]);
+    setFiles(prev => {
+      const existingNames = new Set(prev.map(f => f.name));
+      const deduplicatedNew = cleaned.filter(f => !existingNames.has(f.name));
+      return [...prev, ...deduplicatedNew];
+    });
     setMergedBlob(null);
   };
 
@@ -1242,86 +1246,92 @@ export default function ExcelMergePage() {
       }
 
       // =========================================================================
-      // 🌟 [동시 자동 생성] K-에듀파인 교부서식 시트 및 단독 파일 자동 빌드
+      // 🌟 [동시 자동 생성] K-에듀파인 교부서식 시트 및 단독 파일 (사용자 요청으로 비활성화/숨김)
       // =========================================================================
-      setProgress(88);
-      setStatusMessage('K-에듀파인 전출금 교부양식 동시 생성 중...');
+      const isEdufineEnabled = false; // 사용자 요청: 교부금 프로그램 비활성화
 
-      // 1. 통합 마스터 워크북(templateWb)의 2번째 탭으로 추가
-      const edufineWs = templateWb.addWorksheet('K에듀파인_교부양식');
-      edufineWs.columns = [
-        { header: '연번', key: 'seq', width: 10 },
-        { header: '학교코드', key: 'code', width: 16 },
-        { header: '학교명', key: 'name', width: 28 },
-        { header: '세부사업명', key: 'biz', width: 26 },
-        { header: '교부금액(원)', key: 'amt', width: 18 },
-        { header: '비고', key: 'note', width: 16 }
-      ];
-      const edufineHRow = edufineWs.getRow(1);
-      edufineHRow.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' } };
-      edufineHRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E40AF' } };
-      edufineHRow.alignment = { vertical: 'middle', horizontal: 'center' };
-      edufineHRow.height = 24;
+      let singleEdufineWb: any = null;
+      let edufineWs: any = null;
+      let sWs: any = null;
 
-      // 2. K-에듀파인 전용 단독 워크북 빌드 (에듀파인 업로드 전용)
-      const singleEdufineWb = new ExcelJS.Workbook();
-      const sWs = singleEdufineWb.addWorksheet('전출금교부양식');
-      sWs.columns = [
-        { header: '연번', key: 'seq', width: 10 },
-        { header: '학교코드', key: 'code', width: 16 },
-        { header: '학교명', key: 'name', width: 28 },
-        { header: '세부사업명', key: 'biz', width: 26 },
-        { header: '교부금액(원)', key: 'amt', width: 18 },
-        { header: '비고', key: 'note', width: 16 }
-      ];
-      const sHRow = sWs.getRow(1);
-      sHRow.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' } };
-      sHRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E40AF' } };
-      sHRow.alignment = { vertical: 'middle', horizontal: 'center' };
-      sHRow.height = 24;
+      if (isEdufineEnabled) {
+        setProgress(88);
+        setStatusMessage('K-에듀파인 전출금 교부양식 생성 중...');
 
-      // 데이터 채우기 (자체 명부의 연번·학교코드·학교명 100% 반영)
-      sortedSeqs.forEach((seq, idx) => {
-        const info = matchedMap.get(seq)!;
-        const ws = info.data;
+        // 1. 통합 마스터 워크북(templateWb)의 2번째 탭으로 추가
+        edufineWs = templateWb.addWorksheet('K에듀파인_교부양식');
+        edufineWs.columns = [
+          { header: '연번', key: 'seq', width: 10 },
+          { header: '학교코드', key: 'code', width: 16 },
+          { header: '학교명', key: 'name', width: 28 },
+          { header: '세부사업명', key: 'biz', width: 26 },
+          { header: '교부금액(원)', key: 'amt', width: 18 },
+          { header: '비고', key: 'note', width: 16 }
+        ];
+        const edufineHRow = edufineWs.getRow(1);
+        edufineHRow.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' } };
+        edufineHRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E40AF' } };
+        edufineHRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        edufineHRow.height = 24;
 
-        // 교부금액 추출: edufineAmountCol 열에서 합산 또는 첫 행 값 추출
-        let amount = 0;
-        const amtCell = ws.getCell(blockStartRow, edufineAmountCol).value;
-        if (typeof amtCell === 'number') {
-          amount = amtCell;
-        } else if (amtCell && typeof amtCell === 'object' && 'result' in amtCell && typeof amtCell.result === 'number') {
-          amount = amtCell.result;
-        } else if (amtCell) {
-          const parsed = parseInt(String(amtCell).replace(/[^0-9-]/g, ''), 10);
-          if (!isNaN(parsed)) amount = parsed;
-        }
+        // 2. K-에듀파인 전용 단독 워크북 빌드 (에듀파인 업로드 전용)
+        singleEdufineWb = new ExcelJS.Workbook();
+        sWs = singleEdufineWb.addWorksheet('전출금교부양식');
+        sWs.columns = [
+          { header: '연번', key: 'seq', width: 10 },
+          { header: '학교코드', key: 'code', width: 16 },
+          { header: '학교명', key: 'name', width: 28 },
+          { header: '세부사업명', key: 'biz', width: 26 },
+          { header: '교부금액(원)', key: 'amt', width: 18 },
+          { header: '비고', key: 'note', width: 16 }
+        ];
+        const sHRow = sWs.getRow(1);
+        sHRow.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' } };
+        sHRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E40AF' } };
+        sHRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        sHRow.height = 24;
 
-        // 자체 명부에 등록된 학교코드가 있으면 100% 우선 적용, 없으면 서울시교육청 표준 B-기관코드 형식(B1000001...) 자동 부여
-        const defaultCode = `B10${String(info.school.seq || (idx + 1)).padStart(5, '0')}`;
-        const codeStr = info.school.code || defaultCode;
+        // 데이터 채우기 (자체 명부의 연번·학교코드·학교명 반영)
+        sortedSeqs.forEach((seq, idx) => {
+          const info = matchedMap.get(seq)!;
+          const ws = info.data;
 
-        const rowData = {
-          seq: idx + 1,
-          code: codeStr,
-          name: info.school.name,
-          biz: edufineBizName || '학교 전출금 교부액',
-          amt: amount,
-          note: '정상 교부'
-        };
+          let amount = 0;
+          const amtCell = ws.getCell(blockStartRow, edufineAmountCol).value;
+          if (typeof amtCell === 'number') {
+            amount = amtCell;
+          } else if (amtCell && typeof amtCell === 'object' && 'result' in amtCell && typeof amtCell.result === 'number') {
+            amount = amtCell.result;
+          } else if (amtCell) {
+            const parsed = parseInt(String(amtCell).replace(/[^0-9-]/g, ''), 10);
+            if (!isNaN(parsed)) amount = parsed;
+          }
 
-        const r1 = edufineWs.addRow(rowData);
-        r1.alignment = { vertical: 'middle' };
-        r1.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
-        r1.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
-        r1.getCell(5).numFmt = '#,##0';
+          const defaultCode = `B10${String(info.school.seq || (idx + 1)).padStart(5, '0')}`;
+          const codeStr = info.school.code || defaultCode;
 
-        const r2 = sWs.addRow(rowData);
-        r2.alignment = { vertical: 'middle' };
-        r2.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
-        r2.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
-        r2.getCell(5).numFmt = '#,##0';
-      });
+          const rowData = {
+            seq: idx + 1,
+            code: codeStr,
+            name: info.school.name,
+            biz: edufineBizName || '학교 전출금 교부액',
+            amt: amount,
+            note: '정상 교부'
+          };
+
+          const r1 = edufineWs.addRow(rowData);
+          r1.alignment = { vertical: 'middle' };
+          r1.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+          r1.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
+          r1.getCell(5).numFmt = '#,##0';
+
+          const r2 = sWs.addRow(rowData);
+          r2.alignment = { vertical: 'middle' };
+          r2.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+          r2.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
+          r2.getCell(5).numFmt = '#,##0';
+        });
+      }
 
       // 5. 최종 파일 빌드 전 워크시트 내 잔존 공유 수식(Shared Formula) 전수 안전 살균
       // (cell.model 내부의 sharedFormula 속성까지 100% 제거하여 ExcelJS 크래시 원천 차단)
@@ -1407,14 +1417,18 @@ export default function ExcelMergePage() {
       setMergedBlob(outBlob);
       setMergedFileName(`마스터_통합_취합결과_${new Date().toISOString().slice(0, 10)}.xlsx`);
 
-      // B. K-에듀파인 전용 단독 엑셀 파일
-      const sBuffer = await safeWriteWorkbook(singleEdufineWb);
-      const sBlob = new Blob([sBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      setEdufineBlob(sBlob);
-      setEdufineFileName(`K에듀파인_전출금교부양식_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      // B. K-에듀파인 전용 단독 엑셀 파일 (사용자 요청으로 비활성화/숨김)
+      if (singleEdufineWb) {
+        const sBuffer = await safeWriteWorkbook(singleEdufineWb);
+        const sBlob = new Blob([sBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        setEdufineBlob(sBlob);
+        setEdufineFileName(`K에듀파인_전출금교부양식_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      } else {
+        setEdufineBlob(null);
+      }
 
       setProgress(100);
-      setStatusMessage(`취합 성공! 통합서식 및 에듀파인 교부서식 동시 완성 (정상 ${matchedMap.size}건 / 미제출 ${missing.length}건)`);
+      setStatusMessage(`취합 성공! 마스터 서식 완성 (정상 ${matchedMap.size}건 / 미제출 ${missing.length}건)`);
 
     } catch (error: any) {
       console.error('병합 오류:', error);
@@ -1836,54 +1850,46 @@ export default function ExcelMergePage() {
           </button>
         </div>
 
-        {/* 🏛️ [Step 1] 수합 방식 및 기준 기관 설정 (모바일 최적화 반응형 뷰) */}
+        {/* 🏛️ [Step 1] 수합 방식 및 기준 기관 설정 (좌우 완벽 수평 칼정렬) */}
         <div className="bg-white rounded-xl border border-slate-200 p-3 sm:px-5 sm:py-3 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          {/* 좌측: Step 1 뱃지 + 2대 수합 모드 탭 (모바일 터치 친화형) */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5">
-            <div className="flex items-center gap-2">
-              <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-md border border-blue-200 shrink-0">
-                Step 1
-              </span>
-              <div className="inline-flex bg-slate-100 p-0.5 rounded-lg flex-1 sm:flex-initial">
-                <button
-                  type="button"
-                  onClick={() => setMode('block')}
-                  className={`flex-1 sm:flex-initial py-2 sm:py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                    mode === 'block' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                  title="복합 신청서, 셀 병합, 합계 수식이 들어간 엑셀 양식 취합"
-                >
-                  <Layers size={14} />
-                  <span>서식 블록형</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('simple')}
-                  className={`flex-1 sm:flex-initial py-2 sm:py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                    mode === 'simple' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                  title="1행 1데이터 형태의 일반 명부, 실태조사 엑셀 양식 취합"
-                >
-                  <FileSpreadsheet size={14} />
-                  <span>단순 목록형</span>
-                </button>
-              </div>
-            </div>
-
-            {/* K-에듀파인 교부서식 동시 생성 안내 뱃지 */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 text-[11px] sm:text-xs font-bold shadow-2xs w-fit">
-              <Send size={12} className="text-emerald-600" />
-              <span>K-에듀파인 교부서식 동시 생성</span>
+          {/* 좌측: Step 1 뱃지 + 2대 수합 모드 탭 */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-1.5 rounded-lg border border-blue-200 shrink-0">
+              Step 1
+            </span>
+            <div className="inline-flex bg-slate-100 p-0.5 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setMode('block')}
+                className={`py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  mode === 'block' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title="복합 신청서, 셀 병합, 합계 수식이 들어간 엑셀 양식 취합"
+              >
+                <Layers size={14} />
+                <span>서식 블록형</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('simple')}
+                className={`py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  mode === 'simple' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title="1행 1데이터 형태의 일반 명부, 실태조사 엑셀 양식 취합"
+              >
+                <FileSpreadsheet size={14} />
+                <span>단순 목록형</span>
+              </button>
             </div>
           </div>
 
-          {/* 우측: 기준 명부 매핑 드롭다운 & 자체 명부 버튼 (모바일 터치 최적화) */}
-          <div className="flex flex-wrap items-center gap-2 pt-1 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+          {/* 우측: 기준 명부 매핑 드롭다운 & 자체 명부 버튼 (인라인 수평 정렬) */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-1 lg:pt-0 border-t lg:border-t-0 border-slate-100">
             <span className="text-xs sm:text-sm font-bold text-slate-700 shrink-0">기준 명부:</span>
             <select
               value={selectedRegion}
               onChange={e => setSelectedRegion(e.target.value)}
-              className="flex-1 sm:flex-initial bg-slate-50 border border-slate-300 rounded-lg px-2.5 sm:px-3 py-2 sm:py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer min-h-[38px]"
+              className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer h-[38px] max-w-[260px] sm:max-w-[330px] truncate"
             >
               {ROSTER_OPTIONS.map(opt => {
                 if (opt.id === 'custom') {
@@ -1918,7 +1924,7 @@ export default function ExcelMergePage() {
               <button
                 type="button"
                 onClick={() => rosterInputRef.current?.click()}
-                className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold py-2 sm:py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer min-h-[38px]"
+                className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer h-[38px]"
                 title="A열: 연번, B열: 학교/기관명이 적힌 엑셀 파일을 업로드합니다."
               >
                 <FileUp size={14} className="text-blue-600" />
@@ -1927,29 +1933,24 @@ export default function ExcelMergePage() {
               <button
                 type="button"
                 onClick={handleDownloadRosterTemplate}
-                className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-bold py-2 sm:py-1.5 px-2.5 rounded-lg border border-blue-200 transition-colors cursor-pointer min-h-[38px]"
+                className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-bold py-1.5 px-2.5 rounded-lg border border-blue-200 transition-colors cursor-pointer h-[38px]"
                 title="자체 명부 표준 엑셀 양식(.xlsx)을 다운로드합니다. (A열: 연번, B열: 학교명, 선택: 학교코드)"
               >
                 <Download size={13} />
                 <span>양식</span>
               </button>
-            </div>
-
-            {customRosterName && (
-              <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 bg-blue-50 text-blue-700 font-bold px-2.5 py-1.5 rounded-md border border-blue-200 text-xs sm:text-sm shadow-2xs">
-                <span className="truncate max-w-[200px] sm:max-w-[220px]" title={customRosterName}>
-                  {customRosterName}
-                </span>
+              {customRosterName && (
                 <button
                   type="button"
                   onClick={handleDeleteCustomRoster}
-                  className="text-rose-500 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md cursor-pointer transition-colors shrink-0"
+                  className="flex items-center gap-1 text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs sm:text-sm font-bold py-1.5 px-2 rounded-lg cursor-pointer transition-colors h-[38px]"
                   title="브라우저에 저장된 자체 명부 삭제"
                 >
                   <X size={13} />
+                  <span>해제</span>
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
@@ -2430,48 +2431,50 @@ export default function ExcelMergePage() {
             </div>
           </div>
 
-          {/* K-에듀파인 교부 자동 연동 설정 (모바일 인풋 최적화) */}
-          <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-3 sm:p-3.5 space-y-2 shadow-2xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-              <span className="font-extrabold text-emerald-900 text-xs sm:text-sm flex items-center gap-1.5">
-                <Send size={14} className="text-emerald-700" />
-                <span>K-에듀파인 교부서식 자동 연동 설정</span>
-              </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-200 w-fit">
-                수합 시 시트 2 및 전용 파일 동시 생성
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm pt-1 border-t border-emerald-200/60">
-              <div>
-                <span className="text-slate-700 font-bold block mb-1 text-[11px] sm:text-xs">
-                  에듀파인 세부사업명
+          {/* (사용자 요청) K-에듀파인 교부 자동 연동 설정 숨김 처리 (삭제하지 않고 비노출) */}
+          {false && (
+            <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-3 sm:p-3.5 space-y-2 shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <span className="font-extrabold text-emerald-900 text-xs sm:text-sm flex items-center gap-1.5">
+                  <Send size={14} className="text-emerald-700" />
+                  <span>K-에듀파인 교부서식 자동 연동 설정</span>
                 </span>
-                <input 
-                  type="text" 
-                  value={edufineBizName} 
-                  onChange={e => setEdufineBizName(e.target.value)}
-                  placeholder="예: 학교 전출금 교부액, 무상급식비 지원"
-                  className="w-full bg-white border border-emerald-300 rounded-lg px-2.5 py-1.5 text-slate-900 font-bold text-xs sm:text-sm h-[38px] outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"
-                />
+                <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-200 w-fit">
+                  수합 시 시트 2 및 전용 파일 동시 생성
+                </span>
               </div>
-              <div>
-                <span className="text-slate-700 font-bold block mb-1 text-[11px] sm:text-xs">
-                  교부금액 열 번호 <span className="text-emerald-700 font-normal text-[10px]">(I열=9열, H열=8열)</span>
-                </span>
-                <div className="flex items-center gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm pt-1 border-t border-emerald-200/60">
+                <div>
+                  <span className="text-slate-700 font-bold block mb-1 text-[11px] sm:text-xs">
+                    에듀파인 세부사업명
+                  </span>
                   <input 
-                    type="number" 
-                    inputMode="numeric"
-                    value={edufineAmountCol} 
-                    onChange={e => setEdufineAmountCol(Number(e.target.value))}
-                    className="w-20 bg-white border border-emerald-300 rounded-lg px-2 py-1 text-slate-900 text-center font-black text-xs sm:text-sm h-[38px] shadow-2xs"
+                    type="text" 
+                    value={edufineBizName} 
+                    onChange={e => setEdufineBizName(e.target.value)}
+                    placeholder="예: 학교 전출금 교부액, 무상급식비 지원"
+                    className="w-full bg-white border border-emerald-300 rounded-lg px-2.5 py-1.5 text-slate-900 font-bold text-xs sm:text-sm h-[38px] outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"
                   />
-                  <span className="text-slate-600 text-xs font-bold">열</span>
-                  <span className="text-slate-400 text-[10px] sm:text-[11px] ml-1 truncate">(제출 서식의 지원 금액 컬럼)</span>
+                </div>
+                <div>
+                  <span className="text-slate-700 font-bold block mb-1 text-[11px] sm:text-xs">
+                    교부금액 열 번호 <span className="text-emerald-700 font-normal text-[10px]">(I열=9열, H열=8열)</span>
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <input 
+                      type="number" 
+                      inputMode="numeric"
+                      value={edufineAmountCol} 
+                      onChange={e => setEdufineAmountCol(Number(e.target.value))}
+                      className="w-20 bg-white border border-emerald-300 rounded-lg px-2 py-1 text-slate-900 text-center font-black text-xs sm:text-sm h-[38px] shadow-2xs"
+                    />
+                    <span className="text-slate-600 text-xs font-bold">열</span>
+                    <span className="text-slate-400 text-[10px] sm:text-[11px] ml-1 truncate">(제출 서식의 지원 금액 컬럼)</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* 🚀 [Step 5] 취합 실행 및 결과 대시보드 (모바일 터치 친화형) */}
@@ -2570,27 +2573,27 @@ export default function ExcelMergePage() {
                 </div>
                 <div>
                   <div className="font-bold text-emerald-950 text-xs sm:text-base">
-                    취합 완료! (통합 신청서 마스터 + K-에듀파인 교부서식 동시 완성)
+                    취합 완료! (통합 마스터 엑셀 완성)
                   </div>
                   <div className="text-[11px] sm:text-xs text-emerald-700 mt-0.5 font-medium">
-                    100% 서식·수식 보존 · {((mergedBlob.size) / (1024 * 1024)).toFixed(2)} MB · 시트 1: 통합서식 / 시트 2: 교부양식
+                    100% 서식·수식 보존 취합 완료 · {((mergedBlob.size) / (1024 * 1024)).toFixed(2)} MB
                   </div>
                 </div>
               </div>
               
               <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto shrink-0">
-                {/* 1. 마스터 엑셀 다운로드 (시트 1: 통합 신청서 + 시트 2: 에듀파인 교부서식) */}
+                {/* 1. 마스터 엑셀 다운로드 */}
                 <button
                   onClick={handleDownloadMaster}
                   className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-black px-4 sm:px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm min-h-[42px]"
-                  title="전체 학교 통합 신청서(시트1)와 K-에듀파인 교부서식(시트2)이 모두 포함된 올인원 마스터 파일"
+                  title="전체 학교 통합 신청서 마스터 엑셀 다운로드"
                 >
                   <Download size={15} />
-                  <span>마스터 엑셀 다운로드 (통합본)</span>
+                  <span>마스터 엑셀 다운로드</span>
                 </button>
 
-                {/* 2. K-에듀파인 전용 단독 엑셀 파일 다운로드 */}
-                {edufineBlob && (
+                {/* 2. (사용자 요청) K-에듀파인 전용 단독 엑셀 파일 다운로드 숨김 */}
+                {false && edufineBlob && (
                   <button
                     onClick={handleDownloadEdufine}
                     className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:from-blue-800 active:to-indigo-800 text-white font-black px-4 sm:px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm min-h-[42px]"
