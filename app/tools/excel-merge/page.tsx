@@ -970,55 +970,64 @@ export default function ExcelMergePage() {
           setProgress(pct);
           setStatusMessage(`기관 데이터 결합 (${idx + 1}/${sortedSeqs.length}): ${info.school.name} (${actualRowCount}행)`);
 
-          // 행별 셀 복사 (값, 서식, 수식)
-          for (let r = 0; r < actualRowCount; r++) {
-            const srcRowNum = blockStartRow + r;
-            const dstRowNum = dstStartRow + r;
-            const srcRow = srcWs.getRow(srcRowNum);
-            const dstRow = targetWs.getRow(dstRowNum);
+          try {
+            // 행별 셀 복사 (값, 서식, 수식)
+            for (let r = 0; r < actualRowCount; r++) {
+              const srcRowNum = blockStartRow + r;
+              const dstRowNum = dstStartRow + r;
+              const srcRow = srcWs.getRow(srcRowNum);
+              const dstRow = targetWs.getRow(dstRowNum);
 
-            if (srcRow.height) dstRow.height = srcRow.height;
+              if (srcRow.height) dstRow.height = srcRow.height;
 
-            srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
-              const dstCell = dstRow.getCell(colNumber);
+              srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
+                const dstCell = dstRow.getCell(colNumber);
 
-              // 🛡️ 셀 값 및 수식 안전 복사 (Shared Formula 방어)
-              dstCell.value = copyCellValueSafely(cell, rowOffset);
+                // 🛡️ 셀 값 및 수식 안전 복사 (Shared Formula 방어)
+                dstCell.value = copyCellValueSafely(cell, rowOffset);
 
-              // 스타일 100% 보존
-              if (cell.font) dstCell.font = { ...cell.font };
-              if (cell.fill) dstCell.fill = { ...cell.fill };
-              if (cell.border) dstCell.border = { ...cell.border };
-              if (cell.alignment) dstCell.alignment = { ...cell.alignment };
-              if (cell.numFmt) dstCell.numFmt = cell.numFmt;
-            });
-          }
+                // 스타일 100% 보존
+                if (cell.font) dstCell.font = { ...cell.font };
+                if (cell.fill) dstCell.fill = { ...cell.fill };
+                if (cell.border) dstCell.border = { ...cell.border };
+                if (cell.alignment) dstCell.alignment = { ...cell.alignment };
+                if (cell.numFmt) dstCell.numFmt = cell.numFmt;
+              });
+            }
 
-          // 병합 셀 오프셋 이동 적용
-          if (idx > 0 && srcWs.model && srcWs.model.merges) {
-            srcWs.model.merges.forEach((mergeRange: string) => {
-              const parts = mergeRange.split(':');
-              if (parts.length === 2) {
-                const match1 = parts[0].match(/([A-Z]+)(\d+)/);
-                const match2 = parts[1].match(/([A-Z]+)(\d+)/);
-                if (match1 && match2) {
-                  const col1 = match1[1];
-                  const row1 = parseInt(match1[2], 10);
-                  const col2 = match2[1];
-                  const row2 = parseInt(match2[2], 10);
+            // 병합 셀 오프셋 이동 적용
+            if (idx > 0 && srcWs.model && srcWs.model.merges) {
+              srcWs.model.merges.forEach((mergeRange: string) => {
+                const parts = mergeRange.split(':');
+                if (parts.length === 2) {
+                  const match1 = parts[0].match(/([A-Z]+)(\d+)/);
+                  const match2 = parts[1].match(/([A-Z]+)(\d+)/);
+                  if (match1 && match2) {
+                    const col1 = match1[1];
+                    const row1 = parseInt(match1[2], 10);
+                    const col2 = match2[1];
+                    const row2 = parseInt(match2[2], 10);
 
-                  if (row1 >= blockStartRow && row2 < blockStartRow + actualRowCount) {
-                    const newMerge = `${col1}${row1 + rowOffset}:${col2}${row2 + rowOffset}`;
-                    try {
-                      targetWs.mergeCells(newMerge);
-                    } catch (e) {}
+                    if (row1 >= blockStartRow && row2 < blockStartRow + actualRowCount) {
+                      const newMerge = `${col1}${row1 + rowOffset}:${col2}${row2 + rowOffset}`;
+                      try {
+                        targetWs.mergeCells(newMerge);
+                      } catch (e) {}
+                    }
                   }
                 }
-              }
-            });
-          }
+              });
+            }
 
-          currentDstRow += actualRowCount;
+            currentDstRow += actualRowCount;
+          } catch (schoolMergeErr: any) {
+            console.error(`[${info.school.name}] 서식 오류로 자동 패스:`, schoolMergeErr);
+            const foundItem = processed.find(p => p.matchedSeq === seq || p.schoolName === info.school.name);
+            if (foundItem) {
+              foundItem.status = 'error';
+              foundItem.errorMsg = '서식/수식 깨짐 (자동 패스)';
+            }
+          }
         }
       } else {
         // [모드 2: 단순 목록형 취합]
@@ -1030,25 +1039,34 @@ export default function ExcelMergePage() {
           const lastR = findLastDataRow(srcWs, blockStartRow);
           const count = Math.max(1, lastR - blockStartRow + 1);
 
-          for (let r = 0; r < count; r++) {
-            const srcRowNum = blockStartRow + r;
-            const dstRowNum = currentDstRow + r;
-            const rowOffset = dstRowNum - srcRowNum;
-            const srcRow = srcWs.getRow(srcRowNum);
-            const dstRow = targetWs.getRow(dstRowNum);
-            if (srcRow.height) dstRow.height = srcRow.height;
+          try {
+            for (let r = 0; r < count; r++) {
+              const srcRowNum = blockStartRow + r;
+              const dstRowNum = currentDstRow + r;
+              const rowOffset = dstRowNum - srcRowNum;
+              const srcRow = srcWs.getRow(srcRowNum);
+              const dstRow = targetWs.getRow(dstRowNum);
+              if (srcRow.height) dstRow.height = srcRow.height;
 
-            srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
-              const dstCell = dstRow.getCell(colNumber);
-              dstCell.value = copyCellValueSafely(cell, rowOffset);
-              if (cell.font) dstCell.font = { ...cell.font };
-              if (cell.fill) dstCell.fill = { ...cell.fill };
-              if (cell.border) dstCell.border = { ...cell.border };
-              if (cell.alignment) dstCell.alignment = { ...cell.alignment };
-              if (cell.numFmt) dstCell.numFmt = cell.numFmt;
-            });
+              srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
+                const dstCell = dstRow.getCell(colNumber);
+                dstCell.value = copyCellValueSafely(cell, rowOffset);
+                if (cell.font) dstCell.font = { ...cell.font };
+                if (cell.fill) dstCell.fill = { ...cell.fill };
+                if (cell.border) dstCell.border = { ...cell.border };
+                if (cell.alignment) dstCell.alignment = { ...cell.alignment };
+                if (cell.numFmt) dstCell.numFmt = cell.numFmt;
+              });
+            }
+            currentDstRow += count;
+          } catch (listMergeErr: any) {
+            console.error(`[${info.school.name}] 목록형 서식 오류로 자동 패스:`, listMergeErr);
+            const foundItem = processed.find(p => p.matchedSeq === seq || p.schoolName === info.school.name);
+            if (foundItem) {
+              foundItem.status = 'error';
+              foundItem.errorMsg = '서식/수식 깨짐 (자동 패스)';
+            }
           }
-          currentDstRow += count;
         }
       }
 
@@ -1176,18 +1194,50 @@ export default function ExcelMergePage() {
         });
       });
 
-      // 5. 최종 파일 빌드 (통합 마스터 엑셀 및 K-에듀파인 단독 엑셀)
+      // 5. 최종 파일 빌드 (무정지 2단계 안전 그물망 적용)
       setProgress(95);
       setStatusMessage('통합 마스터 및 에듀파인 교부 파일 최종 렌더링 중...');
 
+      // 🛡️ 무정지 엑셀 빌드 헬퍼 (수식 충돌 시 전원 자동 값 확정 복구 모드 가동)
+      const safeWriteWorkbook = async (wb: any): Promise<Uint8Array> => {
+        try {
+          return await wb.xlsx.writeBuffer();
+        } catch (writeErr: any) {
+          console.warn('1차 수식 보존 빌드 실패 (신청서 수식 손상 감지):', writeErr.message);
+          console.warn('-> 2차 무정지 안전망 가동: 모든 셀 값을 확정값으로 자동 복원하여 파일 생성');
+
+          wb.eachSheet((w: any) => {
+            w.eachRow({ includeEmpty: true }, (row: any) => {
+              row.eachCell({ includeEmpty: true }, (cell: any) => {
+                if (cell.type === 6 || cell.model?.type === 6 || cell.model?.sharedFormula || cell.formula) {
+                  const val = cell.model?.result ?? cell.result ?? cell.value?.result ?? cell.value ?? null;
+                  const cleanVal = (val !== null && typeof val === 'object') ? null : val;
+                  cell.value = cleanVal;
+                  if (cell.model) {
+                    delete cell.model.formula;
+                    delete cell.model.sharedFormula;
+                    delete cell.model.shareType;
+                    delete cell.model.ref;
+                    cell.model.type = typeof cleanVal === 'number' ? 2 : (typeof cleanVal === 'string' ? 3 : 0);
+                    cell.model.value = cleanVal;
+                  }
+                }
+              });
+            });
+          });
+
+          return await wb.xlsx.writeBuffer();
+        }
+      };
+
       // A. 통합 마스터 엑셀 (시트 1: 신청서 취합 원본 + 시트 2: K-에듀파인 교부양식)
-      const outBuffer = await templateWb.xlsx.writeBuffer();
+      const outBuffer = await safeWriteWorkbook(templateWb);
       const outBlob = new Blob([outBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       setMergedBlob(outBlob);
       setMergedFileName(`마스터_통합_취합결과_${new Date().toISOString().slice(0, 10)}.xlsx`);
 
       // B. K-에듀파인 전용 단독 엑셀 파일
-      const sBuffer = await singleEdufineWb.xlsx.writeBuffer();
+      const sBuffer = await safeWriteWorkbook(singleEdufineWb);
       const sBlob = new Blob([sBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       setEdufineBlob(sBlob);
       setEdufineFileName(`K에듀파인_전출금교부양식_${new Date().toISOString().slice(0, 10)}.xlsx`);
