@@ -43,10 +43,10 @@ export default function ExcelMergePage() {
   
   // 블록 모드 설정 (신청, 신청서 등)
   const [sheetKeyword, setSheetKeyword] = useState('신청');
-  const [blockStartRow, setBlockStartRow] = useState(16);
+  const [blockStartRow, setBlockStartRow] = useState(18);
   const [blockRowCount, setBlockRowCount] = useState(16);
   const [schoolCellCol, setSchoolCellCol] = useState(5); // E열
-  const [schoolCellRowOffset, setSchoolCellRowOffset] = useState(0); // 시작행 기준 0이면 16행, 2면 18행
+  const [schoolCellRowOffset, setSchoolCellRowOffset] = useState(0); // 시작행 기준 0이면 18행, 2면 20행
   
   // 단순 표 모드 설정
   const [headerRowCount, setHeaderRowCount] = useState(1);
