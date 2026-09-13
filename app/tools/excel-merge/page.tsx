@@ -841,115 +841,104 @@ export default function ExcelMergePage() {
         }
       />
 
-      <main className="flex-1 max-w-[1140px] w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-4.5">
+      <main className="flex-1 max-w-[1140px] w-full mx-auto px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-3.5">
         
-        {/* 상단 슬로건 & 오프라인 단독 파일 다운로드 바 (세로 콤팩트 원라인) */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-2.5">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
-            <span className="bg-emerald-400 text-slate-900 px-2 py-0.5 rounded-full text-xs font-black">서버 유출 0%</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">100% 로컬 보안</span>
-            <span className="text-white font-black text-sm sm:text-base">
+        {/* 상단 슬로건 & 오프라인 단독 파일 다운로드 바 (세로 50% 슬림화) */}
+        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-xl px-3.5 py-2 text-white shadow-2xs flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 text-xs overflow-hidden">
+            <span className="bg-emerald-400 text-slate-900 px-1.5 py-0.5 rounded text-[11px] font-black shrink-0">서버 유출 0%</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-bold shrink-0 hidden sm:inline">100% 로컬 보안</span>
+            <span className="font-bold truncate text-xs sm:text-sm">
               수십·수백 개 엑셀 서식을 2초 만에 단 1장의 마스터로!
             </span>
           </div>
 
           <button 
             onClick={downloadOfflineHtml}
-            className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/30 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 backdrop-blur-sm cursor-pointer active:scale-95"
+            className="flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer active:scale-95"
             title="인터넷이 차단된 폐쇄망 PC용 단일 파일 다운로드"
           >
-            <DownloadCloud size={15} />
-            <span>오프라인 단독파일 다운</span>
+            <DownloadCloud size={13} />
+            <span className="hidden sm:inline">오프라인 다운</span>
+            <span className="sm:hidden">오프라인</span>
           </button>
         </div>
 
-        {/* 🏛️ [Step 1] 기준 명부 설정 & 3대 수합 모드 상단 컨트롤 바 (콤팩트) */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-4.5 shadow-2xs space-y-2.5">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <div className="flex items-center gap-2">
-              <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2 py-0.5 rounded-lg border border-blue-200">
-                Step 1
-              </span>
-              <span className="font-black text-slate-800 text-sm sm:text-base flex items-center gap-1.5">
-                <Building2 size={17} className="text-blue-600" />
-                수합 방식 및 기준 기관 설정
-              </span>
-            </div>
-            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-              전국 17개 시도교육청 및 자체 서식 완벽 대응
+        {/* 🏛️ [Step 1] 수합 방식 및 기준 기관 설정 (세로 50% 슬림 1열 통합 바) */}
+        <div className="bg-white rounded-xl border border-slate-200 px-3.5 py-2 sm:px-4 sm:py-2.5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-2">
+          {/* 좌측: Step 1 뱃지 + 3대 수합 모드 탭 (컴팩트 인라인) */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="bg-blue-50 text-blue-700 text-xs font-black px-2 py-0.5 rounded-md border border-blue-200 shrink-0">
+              Step 1
             </span>
-          </div>
-
-          {/* 3대 수합 모드 선택 탭 */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
-            <button
-              onClick={() => setMode('block')}
-              className={`py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                mode === 'block' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Layers size={15} />
-              <span>서식 블록형 취합</span>
-            </button>
-            <button
-              onClick={() => setMode('simple')}
-              className={`py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                mode === 'simple' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <FileSpreadsheet size={15} />
-              <span>단순 목록형 취합</span>
-            </button>
-            <button
-              onClick={() => setMode('edufine')}
-              className={`py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                mode === 'edufine' ? 'bg-white text-emerald-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Send size={15} />
-              <span>K-에듀파인 교부 변환</span>
-            </button>
-          </div>
-
-          {/* 기준 명부 선택 및 자체 엑셀 업로드 */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs sm:text-sm font-bold text-slate-700 shrink-0">
-                기준 명부 매핑:
-              </span>
-              <select
-                value={selectedRegion}
-                onChange={e => setSelectedRegion(e.target.value)}
-                className="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
-              >
-                {REGIONAL_OFFICES.map(office => (
-                  <option key={office.id} value={office.id}>
-                    {office.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* 자체 명부 파일 등록 버튼 */}
-              <input 
-                ref={rosterInputRef}
-                type="file" 
-                accept=".xlsx,.xlsm,.xls" 
-                className="hidden" 
-                onChange={handleRosterFileChange}
-              />
+            <div className="inline-flex bg-slate-100 p-0.5 rounded-lg">
               <button
                 type="button"
-                onClick={() => rosterInputRef.current?.click()}
-                className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer"
-                title="A열: 연번, B열: 학교/기관명이 적힌 엑셀 파일을 업로드합니다."
+                onClick={() => setMode('block')}
+                className={`py-1 px-2.5 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  mode === 'block' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
+                }`}
               >
-                <FileUp size={14} className="text-blue-600" />
-                <span>자체 명부 엑셀 등록</span>
+                <Layers size={13} />
+                <span>서식 블록형</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('simple')}
+                className={`py-1 px-2.5 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  mode === 'simple' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <FileSpreadsheet size={13} />
+                <span>단순 목록형</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('edufine')}
+                className={`py-1 px-2.5 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  mode === 'edufine' ? 'bg-white text-emerald-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Send size={13} />
+                <span>K-에듀파인</span>
               </button>
             </div>
+          </div>
+
+          {/* 우측: 기준 명부 매핑 드롭다운 & 자체 명부 버튼 (1열 수평 정렬) */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-600 shrink-0">기준 명부:</span>
+            <select
+              value={selectedRegion}
+              onChange={e => setSelectedRegion(e.target.value)}
+              className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+            >
+              {REGIONAL_OFFICES.map(office => (
+                <option key={office.id} value={office.id}>
+                  {office.name}
+                </option>
+              ))}
+            </select>
+
+            <input 
+              ref={rosterInputRef}
+              type="file" 
+              accept=".xlsx,.xlsm,.xls" 
+              className="hidden" 
+              onChange={handleRosterFileChange}
+            />
+            <button
+              type="button"
+              onClick={() => rosterInputRef.current?.click()}
+              className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-1 px-2.5 rounded-lg border border-slate-200 transition-colors cursor-pointer shrink-0"
+              title="A열: 연번, B열: 학교/기관명이 적힌 엑셀 파일을 업로드합니다."
+            >
+              <FileUp size={13} className="text-blue-600" />
+              <span>자체 명부</span>
+            </button>
 
             {customRosterName && (
-              <span className="text-xs sm:text-sm bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-lg border border-blue-200">
+              <span className="text-xs bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md border border-blue-200 truncate max-w-[130px]">
                 {customRosterName}
               </span>
             )}
