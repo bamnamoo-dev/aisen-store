@@ -705,21 +705,34 @@ export default function ExcelMergePage() {
     const hasExcelInNew = cleaned.some(f => 
       f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls')
     );
-    const hasExcelInPrev = files.some(f => 
-      f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls')
-    );
 
-    if (!hasExcelInNew && !hasExcelInPrev) {
+    if (!hasExcelInNew) {
       alert('취합 기준 템플릿이 될 유효한 엑셀 파일(.xlsx, .xlsm)이 최소 1개 이상 포함되어야 합니다.');
       return;
     }
 
-    setFiles(prev => {
-      const existingNames = new Set(prev.map(f => f.name));
-      const deduplicatedNew = cleaned.filter(f => !existingNames.has(f.name));
-      return [...prev, ...deduplicatedNew];
-    });
+    // 🌟 사용자 요청: 새 파일 업로드 시 기존 자료(파일 및 이전 취합 결과)를 완전히 초기화하고 새 파일들로 교체!
+    // 동일 이름 중복 파일 원천 제거
+    const uniqueFiles: File[] = [];
+    const seenNames = new Set<string>();
+    for (const f of cleaned) {
+      if (!seenNames.has(f.name)) {
+        seenNames.add(f.name);
+        uniqueFiles.push(f);
+      }
+    }
+
+    // 기존 파일 및 결과 데이터 완전 초기화 & 새 파일들로 교체
+    setFiles(uniqueFiles);
+    setProcessedList([]);
+    setMissingSchools([]);
     setMergedBlob(null);
+    setMergedFileName('');
+    setEdufineBlob(null);
+    setProgress(0);
+    setStatusMessage('');
+    setActiveReportTab('missing');
+    setCopiedReportType(null);
   };
 
   // 136개교 가상 샘플 파일 로드
