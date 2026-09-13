@@ -486,14 +486,52 @@ export default function ExcelMergePage() {
     return detectedRow;
   };
 
+  // 🛡️ 한셀/비표준 메타데이터 reading 'company' 크래시 방어 및 자동 치유 엑셀 로더
+  const loadWorkbookSafely = async (file: File, ExcelJS: any): Promise<any> => {
+    const buffer = await file.arrayBuffer();
+    const wb = new ExcelJS.Workbook();
+    try {
+      await wb.xlsx.load(buffer);
+      return wb;
+    } catch (err: any) {
+      const errMsg = String(err?.message || '');
+      // 🚨 한셀/특정 오피스 환경에서 docProps/app.xml의 Company 등 속성 누락 시 자동 보정 치유
+      if (errMsg.includes('company') || errMsg.includes('creator') || errMsg.includes('undefined')) {
+        try {
+          const zip = await JSZip.loadAsync(buffer);
+          const cleanAppXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>Microsoft Excel</Application>
+  <DocSecurity>0</DocSecurity>
+  <ScaleCrop>false</ScaleCrop>
+  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>1</vt:i4></vt:variant></vt:vector></HeadingPairs>
+  <TitlesOfParts><vt:vector size="1" baseType="lpstr"><vt:lpstr>Sheet1</vt:lpstr></vt:vector></TitlesOfParts>
+  <Company></Company>
+  <LinksUpToDate>false</LinksUpToDate>
+  <SharedDoc>false</SharedDoc>
+  <HyperlinksChanged>false</HyperlinksChanged>
+  <AppVersion>16.0300</AppVersion>
+</Properties>`;
+          zip.file('docProps/app.xml', cleanAppXml);
+
+          const healedBuffer = await zip.generateAsync({ type: 'arraybuffer' });
+          const healedWb = new ExcelJS.Workbook();
+          await healedWb.xlsx.load(healedBuffer);
+          return healedWb;
+        } catch (healErr) {
+          throw err;
+        }
+      }
+      throw err;
+    }
+  };
+
   // 첫 번째 파일의 특정 시트를 읽어 시각적 미리보기 구성 & 스마트 헤더 추천
   const loadSheetPreview = async (file: File, forceSheetIndex?: number) => {
     try {
       const ExcelJS = (window as any).ExcelJS;
       if (!ExcelJS) return;
-      const buffer = await file.arrayBuffer();
-      const wb = new ExcelJS.Workbook();
-      await wb.xlsx.load(buffer);
+      const wb = await loadWorkbookSafely(file, ExcelJS);
 
       // 파일 내 전체 시트 목록 추출 (사용자 시트 탭 선택 UI용)
       const sheets = wb.worksheets.map((s: any, idx: number) => ({ index: idx, name: s.name }));
@@ -735,9 +773,7 @@ export default function ExcelMergePage() {
         const isExcel = f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls');
         if (!isExcel || f.name.startsWith('~$')) continue;
         try {
-          const buf = await f.arrayBuffer();
-          const wb = new ExcelJS.Workbook();
-          await wb.xlsx.load(buf);
+          const wb = await loadWorkbookSafely(f, ExcelJS);
 
           // 템플릿 대상 시트 (사용자 지정 순번 > 시트명 > 키워드 > 2번째/1번째 시트)
           let ws: any = null;
@@ -824,9 +860,7 @@ export default function ExcelMergePage() {
         }
 
         try {
-          const buffer = await file.arrayBuffer();
-          const wb = new ExcelJS.Workbook();
-          await wb.xlsx.load(buffer);
+          const wb = await loadWorkbookSafely(file, ExcelJS);
 
           // 🚨 B. 시트 검증 및 취합 대상 시트 탐색 (지정 순번 > 시트명 일치 > 키워드 > 2번째/1번째)
           if (!wb.worksheets || wb.worksheets.length === 0) {
