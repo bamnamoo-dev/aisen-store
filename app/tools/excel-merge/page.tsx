@@ -31,7 +31,8 @@ interface ProcessedFile {
 
 // 서울 11개 교육지원청 및 전국/자체 명부 지원 목록
 const REGIONAL_OFFICES = [
-  { id: 'gangnam', name: '서울 강남서초 (기본 136개교)', count: 136, file: '/data/seoul_schools_gangnam.json' },
+  { id: 'none', name: '선택 안 함 (전국 자유 서식 / 자체 명부)', count: 0, file: '' },
+  { id: 'gangnam', name: '서울 강남서초 (136개교)', count: 136, file: '/data/seoul_schools_gangnam.json' },
   { id: 'gangdong', name: '서울 강동송파 (약 122개교)', count: 122, file: '/data/seoul_schools_gangnam.json' },
   { id: 'gangseo', name: '서울 강서양천 (약 131개교)', count: 131, file: '/data/seoul_schools_gangnam.json' },
   { id: 'bukbu', name: '서울 북부 (약 128개교)', count: 128, file: '/data/seoul_schools_gangnam.json' },
@@ -64,8 +65,8 @@ export default function ExcelMergePage() {
   const [edufineBizName, setEdufineBizName] = useState('학교 전출금 교부액');
   const [edufineAmountCol, setEdufineAmountCol] = useState(9); // I열 = 합계액
 
-  // 기준 명부 관리 상태 (전국 대응)
-  const [selectedRegion, setSelectedRegion] = useState<string>('gangnam');
+  // 기준 명부 관리 상태 (전국 대응 - 초기값은 선택 안 함(0개소))
+  const [selectedRegion, setSelectedRegion] = useState<string>('none');
   const [targetSchools, setTargetSchools] = useState<SchoolItem[]>([]);
   const [customRosterName, setCustomRosterName] = useState<string>('');
 
@@ -121,6 +122,11 @@ export default function ExcelMergePage() {
 
   // 기준 명부 로드 (기본 지원청 JSON)
   useEffect(() => {
+    if (selectedRegion === 'none') {
+      setTargetSchools([]);
+      setCustomRosterName('');
+      return;
+    }
     if (selectedRegion !== 'custom') {
       const office = REGIONAL_OFFICES.find(o => o.id === selectedRegion);
       if (office && office.file) {
@@ -383,6 +389,9 @@ export default function ExcelMergePage() {
     setStatusMessage('관내 136개교 표준 샘플 파일 로드 및 압축 해제 중...');
     setProgress(30);
     try {
+      if (selectedRegion === 'none') {
+        setSelectedRegion('gangnam');
+      }
       const res = await fetch('/samples/sample_136_schools.zip');
       if (!res.ok) throw new Error('샘플 파일을 가져올 수 없습니다.');
       const blob = await res.blob();
@@ -408,6 +417,9 @@ export default function ExcelMergePage() {
 
   // 전체 초기화
   const handleReset = () => {
+    setSelectedRegion('none');
+    setTargetSchools([]);
+    setCustomRosterName('');
     setFiles([]);
     setProcessedList([]);
     setMissingSchools([]);
@@ -415,6 +427,7 @@ export default function ExcelMergePage() {
     setProgress(0);
     setStatusMessage('');
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (rosterInputRef.current) rosterInputRef.current.value = '';
   };
 
   // 전국 범용 마스터 엑셀 병합 실행 엔진
@@ -932,7 +945,7 @@ export default function ExcelMergePage() {
                 수십~수백 개 .xlsx 파일 또는 폴더 일괄 선택 지원
               </div>
               <span className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1 rounded-lg transition-colors">
-                파일 직접 선택 ({files.length}개 로드됨)
+                {files.length > 0 ? `파일 직접 선택 (${files.length}개 로드됨)` : '파일 직접 선택'}
               </span>
             </div>
 
