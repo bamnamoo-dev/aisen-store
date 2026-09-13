@@ -1044,73 +1044,75 @@ export default function ExcelMergePage() {
 
       <main className="flex-1 max-w-[1140px] w-full mx-auto px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-3.5">
         
-        {/* 상단 슬로건 & 오프라인 단독 파일 다운로드 바 (세로 50% 슬림화) */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-xl px-4 py-2 text-white shadow-2xs flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2 text-sm overflow-hidden">
-            <span className="bg-emerald-400 text-slate-900 px-2 py-0.5 rounded text-xs font-black shrink-0">서버 유출 0%</span>
-            <span className="bg-white/20 px-2.5 py-0.5 rounded text-xs font-bold shrink-0 hidden sm:inline">100% 로컬 보안</span>
-            <span className="font-bold truncate text-sm sm:text-base">
+        {/* 상단 슬로건 & 오프라인 단독 파일 다운로드 바 (모바일 반응형 슬림화) */}
+        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-xl px-3.5 sm:px-4 py-2 sm:py-2.5 text-white shadow-2xs flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm overflow-hidden">
+            <span className="bg-emerald-400 text-slate-900 px-2 py-0.5 rounded text-[11px] sm:text-xs font-black shrink-0">서버 유출 0%</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded text-[11px] sm:text-xs font-bold shrink-0 hidden sm:inline">100% 로컬 보안</span>
+            <span className="font-bold truncate text-xs sm:text-base">
               수십·수백 개 엑셀 서식을 2초 만에 단 1장의 마스터로!
             </span>
           </div>
 
           <button 
             onClick={downloadOfflineHtml}
-            className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/30 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer active:scale-95"
+            className="flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/30 px-2.5 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer active:scale-95"
             title="인터넷이 차단된 폐쇄망 PC용 단일 파일 다운로드"
           >
-            <DownloadCloud size={14} />
+            <DownloadCloud size={13} />
             <span className="hidden sm:inline">오프라인 다운</span>
             <span className="sm:hidden">오프라인</span>
           </button>
         </div>
 
-        {/* 🏛️ [Step 1] 수합 방식 및 기준 기관 설정 (세로 50% 슬림 1열 통합 바) */}
-        <div className="bg-white rounded-xl border border-slate-200 px-4 py-2.5 sm:px-5 sm:py-3 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-2.5">
-          {/* 좌측: Step 1 뱃지 + 3대 수합 모드 탭 */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-md border border-blue-200 shrink-0">
-              Step 1
-            </span>
-            <div className="inline-flex bg-slate-100 p-0.5 rounded-lg">
-              <button
-                type="button"
-                onClick={() => setMode('block')}
-                className={`py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  mode === 'block' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="복합 신청서, 셀 병합, 합계 수식이 들어간 엑셀 양식 취합"
-              >
-                <Layers size={14} />
-                <span>서식 블록형</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode('simple')}
-                className={`py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  mode === 'simple' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="1행 1데이터 형태의 일반 명부, 실태조사 엑셀 양식 취합"
-              >
-                <FileSpreadsheet size={14} />
-                <span>단순 목록형</span>
-              </button>
+        {/* 🏛️ [Step 1] 수합 방식 및 기준 기관 설정 (모바일 최적화 반응형 뷰) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-3 sm:px-5 sm:py-3 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* 좌측: Step 1 뱃지 + 2대 수합 모드 탭 (모바일 터치 친화형) */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5">
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-md border border-blue-200 shrink-0">
+                Step 1
+              </span>
+              <div className="inline-flex bg-slate-100 p-0.5 rounded-lg flex-1 sm:flex-initial">
+                <button
+                  type="button"
+                  onClick={() => setMode('block')}
+                  className={`flex-1 sm:flex-initial py-2 sm:py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    mode === 'block' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="복합 신청서, 셀 병합, 합계 수식이 들어간 엑셀 양식 취합"
+                >
+                  <Layers size={14} />
+                  <span>서식 블록형</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode('simple')}
+                  className={`flex-1 sm:flex-initial py-2 sm:py-1.5 px-3 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    mode === 'simple' ? 'bg-white text-blue-700 shadow-2xs ring-1 ring-slate-200' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="1행 1데이터 형태의 일반 명부, 실태조사 엑셀 양식 취합"
+                >
+                  <FileSpreadsheet size={14} />
+                  <span>단순 목록형</span>
+                </button>
+              </div>
             </div>
 
             {/* K-에듀파인 교부서식 동시 생성 안내 뱃지 */}
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 text-xs font-bold shadow-2xs">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 text-[11px] sm:text-xs font-bold shadow-2xs w-fit">
               <Send size={12} className="text-emerald-600" />
               <span>K-에듀파인 교부서식 동시 생성</span>
             </div>
           </div>
 
-          {/* 우측: 기준 명부 매핑 드롭다운 & 자체 명부 버튼 */}
-          <div className="flex items-center gap-2">
+          {/* 우측: 기준 명부 매핑 드롭다운 & 자체 명부 버튼 (모바일 터치 최적화) */}
+          <div className="flex flex-wrap items-center gap-2 pt-1 lg:pt-0 border-t lg:border-t-0 border-slate-100">
             <span className="text-xs sm:text-sm font-bold text-slate-700 shrink-0">기준 명부:</span>
             <select
               value={selectedRegion}
               onChange={e => setSelectedRegion(e.target.value)}
-              className="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+              className="flex-1 sm:flex-initial bg-slate-50 border border-slate-300 rounded-lg px-2.5 sm:px-3 py-2 sm:py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer min-h-[38px]"
             >
               {ROSTER_OPTIONS.map(opt => {
                 if (opt.id === 'custom') {
@@ -1141,34 +1143,36 @@ export default function ExcelMergePage() {
               className="hidden" 
               onChange={handleRosterFileChange}
             />
-            <button
-              type="button"
-              onClick={() => rosterInputRef.current?.click()}
-              className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer shrink-0"
-              title="A열: 연번, B열: 학교/기관명이 적힌 엑셀 파일을 업로드합니다."
-            >
-              <FileUp size={14} className="text-blue-600" />
-              <span>자체 명부</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleDownloadRosterTemplate}
-              className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-bold py-1.5 px-2.5 rounded-lg border border-blue-200 transition-colors cursor-pointer shrink-0"
-              title="자체 명부 표준 엑셀 양식(.xlsx)을 다운로드합니다. (A열: 연번, B열: 학교명)"
-            >
-              <Download size={13} />
-              <span>양식</span>
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => rosterInputRef.current?.click()}
+                className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold py-2 sm:py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer min-h-[38px]"
+                title="A열: 연번, B열: 학교/기관명이 적힌 엑셀 파일을 업로드합니다."
+              >
+                <FileUp size={14} className="text-blue-600" />
+                <span>자체 명부</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadRosterTemplate}
+                className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-bold py-2 sm:py-1.5 px-2.5 rounded-lg border border-blue-200 transition-colors cursor-pointer min-h-[38px]"
+                title="자체 명부 표준 엑셀 양식(.xlsx)을 다운로드합니다. (A열: 연번, B열: 학교명, 선택: 학교코드)"
+              >
+                <Download size={13} />
+                <span>양식</span>
+              </button>
+            </div>
 
             {customRosterName && (
-              <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-md border border-blue-200 text-xs sm:text-sm shadow-2xs">
-                <span className="truncate max-w-[140px] sm:max-w-[200px]" title={customRosterName}>
+              <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 bg-blue-50 text-blue-700 font-bold px-2.5 py-1.5 rounded-md border border-blue-200 text-xs sm:text-sm shadow-2xs">
+                <span className="truncate max-w-[200px] sm:max-w-[220px]" title={customRosterName}>
                   {customRosterName}
                 </span>
                 <button
                   type="button"
                   onClick={handleDeleteCustomRoster}
-                  className="text-rose-500 hover:text-rose-700 hover:bg-rose-100 p-0.5 rounded-md cursor-pointer transition-colors shrink-0"
+                  className="text-rose-500 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md cursor-pointer transition-colors shrink-0"
                   title="브라우저에 저장된 자체 명부 삭제"
                 >
                   <X size={13} />
@@ -1178,32 +1182,32 @@ export default function ExcelMergePage() {
           </div>
         </div>
 
-        {/* 📂 [Step 2] 취합 파일 업로드 & 테스트 샘플 바 (눈에 띄는 컬러 테두리 강조형) */}
-        <div className="bg-white rounded-2xl border-2 border-indigo-200 hover:border-indigo-300 p-4 sm:p-5 shadow-sm space-y-3 transition-colors">
-          <div className="flex items-center justify-between border-b border-indigo-100 pb-2.5">
+        {/* 📂 [Step 2] 취합 파일 업로드 & 테스트 샘플 바 (모바일 터치 완벽 대응형) */}
+        <div className="bg-white rounded-2xl border-2 border-indigo-200 hover:border-indigo-300 p-3.5 sm:p-5 shadow-sm space-y-3 transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-indigo-100 pb-2.5">
             <div className="flex items-center gap-2">
-              <span className="bg-indigo-100 text-indigo-800 text-xs sm:text-sm font-black px-2.5 py-1 rounded-md border border-indigo-300">
+              <span className="bg-indigo-100 text-indigo-800 text-xs sm:text-sm font-black px-2.5 py-1 rounded-md border border-indigo-300 shrink-0">
                 Step 2
               </span>
-              <span className="font-black text-slate-800 text-base sm:text-lg flex items-center gap-1.5">
-                <Upload size={19} className="text-indigo-600" />
+              <span className="font-black text-slate-800 text-sm sm:text-lg flex items-center gap-1.5">
+                <Upload size={18} className="text-indigo-600" />
                 취합할 엑셀 서식 등록
               </span>
             </div>
             {files.length > 0 && (
-              <span className="text-xs sm:text-sm bg-emerald-50 text-emerald-700 font-bold px-3.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1.5">
-                <CheckCircle2 size={15} />
+              <span className="text-xs sm:text-sm bg-emerald-50 text-emerald-700 font-bold px-3 py-1 rounded-lg border border-emerald-200 flex items-center gap-1.5 w-fit">
+                <CheckCircle2 size={14} />
                 총 {files.length}개 파일 준비 완료
               </span>
             )}
           </div>
 
-          {/* 눈에 확실하게 띄는 블루/인디고 컬러 점선 테두리 드롭존 */}
+          {/* 눈에 확실하게 띄는 블루/인디고 컬러 점선 테두리 드롭존 (모바일 터치 탭 안내) */}
           <div 
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleFileDrop}
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-indigo-500 hover:border-indigo-600 bg-indigo-50/60 hover:bg-indigo-50/90 rounded-xl px-5 py-4 sm:py-4.5 text-center sm:text-left cursor-pointer transition-all flex flex-col sm:flex-row items-center justify-between gap-3.5 group shadow-2xs hover:shadow-xs"
+            className="border-2 border-dashed border-indigo-500 hover:border-indigo-600 bg-indigo-50/60 hover:bg-indigo-50/90 active:bg-indigo-100/80 rounded-xl p-4 sm:px-5 sm:py-4.5 text-center sm:text-left cursor-pointer transition-all flex flex-col sm:flex-row items-center justify-between gap-3.5 group shadow-2xs hover:shadow-xs"
           >
             <input 
               ref={fileInputRef}
@@ -1213,87 +1217,88 @@ export default function ExcelMergePage() {
               className="hidden" 
               onChange={handleFileInputChange}
             />
-            <div className="flex items-center gap-3.5">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-3.5">
               <div className="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                 <Upload size={24} className="text-white" />
               </div>
-              <div>
-                <div className="font-black text-indigo-950 text-base sm:text-lg">
-                  취합할 엑셀 파일들을 이곳에 끌어다 놓으세요
+              <div className="text-center sm:text-left">
+                <div className="font-black text-indigo-950 text-sm sm:text-lg">
+                  <span className="hidden sm:inline">취합할 엑셀 파일들을 이곳에 끌어다 놓으세요</span>
+                  <span className="sm:hidden">여기를 터치하여 엑셀 파일들을 선택하세요</span>
                 </div>
-                <div className="text-xs sm:text-sm text-indigo-800/80 font-semibold">
+                <div className="text-xs sm:text-sm text-indigo-800/80 font-semibold mt-0.5">
                   수십~수백 개 .xlsx 파일 일괄 선택 지원 (로컬 브라우저 0초 무부하 보안)
                 </div>
               </div>
             </div>
 
-            <span className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl transition-all shadow-sm group-hover:shadow-md shrink-0 active:scale-95">
+            <span className="w-full sm:w-auto text-center bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-black py-3 px-5 sm:py-2.5 rounded-xl transition-all shadow-sm group-hover:shadow-md shrink-0 active:scale-95">
               {files.length > 0 ? `📂 파일 다시 선택 (${files.length}개)` : '📂 엑셀 파일 직접 선택'}
             </span>
           </div>
 
-          {/* 🧪 테스트 샘플 액션 바 & 초기화 */}
-          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+          {/* 🧪 테스트 샘플 액션 바 & 초기화 (모바일 2열/3열 균형 정렬) */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 pt-0.5">
             <button
               type="button"
               onClick={handleLoadSampleFiles}
               disabled={isProcessing}
-              className="flex-1 min-w-[200px] flex items-center justify-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-300 text-xs sm:text-sm font-bold py-2 px-4 rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-2xs"
+              className="col-span-2 sm:flex-1 flex items-center justify-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-300 text-xs sm:text-sm font-bold py-2.5 px-3 rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-2xs min-h-[38px]"
               title="136개 가상학교 엑셀 샘플 파일 일괄 로드"
             >
-              <FlaskConical size={16} className="text-purple-600" />
-              <span>🧪 [테스트] 136개 가상학교 샘플 1초 로드</span>
+              <FlaskConical size={15} className="text-purple-600" />
+              <span>🧪 136개 가상학교 샘플 1초 로드</span>
             </button>
             <a
               href="/samples/sample_136_schools.zip"
               download="sample_136_schools.zip"
-              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs sm:text-sm font-bold py-2.5 px-3.5 rounded-xl transition-colors shrink-0 shadow-2xs"
+              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs sm:text-sm font-bold py-2.5 px-3 rounded-xl transition-colors shrink-0 shadow-2xs min-h-[38px]"
               title="136개 가상학교 샘플 엑셀 ZIP 다운로드"
             >
-              <Archive size={15} />
+              <Archive size={14} />
               <span>ZIP 다운</span>
             </a>
             <button
               type="button"
               onClick={handleReset}
               disabled={isProcessing || (files.length === 0 && targetSchools.length === 0)}
-              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs sm:text-sm font-bold py-2.5 px-3.5 rounded-xl transition-colors shrink-0 shadow-2xs disabled:opacity-40 cursor-pointer"
+              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs sm:text-sm font-bold py-2.5 px-3 rounded-xl transition-colors shrink-0 shadow-2xs disabled:opacity-40 cursor-pointer min-h-[38px]"
               title="모든 파일 및 통계 초기화 (0개소 제로 상태)"
             >
-              <RotateCcw size={15} />
+              <RotateCcw size={14} />
               <span>초기화</span>
             </button>
           </div>
         </div>
 
-        {/* 👀 [Step 3] 실시간 서식 미리보기 & 스마트 헤더 지정 (대형 와이드 뷰어) */}
+        {/* 👀 [Step 3] 실시간 서식 미리보기 & 스마트 헤더 지정 (모바일 스와이프 친화형) */}
         {files.length > 0 && previewRows.length > 0 ? (
-          <div className="bg-white rounded-2xl border-2 border-blue-300 p-5 sm:p-6 space-y-3.5 shadow-md transition-all animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2.5">
-                <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-lg border border-blue-200">
+          <div className="bg-white rounded-2xl border-2 border-blue-300 p-3.5 sm:p-6 space-y-3 sm:space-y-3.5 shadow-md transition-all animate-in fade-in duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5 sm:pb-3">
+              <div className="flex items-center gap-2">
+                <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-lg border border-blue-200 shrink-0">
                   Step 3
                 </span>
                 <div className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0">
                   <Eye size={15} />
                 </div>
-                <div>
-                  <span className="font-black text-slate-800 text-base sm:text-lg">
+                <div className="min-w-0 flex-1">
+                  <span className="font-black text-slate-800 text-sm sm:text-lg">
                     신청서 서식 실시간 미리보기
                   </span>
-                  <span className="text-xs sm:text-sm text-slate-500 ml-2 font-medium">
-                    ({files[0].name.length > 25 ? files[0].name.slice(0, 25) + '...' : files[0].name} · [{previewSheetName || '기본시트'}])
+                  <span className="text-[11px] sm:text-sm text-slate-500 ml-1.5 font-medium truncate block sm:inline">
+                    ({files[0].name.length > 20 ? files[0].name.slice(0, 20) + '...' : files[0].name} · [{previewSheetName || '기본시트'}])
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
                 <span className="text-xs sm:text-sm text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 font-bold hidden sm:inline">
                   마우스 1클릭으로 헤더 끝 행 지정
                 </span>
                 <button
                   type="button"
                   onClick={() => setIsPreviewOpen(!isPreviewOpen)}
-                  className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 font-bold px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+                  className="w-full sm:w-auto text-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 font-bold px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer min-h-[34px]"
                 >
                   {isPreviewOpen ? '미리보기 접기 ▲' : '미리보기 펼치기 ▼'}
                 </button>
@@ -1301,27 +1306,33 @@ export default function ExcelMergePage() {
             </div>
 
             {autoDetectedBadge && (
-              <div className="bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl font-bold flex items-center justify-between">
+              <div className="bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm p-3 rounded-xl font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <span>{autoDetectedBadge}</span>
-                <span className="text-xs text-blue-600 font-bold">다른 행을 클릭하면 즉시 변경됩니다</span>
+                <span className="text-xs text-blue-600 font-bold">다른 행을 터치/클릭하면 즉시 변경됩니다</span>
               </div>
             )}
 
             {isPreviewOpen && (
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between text-xs sm:text-sm text-slate-600 px-1 font-medium">
+              <div className="space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm text-slate-600 px-1 font-medium gap-1">
                   <span>🔵 1행 ~ <strong>{headerEndRow}행</strong>: 공통 헤더로 1회 유지</span>
                   <span>🟢 <strong>{headerEndRow + 1}행</strong>부터: 각 기관/학교별 본문 결합 시작</span>
                 </div>
 
-                <div className="overflow-x-auto border border-slate-200 rounded-2xl max-h-[340px] overflow-y-auto shadow-inner bg-slate-50/50">
+                {/* 모바일 가로 스크롤 터치 힌트 */}
+                <div className="sm:hidden text-[11px] text-indigo-700 bg-indigo-50/80 px-2.5 py-1 rounded-lg border border-indigo-100 font-bold flex items-center justify-between">
+                  <span>👉 표를 좌우로 밀어서 전체 열을 확인하세요</span>
+                  <span>터치로 헤더 변경</span>
+                </div>
+
+                <div className="overflow-x-auto border border-slate-200 rounded-2xl max-h-[320px] sm:max-h-[340px] overflow-y-auto shadow-inner bg-slate-50/50 touch-pan-x touch-pan-y">
                   <table className="w-full text-xs sm:text-sm text-left border-collapse select-none bg-white">
                     <thead className="bg-slate-100 text-slate-600 sticky top-0 z-10 shadow-2xs">
                       <tr>
-                        <th className="py-2.5 px-3 border-b border-r border-slate-300 w-12 text-center font-bold bg-slate-200">행</th>
-                        <th className="py-2.5 px-3 border-b border-r border-slate-300 w-32 text-center font-bold bg-slate-100">헤더/본문 경계</th>
+                        <th className="py-2 px-2.5 border-b border-r border-slate-300 w-12 text-center font-bold bg-slate-200 text-xs">행</th>
+                        <th className="py-2 px-2.5 border-b border-r border-slate-300 w-28 sm:w-32 text-center font-bold bg-slate-100 text-xs">헤더/본문 경계</th>
                         {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'].map(col => (
-                          <th key={col} className="py-2.5 px-3 border-b border-r border-slate-300 min-w-[80px] text-center font-bold bg-slate-100">
+                          <th key={col} className="py-2 px-2.5 border-b border-r border-slate-300 min-w-[75px] text-center font-bold bg-slate-100 text-xs">
                             {col}열
                           </th>
                         ))}
@@ -1337,7 +1348,7 @@ export default function ExcelMergePage() {
                           <tr
                             key={row.rowNum}
                             onClick={() => handleSelectHeaderEndRow(row.rowNum)}
-                            title={`${row.rowNum}행을 헤더 끝으로 지정하려면 클릭하세요`}
+                            title={`${row.rowNum}행을 헤더 끝으로 지정하려면 터치하세요`}
                             className={`border-b border-slate-200 transition-colors cursor-pointer group ${
                               isHeaderEdge
                                 ? 'bg-blue-100 border-b-2 border-b-blue-600 font-semibold'
@@ -1348,34 +1359,34 @@ export default function ExcelMergePage() {
                                     : 'hover:bg-slate-50'
                             }`}
                           >
-                            <td className={`py-2 px-2.5 text-center border-r border-slate-200 font-mono font-bold ${
+                            <td className={`py-2 px-2 text-center border-r border-slate-200 font-mono font-bold text-xs ${
                               isHeaderEdge ? 'text-blue-700 bg-blue-200/50' : 'text-slate-500'
                             }`}>
                               {row.rowNum}
                             </td>
-                            <td className="py-2 px-2.5 text-center border-r border-slate-200 whitespace-nowrap">
+                            <td className="py-2 px-2 text-center border-r border-slate-200 whitespace-nowrap">
                               {isHeaderEdge ? (
-                                <span className="bg-blue-600 text-white text-xs px-2.5 py-0.5 rounded-full font-bold shadow-xs">
+                                <span className="bg-blue-600 text-white text-[11px] sm:text-xs px-2 py-0.5 rounded-full font-bold shadow-xs">
                                   ✂️ 헤더 끝 ({row.rowNum}행)
                                 </span>
                               ) : isHeader ? (
-                                <span className="text-blue-600 text-xs font-semibold">
+                                <span className="text-blue-600 text-[11px] sm:text-xs font-semibold">
                                   🔵 헤더 영역
                                 </span>
                               ) : isStartData ? (
-                                <span className="bg-emerald-600 text-white text-xs px-2.5 py-0.5 rounded-full font-bold shadow-xs">
+                                <span className="bg-emerald-600 text-white text-[11px] sm:text-xs px-2 py-0.5 rounded-full font-bold shadow-xs">
                                   🟢 본문 시작 ({row.rowNum}행)
                                 </span>
                               ) : (
                                 <span className="text-slate-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                                  여기를 클릭 ➔
+                                  터치 선택 ➔
                                 </span>
                               )}
                             </td>
                             {row.cells.map((cellText, cIdx) => (
                               <td
                                 key={cIdx}
-                                className={`py-2 px-3 border-r border-slate-200 truncate max-w-[150px] ${
+                                className={`py-2 px-2.5 border-r border-slate-200 truncate max-w-[140px] text-xs ${
                                   isHeaderEdge ? 'text-blue-950 font-medium' : isHeader ? 'text-blue-900' : 'text-slate-700'
                                 }`}
                                 title={cellText}
@@ -1394,70 +1405,70 @@ export default function ExcelMergePage() {
           </div>
         ) : (
           /* 파일 업로드 전 슬림 안내 바 */
-          <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-5 text-center text-slate-400 flex items-center justify-center gap-2.5 shadow-2xs">
-            <Eye size={20} className="text-slate-400 shrink-0" />
-            <span className="text-sm sm:text-base font-medium text-slate-600">
-              [Step 3] 엑셀 파일을 등록하면 이곳에 실시간 시트 뷰어가 펼쳐지며 마우스 1클릭으로 헤더를 확정할 수 있습니다.
+          <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-4 sm:p-5 text-center text-slate-400 flex items-center justify-center gap-2 shadow-2xs">
+            <Eye size={18} className="text-slate-400 shrink-0" />
+            <span className="text-xs sm:text-base font-medium text-slate-600">
+              [Step 3] 엑셀 파일을 등록하면 이곳에 실시간 시트 뷰어가 펼쳐지며 1클릭으로 헤더를 확정할 수 있습니다.
             </span>
           </div>
         )}
 
-        {/* ⚙️ [Step 4] 범용 수합 3원칙 설정 패널 */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-3 shadow-xs">
+        {/* ⚙️ [Step 4] 범용 수합 3원칙 설정 패널 (모바일 최적화 터치 인풋) */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-3.5 sm:p-5 space-y-3 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
             <div className="flex items-center gap-2">
-              <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-0.5 rounded-lg border border-blue-200">
+              <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-0.5 rounded-lg border border-blue-200 shrink-0">
                 Step 4
               </span>
               <span className="font-black text-slate-800 text-sm sm:text-base flex items-center gap-1.5">
-                <SlidersHorizontal size={17} className="text-blue-600" />
+                <SlidersHorizontal size={16} className="text-blue-600" />
                 범용 수합 3원칙 설정
               </span>
             </div>
 
             {/* ⚡ 업무별 1초 원클릭 프리셋 버튼 3종 가로 배치 */}
-            <div className="flex items-center gap-1.5 overflow-x-auto">
-              <span className="text-slate-600 font-bold text-xs sm:text-sm shrink-0 mr-1">⚡ 1초 프리셋:</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 touch-pan-x">
+              <span className="text-slate-600 font-bold text-xs sm:text-sm shrink-0 mr-0.5">⚡ 프리셋:</span>
               <button
                 type="button"
                 onClick={() => applyPreset('food')}
-                className={`py-1.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                className={`py-1.5 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap min-h-[34px] ${
                   activePreset === 'food'
                     ? 'bg-blue-50 text-blue-700 border-blue-300 shadow-xs ring-2 ring-blue-100'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                 }`}
               >
-                🍱 블록 서식 (16줄 고정)
+                🍱 블록 서식
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset('labor')}
-                className={`py-1.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                className={`py-1.5 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap min-h-[34px] ${
                   activePreset === 'labor'
                     ? 'bg-purple-50 text-purple-700 border-purple-300 shadow-xs ring-2 ring-purple-100'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                 }`}
               >
-                👨‍🍳 가변 서식 (동적 감지)
+                👨‍🍳 가변 서식
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset('general')}
-                className={`py-1.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                className={`py-1.5 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer whitespace-nowrap min-h-[34px] ${
                   activePreset === 'general'
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-xs ring-2 ring-emerald-100'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                 }`}
               >
-                📋 일반 목록 (헤더 1회 유지)
+                📋 일반 목록
               </button>
             </div>
           </div>
 
-          {/* 3원칙 컨트롤 그리드 (슬림하고 단정한 높이) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs sm:text-sm">
+          {/* 3원칙 컨트롤 그리드 (모바일 터치 타겟 넉넉화) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3 text-xs sm:text-sm">
             {/* 1. 공통 헤더 1회 유지 */}
-            <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
+            <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="font-extrabold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
                   <span className="w-5 h-5 bg-blue-600 text-white rounded-full text-xs flex items-center justify-center font-bold">1</span>
@@ -1470,6 +1481,7 @@ export default function ExcelMergePage() {
                 <div className="flex items-center gap-1.5">
                   <input 
                     type="number" 
+                    inputMode="numeric"
                     value={headerEndRow} 
                     onChange={e => {
                       const newEnd = Number(e.target.value);
@@ -1477,7 +1489,7 @@ export default function ExcelMergePage() {
                       setBlockStartRow(newEnd + 1);
                       setActivePreset('custom');
                     }}
-                    className="w-18 bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-900 text-center font-black text-xs sm:text-sm shadow-2xs"
+                    className="w-20 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-slate-900 text-center font-black text-xs sm:text-sm shadow-2xs h-[38px]"
                   />
                   <span className="text-slate-600 text-xs font-bold">행</span>
                 </div>
@@ -1485,14 +1497,14 @@ export default function ExcelMergePage() {
             </div>
 
             {/* 2. 본문 추출 방식 */}
-            <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
+            <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="font-extrabold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
                   <span className="w-5 h-5 bg-purple-600 text-white rounded-full text-xs flex items-center justify-center font-bold">2</span>
                   본문 추출 방식
                 </span>
                 <label 
-                  className="flex items-center gap-1.5 cursor-pointer text-purple-700 font-bold text-xs bg-purple-50 hover:bg-purple-100/70 px-2 py-0.5 rounded-md border border-purple-200 transition-colors shadow-2xs"
+                  className="flex items-center gap-1.5 cursor-pointer text-purple-700 font-bold text-xs bg-purple-50 hover:bg-purple-100/70 px-2.5 py-1 rounded-md border border-purple-200 transition-colors shadow-2xs min-h-[28px]"
                   title="학교마다 작성한 행 수가 달라도 데이터가 잘리거나 빈칸이 생기지 않도록 실제 작성 줄까지 자동 감지합니다."
                 >
                   <input 
@@ -1502,7 +1514,7 @@ export default function ExcelMergePage() {
                       setIsAutoDetectRows(e.target.checked);
                       setActivePreset('custom');
                     }}
-                    className="rounded text-purple-600 focus:ring-purple-500"
+                    className="rounded text-purple-600 focus:ring-purple-500 w-4 h-4"
                   />
                   <span>가변행 감지</span>
                 </label>
@@ -1514,12 +1526,13 @@ export default function ExcelMergePage() {
                   </span>
                   <input 
                     type="number" 
+                    inputMode="numeric"
                     value={blockStartRow} 
                     onChange={e => {
                       setBlockStartRow(Number(e.target.value));
                       setActivePreset('custom');
                     }}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-900 font-black text-xs sm:text-sm text-center shadow-2xs h-[34px]"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-900 font-black text-xs sm:text-sm text-center shadow-2xs h-[38px]"
                   />
                 </div>
                 <div>
@@ -1529,7 +1542,7 @@ export default function ExcelMergePage() {
                         추출 범위
                       </span>
                       <div 
-                        className="w-full bg-purple-100/90 border border-purple-300 text-purple-800 font-extrabold text-[11px] sm:text-xs rounded-lg px-1.5 py-1 text-center flex items-center justify-center gap-1 shadow-2xs h-[34px]"
+                        className="w-full bg-purple-100/90 border border-purple-300 text-purple-800 font-extrabold text-[11px] sm:text-xs rounded-lg px-1.5 py-1 text-center flex items-center justify-center gap-1 shadow-2xs h-[38px]"
                         title="가변행 감지: 학교마다 작성한 줄 수가 달라도 빈 행 전까지의 실제 작성 데이터를 자동으로 모두 수합합니다."
                       >
                         <Sparkles size={13} className="text-purple-600 shrink-0" />
@@ -1544,12 +1557,13 @@ export default function ExcelMergePage() {
                       <div className="flex items-center gap-1">
                         <input 
                           type="number" 
+                          inputMode="numeric"
                           value={blockRowCount} 
                           onChange={e => {
                             setBlockRowCount(Number(e.target.value));
                             setActivePreset('custom');
                           }}
-                          className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-900 font-black text-xs sm:text-sm text-center shadow-2xs h-[34px]"
+                          className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-900 font-black text-xs sm:text-sm text-center shadow-2xs h-[38px]"
                         />
                         <span className="text-slate-500 text-[11px] font-bold shrink-0">행</span>
                       </div>
@@ -1560,7 +1574,7 @@ export default function ExcelMergePage() {
             </div>
 
             {/* 3. 취합 순서 정렬 */}
-            <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
+            <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="font-extrabold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
                   <span className="w-5 h-5 bg-emerald-600 text-white rounded-full text-xs flex items-center justify-center font-bold">3</span>
@@ -1572,7 +1586,7 @@ export default function ExcelMergePage() {
                 <button
                   type="button"
                   onClick={() => setSortMode('seq')}
-                  className={`py-1.5 rounded-lg text-xs font-bold border text-center transition-colors cursor-pointer ${
+                  className={`py-2 rounded-lg text-xs font-bold border text-center transition-colors cursor-pointer min-h-[38px] ${
                     sortMode === 'seq' ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
@@ -1581,7 +1595,7 @@ export default function ExcelMergePage() {
                 <button
                   type="button"
                   onClick={() => setSortMode('name')}
-                  className={`py-1.5 rounded-lg text-xs font-bold border text-center transition-colors cursor-pointer ${
+                  className={`py-2 rounded-lg text-xs font-bold border text-center transition-colors cursor-pointer min-h-[38px] ${
                     sortMode === 'name' ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
@@ -1590,7 +1604,7 @@ export default function ExcelMergePage() {
                 <button
                   type="button"
                   onClick={() => setSortMode('filename')}
-                  className={`py-1.5 rounded-lg text-xs font-bold border text-center transition-colors cursor-pointer ${
+                  className={`py-2 rounded-lg text-xs font-bold border text-center transition-colors cursor-pointer min-h-[38px] ${
                     sortMode === 'filename' ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
@@ -1600,18 +1614,18 @@ export default function ExcelMergePage() {
             </div>
           </div>
 
-          {/* K-에듀파인 교부 자동 연동 설정 */}
+          {/* K-에듀파인 교부 자동 연동 설정 (모바일 인풋 최적화) */}
           <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-3 sm:p-3.5 space-y-2 shadow-2xs">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <span className="font-extrabold text-emerald-900 text-xs sm:text-sm flex items-center gap-1.5">
                 <Send size={14} className="text-emerald-700" />
                 <span>K-에듀파인 교부서식 자동 연동 설정</span>
               </span>
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-200">
+              <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-200 w-fit">
                 수합 시 시트 2 및 전용 파일 동시 생성
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs sm:text-sm pt-1 border-t border-emerald-200/60">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm pt-1 border-t border-emerald-200/60">
               <div>
                 <span className="text-slate-700 font-bold block mb-1 text-[11px] sm:text-xs">
                   에듀파인 세부사업명
@@ -1621,7 +1635,7 @@ export default function ExcelMergePage() {
                   value={edufineBizName} 
                   onChange={e => setEdufineBizName(e.target.value)}
                   placeholder="예: 학교 전출금 교부액, 무상급식비 지원"
-                  className="w-full bg-white border border-emerald-300 rounded-lg px-2.5 py-1 text-slate-900 font-bold text-xs sm:text-sm h-[32px] outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"
+                  className="w-full bg-white border border-emerald-300 rounded-lg px-2.5 py-1.5 text-slate-900 font-bold text-xs sm:text-sm h-[38px] outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"
                 />
               </div>
               <div>
@@ -1631,53 +1645,52 @@ export default function ExcelMergePage() {
                 <div className="flex items-center gap-1.5">
                   <input 
                     type="number" 
+                    inputMode="numeric"
                     value={edufineAmountCol} 
                     onChange={e => setEdufineAmountCol(Number(e.target.value))}
-                    className="w-20 bg-white border border-emerald-300 rounded-lg px-2 py-1 text-slate-900 text-center font-black text-xs sm:text-sm h-[32px] shadow-2xs"
+                    className="w-20 bg-white border border-emerald-300 rounded-lg px-2 py-1 text-slate-900 text-center font-black text-xs sm:text-sm h-[38px] shadow-2xs"
                   />
                   <span className="text-slate-600 text-xs font-bold">열</span>
-                  <span className="text-slate-400 text-[11px] ml-1">(제출 서식의 지원 금액 컬럼)</span>
+                  <span className="text-slate-400 text-[10px] sm:text-[11px] ml-1 truncate">(제출 서식의 지원 금액 컬럼)</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 🚀 [Step 5] 취합 실행 및 결과 대시보드 */}
-        <div className="space-y-4">
-          {/* 대형 실행 버튼 */}
+        {/* 🚀 [Step 5] 취합 실행 및 결과 대시보드 (모바일 터치 친화형) */}
+        <div className="space-y-3 sm:space-y-4">
+          {/* 대형 실행 버튼 (모바일 터치 최적화) */}
           <button
             disabled={files.length === 0 || isProcessing}
             onClick={runMerge}
-            className={`w-full py-4 sm:py-4.5 rounded-2xl font-black text-lg sm:text-xl shadow-lg flex items-center justify-center gap-3 transition-all cursor-pointer ${
+            className={`w-full py-3.5 sm:py-4.5 px-4 rounded-2xl font-black text-base sm:text-xl shadow-lg flex items-center justify-center gap-2.5 sm:gap-3 transition-all cursor-pointer min-h-[52px] ${
               files.length === 0 || isProcessing
                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
-                : mode === 'edufine'
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-200 hover:shadow-xl active:scale-[0.99]'
-                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-200 hover:shadow-xl active:scale-[0.99]'
+                : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-200 hover:shadow-xl active:scale-[0.99]'
             }`}
           >
             {isProcessing ? (
               <>
-                <RefreshCw className="animate-spin" size={24} />
+                <RefreshCw className="animate-spin" size={20} />
                 <span>병합 처리 중... ({progress}%)</span>
               </>
             ) : (
               <>
-                <Sparkles size={24} />
-                <span>{files.length > 0 ? `${files.length}개 파일 일괄 수합 실행 (서식·수식 100% 보존)` : '엑셀 파일을 먼저 등록해주세요'}</span>
+                <Sparkles size={20} />
+                <span>{files.length > 0 ? `${files.length}개 파일 일괄 수합 실행 (100% 보존)` : '엑셀 파일을 먼저 등록해주세요'}</span>
               </>
             )}
           </button>
 
           {/* 처리 프로그레스 바 */}
           {isProcessing && (
-            <div className="bg-white rounded-2xl border border-blue-200 p-4 space-y-2 shadow-md">
-              <div className="flex justify-between text-sm font-bold text-blue-900">
+            <div className="bg-white rounded-2xl border border-blue-200 p-3.5 sm:p-4 space-y-2 shadow-md">
+              <div className="flex justify-between text-xs sm:text-sm font-bold text-blue-900">
                 <span>{statusMessage}</span>
                 <span>{progress}%</span>
               </div>
-              <div className="w-full bg-blue-100 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-blue-100 rounded-full h-2.5 sm:h-3 overflow-hidden">
                 <div 
                   className="bg-blue-600 h-full rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
@@ -1686,61 +1699,61 @@ export default function ExcelMergePage() {
             </div>
           )}
 
-          {/* 통계 신호등 요약 카드 4종 (가로 4열) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs">
-              <div className="text-sm sm:text-base text-slate-600 font-bold">총 관리 대상수</div>
-              <div className="text-3xl sm:text-4xl font-black text-slate-800 mt-1">{targetSchools.length}개소</div>
+          {/* 통계 신호등 요약 카드 4종 (모바일 2x2 그리드 완벽 대응) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
+            <div className="bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-2xs">
+              <div className="text-xs sm:text-base text-slate-600 font-bold">총 관리 대상수</div>
+              <div className="text-2xl sm:text-4xl font-black text-slate-800 mt-0.5 sm:mt-1">{targetSchools.length}개소</div>
             </div>
-            <div className="bg-white border border-emerald-200 rounded-2xl p-4 sm:p-5 shadow-xs">
-              <div className="text-sm sm:text-base text-emerald-600 font-bold flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div className="bg-white border border-emerald-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-2xs">
+              <div className="text-xs sm:text-base text-emerald-600 font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 정상 매칭
               </div>
-              <div className="text-3xl sm:text-4xl font-black text-emerald-700 mt-1">
+              <div className="text-2xl sm:text-4xl font-black text-emerald-700 mt-0.5 sm:mt-1">
                 {processedList.filter(p => p.status === 'matched').length}개소
               </div>
             </div>
-            <div className="bg-white border border-rose-200 rounded-2xl p-4 sm:p-5 shadow-xs">
-              <div className="text-sm sm:text-base text-rose-600 font-bold flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+            <div className="bg-white border border-rose-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-2xs">
+              <div className="text-xs sm:text-base text-rose-600 font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-rose-500"></span>
                 미제출 기관
               </div>
-              <div className="text-3xl sm:text-4xl font-black text-rose-700 mt-1">{missingSchools.length}개소</div>
+              <div className="text-2xl sm:text-4xl font-black text-rose-700 mt-0.5 sm:mt-1">{missingSchools.length}개소</div>
             </div>
-            <div className="bg-white border border-amber-200 rounded-2xl p-4 sm:p-5 shadow-xs">
-              <div className="text-sm sm:text-base text-amber-600 font-bold">중복/확인필요</div>
-              <div className="text-3xl sm:text-4xl font-black text-amber-700 mt-1">
+            <div className="bg-white border border-amber-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-2xs">
+              <div className="text-xs sm:text-base text-amber-600 font-bold">중복/확인필요</div>
+              <div className="text-2xl sm:text-4xl font-black text-amber-700 mt-0.5 sm:mt-1">
                 {processedList.filter(p => p.status === 'duplicate' || p.status === 'unmatched').length}건
               </div>
             </div>
           </div>
 
-          {/* 결과 다운로드 카드 (마스터 통합본 + K-에듀파인 전용 2-Way 완비) */}
+          {/* 결과 다운로드 카드 (마스터 통합본 + K-에듀파인 전용 2-Way 완비 / 모바일 꽉찬 터치) */}
           {mergedBlob && (
-            <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-500 rounded-2xl p-5 shadow-lg flex flex-col lg:flex-row items-center justify-between gap-4 animate-in fade-in">
-              <div className="flex items-center gap-3.5 w-full lg:w-auto">
-                <div className="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
-                  <FileCheck2 size={24} />
+            <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-500 rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col lg:flex-row items-center justify-between gap-3.5 sm:gap-4 animate-in fade-in">
+              <div className="flex items-center gap-3 w-full lg:w-auto">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
+                  <FileCheck2 size={22} />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-950 text-sm sm:text-base">
+                  <div className="font-bold text-emerald-950 text-xs sm:text-base">
                     취합 완료! (통합 신청서 마스터 + K-에듀파인 교부서식 동시 완성)
                   </div>
-                  <div className="text-xs text-emerald-700 mt-0.5 font-medium">
+                  <div className="text-[11px] sm:text-xs text-emerald-700 mt-0.5 font-medium">
                     100% 서식·수식 보존 · {((mergedBlob.size) / (1024 * 1024)).toFixed(2)} MB · 시트 1: 통합서식 / 시트 2: 교부양식
                   </div>
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full lg:w-auto shrink-0">
+              <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto shrink-0">
                 {/* 1. 마스터 엑셀 다운로드 (시트 1: 통합 신청서 + 시트 2: 에듀파인 교부서식) */}
                 <button
                   onClick={handleDownloadMaster}
-                  className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm"
+                  className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-black px-4 sm:px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm min-h-[42px]"
                   title="전체 학교 통합 신청서(시트1)와 K-에듀파인 교부서식(시트2)이 모두 포함된 올인원 마스터 파일"
                 >
-                  <Download size={16} />
+                  <Download size={15} />
                   <span>마스터 엑셀 다운로드 (통합본)</span>
                 </button>
 
@@ -1748,10 +1761,10 @@ export default function ExcelMergePage() {
                 {edufineBlob && (
                   <button
                     onClick={handleDownloadEdufine}
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm"
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:from-blue-800 active:to-indigo-800 text-white font-black px-4 sm:px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm min-h-[42px]"
                     title="K-에듀파인 시스템에 즉시 엑셀 업로드할 수 있는 단독 표준 규격 파일"
                   >
-                    <Send size={15} />
+                    <Send size={14} />
                     <span>K-에듀파인 전용 다운로드</span>
                   </button>
                 )}
@@ -1761,20 +1774,20 @@ export default function ExcelMergePage() {
 
           {/* 미제출교 독촉 명단 박스 */}
           {missingSchools.length > 0 && (
-            <div className="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm space-y-3">
+            <div className="bg-white rounded-2xl border border-rose-200 p-4 sm:p-5 shadow-sm space-y-2.5 sm:space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-rose-900 text-xs sm:text-sm flex items-center gap-1.5">
-                  <AlertCircle size={15} className="text-rose-600" />
+                  <AlertCircle size={15} className="text-rose-600 shrink-0" />
                   미제출 기관·학교 명단 ({missingSchools.length}개소)
                 </span>
                 <button
                   onClick={copyMissingList}
-                  className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-lg font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                  className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-colors flex items-center gap-1 cursor-pointer shrink-0 min-h-[32px]"
                 >
                   {copiedNotification ? (
                     <>
                       <Check size={13} className="text-emerald-600" />
-                      <span className="text-emerald-700">복사 완료!</span>
+                      <span className="text-emerald-700 font-black">복사 완료!</span>
                     </>
                   ) : (
                     <>
@@ -1784,11 +1797,11 @@ export default function ExcelMergePage() {
                   )}
                 </button>
               </div>
-              <div className="max-h-40 overflow-y-auto bg-rose-50/50 rounded-xl p-3 text-xs text-rose-950 font-medium divide-y divide-rose-100/60">
+              <div className="max-h-40 overflow-y-auto bg-rose-50/50 rounded-xl p-2.5 sm:p-3 text-xs text-rose-950 font-medium divide-y divide-rose-100/60">
                 {missingSchools.map((s, idx) => (
-                  <div key={idx} className="py-1 flex justify-between">
-                    <span>{s.seq}. {s.name}</span>
-                    <span className="text-rose-500 text-[11px]">{s.type || '미제출'}</span>
+                  <div key={idx} className="py-1 flex justify-between gap-2">
+                    <span className="truncate">{s.seq}. {s.name}</span>
+                    <span className="text-rose-500 text-[11px] shrink-0">{s.type || '미제출'}</span>
                   </div>
                 ))}
               </div>
@@ -1796,28 +1809,28 @@ export default function ExcelMergePage() {
           )}
 
           {/* 기관/학교별 실시간 처리 리스트 */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-2.5 sm:space-y-3">
             <div className="font-bold text-slate-800 text-xs sm:text-sm flex items-center justify-between">
               <span>기관/학교별 처리 현황 ({processedList.length}건)</span>
               <span className="text-[11px] text-slate-400 font-normal">연번 순 정렬</span>
             </div>
             <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 text-xs">
               {processedList.length === 0 ? (
-                <div className="text-center py-8 text-slate-400 text-xs">
+                <div className="text-center py-6 text-slate-400 text-xs">
                   파일을 업로드하면 실시간 검증 결과가 여기에 표시됩니다.
                 </div>
               ) : (
                 processedList.map((item, idx) => (
-                  <div key={idx} className="py-2.5 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div key={idx} className="py-2.5 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                       {item.status === 'matched' && <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />}
                       {item.status === 'unmatched' && <AlertTriangle size={15} className="text-amber-500 shrink-0" />}
                       {item.status === 'duplicate' && <AlertCircle size={15} className="text-rose-500 shrink-0" />}
                       {item.status === 'error' && <AlertCircle size={15} className="text-rose-600 shrink-0" />}
-                      <span className="font-medium text-slate-800">{item.schoolName}</span>
-                      <span className="text-slate-400 text-[10px] truncate max-w-[250px]">({item.name})</span>
+                      <span className="font-medium text-slate-800 truncate">{item.schoolName}</span>
+                      <span className="text-slate-400 text-[10px] truncate hidden sm:inline">({item.name})</span>
                     </div>
-                    <div>
+                    <div className="shrink-0">
                       {item.status === 'matched' && (
                         <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">정상</span>
                       )}
