@@ -500,31 +500,28 @@ export default function ExcelMergePage() {
       await wb.xlsx.load(buffer);
       return wb;
     } catch (err: any) {
-      const errMsg = String(err?.message || '');
-
-      // 🚨 1단계 치유: JSZip으로 [Content_Types].xml에 Override 등록 및 docProps/app.xml 강제 주입
+      // 🚨 1단계 치유: JSZip으로 [Content_Types].xml 공백 정규화 및 docProps/app.xml 강제 주입
       try {
         const zip = await JSZip.loadAsync(buffer);
 
-        // 1-1. [Content_Types].xml에 extended-properties+xml Override 등록 (ExcelJS 필수)
+        // 1-1. [Content_Types].xml의 등호 공백(PartName = "/docProps/app.xml") 정규화
         const ctFile = zip.file('[Content_Types].xml') || zip.file('[content_types].xml');
         if (ctFile) {
           let ctText = await ctFile.async('string');
-          let modified = false;
-          if (!ctText.includes('extended-properties+xml')) {
+          ctText = ctText.replace(/PartName\s*=\s*/g, 'PartName=')
+                         .replace(/ContentType\s*=\s*/g, 'ContentType=')
+                         .replace(/Extension\s*=\s*/g, 'Extension=');
+
+          if (!ctText.includes('PartName="/docProps/app.xml"')) {
             ctText = ctText.replace('</Types>', '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>');
-            modified = true;
           }
-          if (!ctText.includes('core-properties+xml')) {
+          if (!ctText.includes('PartName="/docProps/core.xml"')) {
             ctText = ctText.replace('</Types>', '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>');
-            modified = true;
           }
-          if (modified) {
-            zip.file('[Content_Types].xml', ctText);
-          }
+          zip.file('[Content_Types].xml', ctText);
         }
 
-        // 1-2. docProps/app.xml 표준 규격 주입
+        // 1-2. docProps/app.xml 표준 규격 강제 주입 (한셀의 Company 누락 크래시 원천 해결)
         const cleanAppXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
   <Application>Microsoft Excel</Application>
@@ -935,17 +932,34 @@ export default function ExcelMergePage() {
           }
 
           let ws: any = null;
-          if (selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
-            ws = wb.worksheets[selectedSheetIndex];
-          } else if (previewSheetName) {
+          // 1. 시트명 직접 일치 우선 (예: '신청서식')
+          if (previewSheetName) {
             ws = wb.worksheets.find((s: any) => s.name === previewSheetName);
-          } else if (sheetKeyword) {
+          }
+          // 2. 키워드 일치 (예: '신청' or '급식' or '인건비')
+          if (!ws && sheetKeyword) {
             ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
           }
+          // 3. 사용자가 지정한 탭 순번
+          if (!ws && selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
+            ws = wb.worksheets[selectedSheetIndex];
+          }
+          // 4. 2번째 또는 1번째 시트
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
 
+          // 🌟 스마트 시트 자동 보정: 선택된 ws의 행 수가 blockStartRow보다 작다면 유효 데이터 시트 자동 탐색!
+          if (ws && (ws.rowCount || 0) < blockStartRow) {
+            const candidate = wb.worksheets.find((s: any) => 
+              (s.rowCount || 0) >= blockStartRow && 
+              (s.name.includes('신청') || s.name.includes('서식') || s.name.includes('급식') || (s.rowCount || 0) > 10)
+            );
+            if (candidate) {
+              ws = candidate;
+            }
+          }
+
           // 🚨 C-1. 서식 자체를 잘못 낸 경우 (행 수 극단적 부족)
-          const totalRows = ws.rowCount || 0;
+          const totalRows = ws?.rowCount || 0;
           if (totalRows < blockStartRow && totalRows <= 3) {
             processed.push({
               name: file.name,
