@@ -633,8 +633,6 @@ export default function ExcelMergePage() {
       setPreviewSheetName(ws.name);
       if (forceSheetIndex !== undefined) {
         setSelectedSheetIndex(forceSheetIndex);
-      } else if (selectedSheetIndex === -1 && currentIdx >= 0) {
-        setSelectedSheetIndex(currentIdx);
       }
 
       const rows: Array<{ rowNum: number; cells: string[] }> = [];
@@ -974,12 +972,7 @@ export default function ExcelMergePage() {
           let bestFitness = -1;
           let bestMatchedWords = 0;
 
-          // 1-1. 사용자가 상단 미리보기에서 특정 시트 순번을 직접 클릭한 경우 우선 반영
-          if (selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
-            ws = wb.worksheets[selectedSheetIndex];
-          }
-
-          // 1-2. 각 시트의 헤더 지문(Fingerprint) 정밀 스캔하여 기준 템플릿과 일치도가 가장 높은 최적 시트 자동 선택
+          // 1-1. 각 시트의 헤더 지문(Fingerprint) 정밀 스캔하여 기준 템플릿과 일치도가 가장 높은 최적 시트 자동 선택
           for (const s of wb.worksheets) {
             let score = 0;
             // 시트명 매칭 가산점 (미리보기 시트명 일치 +50, 키워드 일치 +25)
@@ -1014,11 +1007,14 @@ export default function ExcelMergePage() {
             score += matchCount * 5;
             if (score > bestFitness) {
               bestFitness = score;
-              if (selectedSheetIndex < 0) {
-                ws = s;
-              }
+              ws = s;
               bestMatchedWords = matchCount;
             }
+          }
+
+          // 1-2. 사용자가 상단 미리보기에서 특정 시트 순번을 직접 클릭한 경우 우선 반영
+          if (selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
+            ws = wb.worksheets[selectedSheetIndex];
           }
 
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
