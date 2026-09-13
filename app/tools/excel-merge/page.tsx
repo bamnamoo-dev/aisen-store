@@ -3588,174 +3588,196 @@ export default function ExcelMergePage() {
 
       </main>
 
-      {/* 📖 AI-SEN 엑셀수합 실무 사용설명서 모달 (3초 초간단 비주얼 가이드) */}
+      {/* 📖 AI-SEN 엑셀수합 실무 사용설명서 모달 (대형 와이드 & 고시인성 프리미엄 가이드) */}
       {isManualOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
           onClick={() => setIsManualOpen(false)}
         >
           <div 
-            className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-xl w-full overflow-hidden animate-in zoom-in-95 duration-200"
+            className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-5xl w-full overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 모달 헤더 */}
-            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-5 sm:p-6 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-xs shadow-xs shrink-0">
-                  <BookOpen size={22} className="text-amber-300" />
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-5 sm:p-7 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-xs shadow-md shrink-0">
+                  <BookOpen size={28} className="text-amber-300" />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg sm:text-xl tracking-tight">
+                  <h3 className="font-black text-xl sm:text-2xl tracking-tight">
                     AI-SEN 엑셀수합 실무 시뮬레이션 가이드
                   </h3>
-                  <p className="text-blue-100 text-xs sm:text-sm mt-0.5 font-medium">
-                    실제 행정 실무 진행 순서대로 빠짐없이 정리한 핵심 4단계 가이드
+                  <p className="text-blue-100 text-sm sm:text-base mt-1 font-medium">
+                    실제 교육행정 실무 진행 순서대로 빠짐없이 정리한 핵심 4단계 가이드
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsManualOpen(false)}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-white shrink-0"
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-white shrink-0"
                 title="닫기"
               >
-                <X size={20} />
+                <X size={24} />
               </button>
             </div>
 
-            {/* 모달 본문 (실제 실무 순서 4단계 + 사전팁 + 보안) */}
-            <div className="p-5 sm:p-6 space-y-3.5 max-h-[72vh] overflow-y-auto text-slate-800">
+            {/* 모달 본문 (2단 와이드 레이아웃 + 대형 폰트) */}
+            <div className="p-5 sm:p-7 space-y-5 overflow-y-auto text-slate-800 flex-1">
               
-              {/* 사전 준비 팁 (선택) */}
-              <div className="bg-blue-50/70 border border-blue-200/80 rounded-2xl p-4 flex items-start gap-3.5">
-                <span className="text-xl shrink-0 mt-0.5">💡</span>
-                <div className="text-xs sm:text-sm space-y-1">
-                  <div className="font-black text-blue-950 flex items-center gap-2">
+              {/* 사전 준비 팁 (상단 전폭 배너) */}
+              <div className="bg-gradient-to-r from-blue-50/90 to-indigo-50/80 border border-blue-200 rounded-2xl p-4 sm:p-5 flex items-start gap-4 shadow-xs">
+                <span className="text-2xl sm:text-3xl shrink-0 mt-0.5">💡</span>
+                <div className="text-sm sm:text-base space-y-1.5 flex-1">
+                  <div className="font-black text-blue-950 text-base sm:text-lg flex flex-wrap items-center gap-2">
                     <span>[사전 준비] 자체 학교 기준 명부 등록 (선택 사항)</span>
-                    <span className="bg-blue-200/70 text-blue-900 text-[11px] px-2 py-0.5 rounded-md font-bold">브라우저 자동 영구 보관</span>
+                    <span className="bg-blue-600 text-white text-xs px-2.5 py-0.5 rounded-full font-bold shadow-xs">브라우저 자동 영구 보관</span>
                   </div>
-                  <p className="text-blue-800/90 leading-relaxed font-medium">
-                    지원청의 <strong>[학교명 - 연번]</strong> 엑셀이 있다면 <strong>[자체 기준 명부 등록]</strong>에 1회 등록해 두세요. 등록된 학교 순서대로 깔끔하게 자동 정렬되고, 미제출 학교도 1초 만에 자동 파악됩니다. <span className="text-blue-600">(명부가 없어도 제출된 파일 순서대로 자유롭게 자동 수합됩니다)</span>
+                  <p className="text-blue-900/90 leading-relaxed font-medium">
+                    지원청의 <strong>[학교명 - 연번]</strong> 엑셀이 있다면 <strong>[자체 기준 명부 등록]</strong>에 1회 등록해 두세요. 등록된 학교 순서대로 깔끔하게 자동 정렬되고, 미제출 학교도 1초 만에 자동 파악됩니다. <span className="text-blue-700 font-bold">(명부가 없어도 제출된 파일 순서대로 자유롭게 100% 자동 수합됩니다)</span>
                   </p>
                 </div>
               </div>
 
-              {/* 1단계: 엑셀 파일 일괄 드롭 */}
-              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
-                <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                  1
-                </div>
-                <div className="space-y-1 flex-1">
-                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
-                    <span>취합할 엑셀 파일 일괄 등록</span>
-                    <span className="text-xs text-blue-600 font-bold">마우스 드래그 & 드롭</span>
+              {/* 4대 핵심 단계 2x2 반응형 그리드 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                
+                {/* 1단계: 엑셀 파일 일괄 등록 */}
+                <div className="bg-slate-50 border border-slate-200/90 p-5 rounded-2xl flex flex-col justify-between hover:border-blue-300 transition-colors">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-sm">
+                          1
+                        </div>
+                        <h4 className="font-black text-slate-900 text-base sm:text-lg">취합할 엑셀 파일 일괄 등록</h4>
+                      </div>
+                      <span className="text-xs bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-lg">드래그 & 드롭</span>
+                    </div>
+                    <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
+                      학교들로부터 취합된 수십~수백 개의 엑셀 파일(.xlsx)을 중앙 점선 영역에 한 번에 끌어다 놓습니다. (즉시 서식 유효성 검사 및 실시간 현황 자동 집계)
+                    </p>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                    학교들로부터 취합된 수십 개의 엑셀 파일(.xlsx)을 중앙 점선 영역에 한 번에 끌어다 놓습니다. (즉시 유효성 검사 및 실시간 목록 표시)
-                  </p>
+                  <div className="mt-3 bg-white border border-slate-200/80 rounded-xl p-3 text-xs sm:text-sm text-slate-600 font-medium">
+                    📁 100개 이상의 대용량 파일도 0.5초 만에 메모리에서 안전하게 로드됩니다.
+                  </div>
                 </div>
+
+                {/* 2단계: 양식 모드 & 헤더 끝 행 지정 */}
+                <div className="bg-slate-50 border border-slate-200/90 p-5 rounded-2xl flex flex-col justify-between hover:border-indigo-300 transition-colors">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-indigo-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-sm">
+                          2
+                        </div>
+                        <h4 className="font-black text-slate-900 text-base sm:text-lg">양식 모드 & 헤더 끝 확인</h4>
+                      </div>
+                      <span className="text-xs bg-indigo-100 text-indigo-800 font-bold px-2.5 py-1 rounded-lg">★ 핵심 1초</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                      <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
+                        <strong className="text-indigo-950 block mb-0.5 font-black text-sm">🥞 서식 블록형</strong>
+                        <span className="text-slate-600 leading-snug">학교당 여러 줄 복합 서식/수식 (급식비, 인건비)</span>
+                      </div>
+                      <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
+                        <strong className="text-indigo-950 block mb-0.5 font-black text-sm">📄 단순 목록형</strong>
+                        <span className="text-slate-600 leading-snug">학교당 1줄씩 나열되는 명부 (수요조사, 실태조사)</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50/90 border border-indigo-200 rounded-xl p-3 text-xs sm:text-sm space-y-1">
+                      <div className="font-black text-indigo-950 flex items-center gap-1.5">
+                        <span className="text-indigo-600">🎯</span>
+                        <span>[헤더 끝 행]이란 무엇이고 어떻게 지정하나요?</span>
+                      </div>
+                      <p className="text-indigo-900/90 leading-relaxed font-medium">
+                        표 제목/항목명이 끝나는 <strong>마지막 행 번호</strong>입니다. 파일 등록 시 프로그램이 <strong>파란 음영으로 자동 감지</strong>하며, 다를 경우 아래 <strong>[시트 뷰어 표]에서 마지막 제목 행을 마우스로 클릭</strong>하면 1초 만에 즉시 수정됩니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3단계: 수합 실행 */}
+                <div className="bg-slate-50 border border-slate-200/90 p-5 rounded-2xl flex flex-col justify-between hover:border-emerald-300 transition-colors">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-sm">
+                          3
+                        </div>
+                        <h4 className="font-black text-slate-900 text-base sm:text-lg">🚀 [수합 실행] 클릭</h4>
+                      </div>
+                      <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">0.5초 고속 연산</span>
+                    </div>
+                    <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
+                      클릭 즉시 모든 학교 파일의 서식과 수식을 100% 온전하게 보존한 <strong>[취합 마스터 엑셀]</strong>이 고속 자동 병합됩니다.
+                    </p>
+                  </div>
+                  <div className="mt-3 bg-emerald-50/90 border border-emerald-200/90 rounded-xl p-3 text-xs sm:text-sm text-emerald-900 font-medium">
+                    🟢 정상 제출 및 🔴 미제출 학교가 5대 신호등으로 즉시 자동 분류되며, <strong>[📋 미제출 독촉 명단 1초 복사]</strong>가 지원됩니다.
+                  </div>
+                </div>
+
+                {/* 4단계: 결과 확인 및 엑셀 다운로드 */}
+                <div className="bg-slate-50 border border-slate-200/90 p-5 rounded-2xl flex flex-col justify-between hover:border-blue-400 transition-colors">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-700 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-sm">
+                          4
+                        </div>
+                        <h4 className="font-black text-slate-900 text-base sm:text-lg">결과 확인 및 맞춤 다운로드</h4>
+                      </div>
+                      <span className="text-xs bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-lg">원클릭 저장</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+                      <div className="bg-white border border-slate-200 rounded-xl p-2.5">
+                        <strong className="text-slate-900 block mb-0.5 font-black text-sm">📥 마스터 엑셀 다운로드</strong>
+                        <span className="text-slate-600 leading-snug">모든 학교의 서식·수식·셀병합이 100% 보존된 최종 취합본</span>
+                      </div>
+                      <div className="bg-white border border-blue-200 rounded-xl p-2.5">
+                        <strong className="text-blue-900 block mb-0.5 font-black text-sm">📊 종합보고서 / 현재 목록 엑셀</strong>
+                        <span className="text-blue-800 leading-snug">정상, 미제출, 오류, 중복 현황이 엑셀 필터와 함께 정리된 보고서</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
-              {/* 2단계: 양식 모드 & 헤더 끝 행 지정 */}
-              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                  2
+              {/* 하단 100% 로컬 보안 안내 (전폭 배너) */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <ShieldCheck size={24} />
                 </div>
-                <div className="space-y-2 flex-1">
-                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
-                    <span>양식 모드 선택 & 헤더 끝 행 확인 (★ 핵심)</span>
-                    <span className="text-xs text-indigo-600 font-bold">1초 확인</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
-                      <strong className="text-indigo-950 block mb-0.5 font-black">🥞 서식 블록형</strong>
-                      <span className="text-slate-600">학교당 여러 줄 복합 서식/수식 (급식비, 인건비, 목적사업비)</span>
-                    </div>
-                    <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
-                      <strong className="text-indigo-950 block mb-0.5 font-black">📄 단순 목록형</strong>
-                      <span className="text-slate-600">학교당 1줄씩 나열되는 명부 (수요조사, 비품 실태조사)</span>
-                    </div>
-                  </div>
-                  {/* 헤더 끝 행 지정 방법 상세 안내 */}
-                  <div className="bg-indigo-50/80 border border-indigo-200/90 rounded-xl p-3 text-xs space-y-1.5">
-                    <div className="font-black text-indigo-950 flex items-center gap-1.5">
-                      <span className="text-indigo-600">🎯</span>
-                      <span>[헤더 끝 행]이란 무엇이고 어떻게 지정하나요?</span>
-                    </div>
-                    <ul className="list-disc list-inside space-y-1 text-indigo-900/90 leading-relaxed font-medium">
-                      <li>
-                        <strong>역할:</strong> 표의 제목/항목명(연번, 학교명, 신청금액 등)이 끝나는 <strong>마지막 행 번호</strong>입니다. 이 행 바로 다음 줄부터 실제 각 학교의 데이터(본문)가 합쳐집니다.
-                      </li>
-                      <li>
-                        <strong>지정 방법:</strong> 파일 등록 시 프로그램이 <strong>파란색 음영으로 자동 감지</strong>합니다. 만약 실제 표 제목과 다를 경우, 아래 <strong>[시트 뷰어 표]에서 표 제목의 마지막 행을 마우스로 &lsquo;콕&rsquo; 클릭</strong>하시면 1초 만에 즉시 수정됩니다.
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3단계: 수합 실행 */}
-              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                  3
-                </div>
-                <div className="space-y-1 flex-1">
-                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
-                    <span>🚀 [수합 실행] 클릭</span>
-                    <span className="text-xs text-emerald-600 font-bold">0.5초 고속 연산</span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                    클릭 즉시 모든 학교 파일의 서식과 수식을 100% 온전하게 보존한 <strong>[취합 마스터 엑셀]</strong>이 고속 생성됩니다.
-                  </p>
-                  <p className="text-xs text-emerald-700 font-medium">
-                    🟢 정상 제출 및 🔴 미제출 학교가 5대 신호등으로 즉시 자동 분류되며, <strong>[📋 미제출 독촉 명단 1초 복사]</strong>가 가능합니다.
-                  </p>
-                </div>
-              </div>
-
-              {/* 4단계: 결과 확인 및 엑셀 다운로드 */}
-              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
-                <div className="w-10 h-10 rounded-2xl bg-blue-700 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                  4
-                </div>
-                <div className="space-y-1.5 flex-1">
-                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
-                    <span>결과 확인 및 엑셀 다운로드</span>
-                    <span className="text-xs text-blue-700 font-bold">원클릭 저장</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <div className="bg-white border border-slate-200 rounded-xl p-2.5">
-                      <strong className="text-slate-900 block mb-0.5 font-black">📥 마스터 엑셀 다운로드</strong>
-                      <span className="text-slate-600">모든 학교의 서식·수식·셀병합이 100% 보존된 최종 취합본</span>
-                    </div>
-                    <div className="bg-white border border-blue-200 rounded-xl p-2.5">
-                      <strong className="text-blue-900 block mb-0.5 font-black">📊 종합보고서 / 현재 목록 엑셀</strong>
-                      <span className="text-blue-800">정상, 미제출, 오류, 중복 현황이 엑셀 필터와 함께 정리된 보고서</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 하단 100% 로컬 보안 안내 */}
-              <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3.5 flex items-center gap-3">
-                <ShieldCheck size={22} className="text-emerald-600 shrink-0" />
-                <div className="text-xs sm:text-sm">
-                  <span className="font-black text-emerald-950 block">100% 로컬 브라우저 보안 (서버 유출 0%)</span>
-                  <span className="text-emerald-800 font-medium">모든 취합 연산은 담당자 PC 메모리 안에서만 처리되며, 외부 서버로 단 1바이트도 전송되지 않습니다.</span>
+                <div className="text-sm sm:text-base flex-1">
+                  <span className="font-black text-emerald-950 block text-base sm:text-lg">100% 로컬 브라우저 보안 (서버 유출 0%)</span>
+                  <span className="text-emerald-800 font-medium">모든 취합 연산은 담당자 PC 메모리 안에서만 0초 만에 처리되며, 급여나 개인정보가 외부 서버로 단 1바이트도 전송되지 않습니다.</span>
                 </div>
               </div>
 
             </div>
 
             {/* 모달 하단 푸터 버튼 */}
-            <div className="bg-slate-50 border-t border-slate-100 p-4 sm:p-5 flex justify-end">
+            <div className="bg-slate-50 border-t border-slate-200/80 p-4 sm:p-6 flex items-center justify-between shrink-0">
+              <span className="text-xs sm:text-sm text-slate-500 font-medium hidden sm:inline">
+                단 3초 만에 끝나는 AI-SEN 엑셀수합
+              </span>
               <button
                 type="button"
                 onClick={() => setIsManualOpen(false)}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-black px-8 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer"
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-base sm:text-lg font-black px-10 py-3.5 rounded-2xl shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
-                확인
+                가이드 확인 완료
               </button>
             </div>
+
+          </div>
+        </div>
+      )}
 
           </div>
         </div>
