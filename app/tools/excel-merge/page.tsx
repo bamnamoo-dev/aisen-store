@@ -3403,14 +3403,17 @@ export default function ExcelMergePage() {
                         <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white p-1">
                           {filteredError.map((item, idx) => (
                             <div key={idx} className="py-3.5 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-rose-50/50 rounded-lg transition-colors">
-                              <div className="min-w-0 space-y-1">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <span className="font-black text-slate-900 text-sm sm:text-base">{item.schoolName}</span>
-                                  <span className="text-slate-500 text-xs sm:text-sm font-medium">({item.name})</span>
-                                </div>
-                                <div className="text-xs sm:text-sm text-rose-600 font-bold flex items-center gap-1.5">
-                                  <AlertCircle size={14} className="shrink-0 text-rose-600" />
-                                  <span>{item.errorMsg || '서식 불일치 (취합 제외)'}</span>
+                              <div className="flex items-center gap-3 min-w-0">
+                                <span className="font-black text-rose-800 text-sm sm:text-base w-8 text-right shrink-0">{item.matchedSeq || idx + 1}.</span>
+                                <div className="min-w-0 space-y-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="font-black text-slate-900 text-sm sm:text-base">{item.schoolName}</span>
+                                    <span className="text-slate-500 text-xs sm:text-sm font-medium">({item.name})</span>
+                                  </div>
+                                  <div className="text-xs sm:text-sm text-rose-600 font-bold flex items-center gap-1.5">
+                                    <AlertCircle size={14} className="shrink-0 text-rose-600" />
+                                    <span>{item.errorMsg || '서식 불일치 (취합 제외)'}</span>
+                                  </div>
                                 </div>
                               </div>
                               <div className="shrink-0 flex items-center gap-1.5">
@@ -3463,9 +3466,12 @@ export default function ExcelMergePage() {
                         <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white p-1">
                           {filteredDuplicate.map((item, idx) => (
                             <div key={idx} className="py-3 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-amber-50/50 rounded-lg">
-                              <div className="min-w-0 space-y-0.5">
-                                <span className="font-black text-slate-900 text-sm sm:text-base">{item.schoolName}</span>
-                                <span className="text-slate-500 text-xs sm:text-sm ml-2 font-medium">({item.name})</span>
+                              <div className="flex items-center gap-3 min-w-0">
+                                <span className="font-black text-amber-800 text-sm sm:text-base w-8 text-right shrink-0">{item.matchedSeq || idx + 1}.</span>
+                                <div className="min-w-0 space-y-0.5">
+                                  <span className="font-black text-slate-900 text-sm sm:text-base">{item.schoolName}</span>
+                                  <span className="text-slate-500 text-xs sm:text-sm ml-2 font-medium">({item.name})</span>
+                                </div>
                               </div>
                               <span className="bg-amber-100 text-amber-900 border border-amber-200 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold shrink-0">
                                 중복 (연번 {item.matchedSeq || '-'})
@@ -3557,6 +3563,7 @@ export default function ExcelMergePage() {
                         {filteredAll.map((item, idx) => (
                           <div key={idx} className="py-3 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50 rounded-lg">
                             <div className="flex items-center gap-3 min-w-0">
+                              <span className="font-black text-slate-700 text-sm sm:text-base w-8 text-right shrink-0">{item.matchedSeq || idx + 1}.</span>
                               {item.status === 'matched' && <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />}
                               {item.status === 'error' && <AlertCircle size={16} className="text-rose-600 shrink-0" />}
                               {item.status === 'duplicate' && <AlertTriangle size={16} className="text-amber-500 shrink-0" />}
