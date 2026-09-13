@@ -47,7 +47,7 @@ const CATEGORIES: CategoryTab[] = [
   },
   { 
     id: 'ai', 
-    label: 'AI·포털', 
+    label: 'AI·지침', 
     count: 4, 
     colorClass: 'text-blue-700 bg-blue-50/80 border-blue-200 hover:bg-blue-100', 
     activeClass: 'bg-blue-600 text-white border-blue-600 shadow-xs' 
@@ -68,7 +68,7 @@ const CATEGORIES: CategoryTab[] = [
   },
   { 
     id: 'facility', 
-    label: '공간·힐링', 
+    label: '서식·공간', 
     count: 4, 
     colorClass: 'text-rose-700 bg-rose-50/80 border-rose-200 hover:bg-rose-100', 
     activeClass: 'bg-rose-500 text-white border-rose-500 shadow-xs' 
@@ -100,7 +100,7 @@ interface ServiceCardItem {
 
 const SERVICE_CARDS: ServiceCardItem[] = [
   // =========================================================================
-  // ROW 1: AI & 스마트 포털 허브 (Royal Blue Top Accent 🔵 4칸)
+  // ROW 1: AI & 지침 포털 허브 (Royal Blue Top Accent 🔵 4칸)
   // =========================================================================
   {
     id: 'sen-chatbot',
@@ -112,6 +112,27 @@ const SERVICE_CARDS: ServiceCardItem[] = [
     href: 'https://chatbot.aisen.store',
     isExternal: true,
     icon: <Bot size={18} />,
+    theme: {
+      stripe: 'bg-blue-600',
+      iconBg: 'bg-blue-50 text-blue-600 border-blue-100',
+      iconColor: 'text-blue-600',
+      badgeBg: 'bg-blue-50',
+      badgeText: 'text-blue-700',
+      badgeBorder: 'border-blue-200',
+      actionColor: 'text-blue-600',
+      hoverBorder: 'hover:border-blue-400',
+    }
+  },
+  {
+    id: 'sen-archive',
+    category: 'ai',
+    title: 'AI-SEN 행정서고',
+    description: '28개 분야 102권 서울교육 공식 지침서 스트리밍 서고',
+    badge: '102권 공식',
+    actionText: '서고 열람',
+    href: '/archive',
+    isExternal: false,
+    icon: <FolderOpen size={18} />,
     theme: {
       stripe: 'bg-blue-600',
       iconBg: 'bg-blue-50 text-blue-600 border-blue-100',
@@ -154,27 +175,6 @@ const SERVICE_CARDS: ServiceCardItem[] = [
     href: '/board',
     isExternal: false,
     icon: <MessageSquareShare size={18} />,
-    theme: {
-      stripe: 'bg-blue-600',
-      iconBg: 'bg-blue-50 text-blue-600 border-blue-100',
-      iconColor: 'text-blue-600',
-      badgeBg: 'bg-blue-50',
-      badgeText: 'text-blue-700',
-      badgeBorder: 'border-blue-200',
-      actionColor: 'text-blue-600',
-      hoverBorder: 'hover:border-blue-400',
-    }
-  },
-  {
-    id: 'sen-forms',
-    category: 'ai',
-    title: 'AI-SEN 행정서식',
-    description: '인사·복무·계약 등 71종 서식 실시간 미리보기 및 HWPX 다운',
-    badge: '71종',
-    actionText: '서식 서고',
-    href: '/forms',
-    isExternal: false,
-    icon: <FileCheck size={18} />,
     theme: {
       stripe: 'bg-blue-600',
       iconBg: 'bg-blue-50 text-blue-600 border-blue-100',
@@ -276,18 +276,39 @@ const SERVICE_CARDS: ServiceCardItem[] = [
   },
 
   // =========================================================================
-  // ROW 3: 행정 실무 자료실 & 문서 툴킷 (Purple Top Accent 🟣 4칸 칼정렬)
+  // ROW 3: 행정 실무 엑셀 & 문서 편철 툴킷 (Purple Top Accent 🟣 4칸 칼정렬)
   // =========================================================================
   {
-    id: 'sen-archive',
+    id: 'sen-excel-merge',
     category: 'admin',
-    title: 'AI-SEN 행정서고',
-    description: '28개 분야 102권 공식 지침서 스트리밍 서고',
-    badge: '102권',
-    actionText: '서고 열람',
-    href: '/archive',
+    title: 'AI-SEN 엑셀수합',
+    description: '공통 서식 100% 무오차 자동 결합 & 에듀파인 교부 마스터',
+    badge: '100% 범용',
+    actionText: '엑셀 수합',
+    href: '/tools/excel-merge',
     isExternal: false,
-    icon: <FolderOpen size={18} />,
+    icon: <Layers size={18} />,
+    theme: {
+      stripe: 'bg-purple-600',
+      iconBg: 'bg-purple-50 text-purple-600 border-purple-100',
+      iconColor: 'text-purple-600',
+      badgeBg: 'bg-purple-50',
+      badgeText: 'text-purple-700',
+      badgeBorder: 'border-purple-200',
+      actionColor: 'text-purple-600',
+      hoverBorder: 'hover:border-purple-400',
+    }
+  },
+  {
+    id: 'sen-sheet-splitter',
+    category: 'admin',
+    title: 'AI-SEN 엑셀분리',
+    description: '엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장',
+    badge: '초고속 분리',
+    actionText: '시트 분리',
+    href: '/tools/sheet-splitter',
+    isExternal: false,
+    icon: <FileSpreadsheet size={18} />,
     theme: {
       stripe: 'bg-purple-600',
       iconBg: 'bg-purple-50 text-purple-600 border-purple-100',
@@ -341,31 +362,31 @@ const SERVICE_CARDS: ServiceCardItem[] = [
       hoverBorder: 'hover:border-purple-400',
     }
   },
-  {
-    id: 'sen-sheet-splitter',
-    category: 'admin',
-    title: 'AI-SEN 엑셀분리',
-    description: '엑셀 파일 내 개별 시트를 단일 파일로 일괄 분리·저장',
-    badge: '초고속 분리',
-    actionText: '시트 분리',
-    href: '/tools/sheet-splitter',
-    isExternal: false,
-    icon: <FileSpreadsheet size={18} />,
-    theme: {
-      stripe: 'bg-purple-600',
-      iconBg: 'bg-purple-50 text-purple-600 border-purple-100',
-      iconColor: 'text-purple-600',
-      badgeBg: 'bg-purple-50',
-      badgeText: 'text-purple-700',
-      badgeBorder: 'border-purple-200',
-      actionColor: 'text-purple-600',
-      hoverBorder: 'hover:border-purple-400',
-    }
-  },
 
   // =========================================================================
-  // ROW 4: 공간 & 시설 & 힐링 (Rose Top Accent 🔴 4칸 칼정렬: 1칸 + 1칸 + 2칸 와이드)
+  // ROW 4: 서식 & 시설·공간 & 힐링 (Rose Top Accent 🔴 4칸 칼정렬)
   // =========================================================================
+  {
+    id: 'sen-forms',
+    category: 'facility',
+    title: 'AI-SEN 행정서식',
+    description: '인사·복무·계약 등 71종 서식 실시간 미리보기 및 HWPX 다운',
+    badge: '71종 서식',
+    actionText: '서식 서고',
+    href: '/forms',
+    isExternal: false,
+    icon: <FileCheck size={18} />,
+    theme: {
+      stripe: 'bg-rose-500',
+      iconBg: 'bg-rose-50 text-rose-600 border-rose-100',
+      iconColor: 'text-rose-600',
+      badgeBg: 'bg-rose-50',
+      badgeText: 'text-rose-700',
+      badgeBorder: 'border-rose-200',
+      actionColor: 'text-rose-600',
+      hoverBorder: 'hover:border-rose-400',
+    }
+  },
   {
     id: 'sen-gym-calc',
     category: 'facility',
@@ -397,27 +418,6 @@ const SERVICE_CARDS: ServiceCardItem[] = [
     href: '/tools/classmap',
     isExternal: false,
     icon: <LayoutGrid size={18} />,
-    theme: {
-      stripe: 'bg-rose-500',
-      iconBg: 'bg-rose-50 text-rose-600 border-rose-100',
-      iconColor: 'text-rose-600',
-      badgeBg: 'bg-rose-50',
-      badgeText: 'text-rose-700',
-      badgeBorder: 'border-rose-200',
-      actionColor: 'text-rose-600',
-      hoverBorder: 'hover:border-rose-400',
-    }
-  },
-  {
-    id: 'sen-excel-merge',
-    category: 'facility',
-    title: 'AI-SEN 엑셀수합',
-    description: '관내 학교 서식 일괄 취합 & 에듀파인 교부 마스터 (로컬 0초)',
-    badge: '취합·교부',
-    actionText: '엑셀 수합',
-    href: '/tools/excel-merge',
-    isExternal: false,
-    icon: <Layers size={18} />,
     theme: {
       stripe: 'bg-rose-500',
       iconBg: 'bg-rose-50 text-rose-600 border-rose-100',
