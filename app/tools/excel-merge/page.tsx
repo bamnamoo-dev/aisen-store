@@ -242,34 +242,54 @@ export default function ExcelMergePage() {
       const customList: SchoolItem[] = [];
       let seqCounter = 1;
 
-      // 1. 헤더 행(1~3행) 분석을 통한 학교명/연번/학교코드 컬럼 스마트 탐색
-      let nameColIdx = 2; // 기본 B열
-      let seqColIdx = 1;  // 기본 A열
-      let codeColIdx = -1; // 학교코드 열
+      // 1. 헤더 행(1~15행) 전수 탐색을 통한 학교명/연번/학교코드 컬럼 스마트 자동 감지
+      let nameColIdx = -1;
+      let seqColIdx = -1;
+      let codeColIdx = -1;
       let startScanRow = 2;
 
-      for (let testR = 1; testR <= Math.min(ws.rowCount, 3); testR++) {
+      for (let testR = 1; testR <= Math.min(ws.rowCount, 15); testR++) {
         const row = ws.getRow(testR);
-        for (let c = 1; c <= Math.min(row.cellCount, 15); c++) {
+        let foundNameCol = -1;
+        let foundSeqCol = -1;
+        let foundCodeCol = -1;
+
+        for (let c = 1; c <= Math.min(row.cellCount, 25); c++) {
           const val = String(row.getCell(c).value || '').trim();
-          if (/학교|기관|소속|기관명|학교명|대상기관/.test(val)) {
-            nameColIdx = c;
-            startScanRow = testR + 1;
+          if (!val) continue;
+          if (/^학교명$|^기관명$|^대상교$|^학교$|^기관$/i.test(val) || (/학교|기관/i.test(val) && !/운영|여부|급식|지원|대상/i.test(val))) {
+            foundNameCol = c;
           }
-          if (/연번|순번|번호|^No/i.test(val)) {
-            seqColIdx = c;
+          if (/^연번$|^순번$|^번호$|^No$/i.test(val)) {
+            foundSeqCol = c;
           }
           if (/코드|학교코드|기관코드|표준코드/i.test(val)) {
-            codeColIdx = c;
+            foundCodeCol = c;
           }
+        }
+
+        // 해당 행에 '학교명' 컬럼이 존재하면 이 행을 실제 표의 헤더 행으로 확정!
+        if (foundNameCol > 0) {
+          nameColIdx = foundNameCol;
+          seqColIdx = foundSeqCol > 0 ? foundSeqCol : (nameColIdx > 1 ? 1 : -1);
+          if (foundCodeCol > 0) codeColIdx = foundCodeCol;
+          startScanRow = testR + 1;
+          break;
         }
       }
 
-      // 2. 데이터 행 스캔
-      for (let r = startScanRow; r <= Math.min(ws.rowCount, 1000); r++) {
+      // 만약 헤더 키워드를 못 찾았다면 기본값 (A열: 연번, B열: 학교명) 폴백
+      if (nameColIdx === -1) {
+        nameColIdx = 2;
+        seqColIdx = 1;
+        startScanRow = 2;
+      }
+
+      // 2. 데이터 행 스캔 (서울시 1,355개교 전체 지원을 위해 최대 3,000행 스캔)
+      for (let r = startScanRow; r <= Math.min(ws.rowCount, 3000); r++) {
         const row = ws.getRow(r);
         const nameVal = row.getCell(nameColIdx).value;
-        const seqVal = row.getCell(seqColIdx).value;
+        const seqVal = seqColIdx > 0 ? row.getCell(seqColIdx).value : null;
         const codeVal = codeColIdx > 0 ? row.getCell(codeColIdx).value : null;
 
         let name = '';
@@ -288,7 +308,7 @@ export default function ExcelMergePage() {
           }
         }
 
-        if (name && !/연번|학교명|기관명|합계|소계/.test(name)) {
+        if (name && !/연번|학교명|기관명|합계|소계|총계|총\s*\d+교/.test(name)) {
           customList.push({ seq, name, code: code || undefined });
           seqCounter++;
         }
@@ -763,9 +783,17 @@ export default function ExcelMergePage() {
           }
 
           const matchedSchool = findMatchingSchool(rawSchoolName);
-          const finalSeq = (!isNaN(parsedColSeq) && parsedColSeq > 0) 
-            ? parsedColSeq 
-            : (matchedSchool?.seq || matchedSchoolByName?.seq || (i + 1));
+
+          // 🌟 기준 명부가 등록되어 있는 경우 -> 명부의 연번(seq)을 100% 최우선 적용하여 칼정렬!
+          let finalSeq = (i + 1);
+          if (matchedSchool?.seq) {
+            finalSeq = matchedSchool.seq;
+          } else if (matchedSchoolByName?.seq) {
+            finalSeq = matchedSchoolByName.seq;
+          } else if (!isNaN(parsedColSeq) && parsedColSeq > 0) {
+            finalSeq = parsedColSeq;
+          }
+
           const finalSchoolName = matchedSchool?.name || matchedSchoolByName?.name || rawSchoolName || `기관_${finalSeq}`;
 
           // 🚨 D. 본문 데이터 전무 검사 (엉뚱한 빈 서식 패스)
