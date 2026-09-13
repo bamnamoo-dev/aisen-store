@@ -875,6 +875,9 @@ export default function ExcelMergePage() {
             
             {/* 좌측: 기준 명부 선택 및 자체 엑셀 업로드 */}
             <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+              <span className="bg-blue-50 text-blue-700 text-xs font-black px-2 py-0.5 rounded-md border border-blue-200">
+                Step 1
+              </span>
               <span className="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5 shrink-0">
                 <Building2 size={16} className="text-blue-600" />
                 기준 명부:
@@ -950,590 +953,592 @@ export default function ExcelMergePage() {
           </div>
         </div>
 
-        {/* 2열 메인 워크스페이스: 좌측(컨트롤 타워 5칸) vs 우측(시각적 검증 & 대시보드 7칸) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          
-          {/* ◀ 좌측: 입력 & 세부 제어 (5칸) */}
-          <div className="lg:col-span-5 space-y-4">
-            
-            {/* 드래그 앤 드롭 드롭존 */}
-            <div 
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleFileDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className="bg-white border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-2xl p-6 text-center cursor-pointer transition-all hover:shadow-md group flex flex-col items-center justify-center min-h-[160px]"
+        {/* 📂 [Step 2] 취합 파일 업로드 & 테스트 샘플 바 */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="bg-indigo-50 text-indigo-700 text-xs font-black px-2 py-0.5 rounded-md border border-indigo-200">
+                Step 2
+              </span>
+              <span className="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                <Upload size={16} className="text-indigo-600" />
+                취합할 엑셀 서식 등록
+              </span>
+            </div>
+            {files.length > 0 && (
+              <span className="text-xs bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1">
+                <CheckCircle2 size={13} />
+                총 {files.length}개 파일 준비 완료
+              </span>
+            )}
+          </div>
+
+          {/* 가로형 컴팩트 드롭존 */}
+          <div 
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleFileDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/20 hover:bg-indigo-50/40 rounded-xl p-4 sm:p-5 text-center cursor-pointer transition-all flex flex-col sm:flex-row items-center justify-between gap-3 group"
+          >
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              multiple 
+              accept=".xlsx,.xlsm,.xls" 
+              className="hidden" 
+              onChange={handleFileInputChange}
+            />
+            <div className="flex items-center gap-3 text-left">
+              <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Upload size={20} />
+              </div>
+              <div>
+                <div className="font-bold text-slate-800 text-xs sm:text-sm">
+                  취합할 엑셀 파일들을 이곳에 끌어다 놓으세요
+                </div>
+                <div className="text-[11px] text-slate-400">
+                  수십~수백 개 .xlsx 파일 또는 폴더 일괄 선택 지원 (로컬 브라우저 0초 안전 처리)
+                </div>
+              </div>
+            </div>
+
+            <span className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-2xs shrink-0">
+              {files.length > 0 ? `파일 다시 선택 (${files.length}개)` : '📂 파일 직접 선택'}
+            </span>
+          </div>
+
+          {/* 🧪 테스트 샘플 액션 바 & 초기화 */}
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <button
+              type="button"
+              onClick={handleLoadSampleFiles}
+              disabled={isProcessing}
+              className="flex-1 min-w-[240px] flex items-center justify-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              title="136개 가상학교 엑셀 샘플 파일 일괄 로드"
             >
-              <input 
-                ref={fileInputRef}
-                type="file" 
-                multiple 
-                accept=".xlsx,.xlsm,.xls" 
-                className="hidden" 
-                onChange={handleFileInputChange}
-              />
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
-                <Upload size={24} />
+              <FlaskConical size={14} />
+              <span>🧪 [테스트] 136개 가상학교 샘플 1초 로드</span>
+            </button>
+            <a
+              href="/samples/sample_136_schools.zip"
+              download="sample_136_schools.zip"
+              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs font-bold py-2 px-3 rounded-xl transition-colors shrink-0 shadow-2xs"
+              title="136개 가상학교 샘플 엑셀 ZIP 다운로드"
+            >
+              <Archive size={13} />
+              <span>ZIP 다운</span>
+            </a>
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={isProcessing || (files.length === 0 && targetSchools.length === 0)}
+              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs font-bold py-2 px-3 rounded-xl transition-colors shrink-0 shadow-2xs disabled:opacity-40 cursor-pointer"
+              title="모든 파일 및 통계 초기화 (0개소 제로 상태)"
+            >
+              <RotateCcw size={13} />
+              <span>초기화</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 👀 [Step 3] 실시간 서식 미리보기 & 스마트 헤더 지정 */}
+        {files.length > 0 && previewRows.length > 0 ? (
+          <div className="bg-white rounded-2xl border-2 border-blue-300 p-4 space-y-3 shadow-md transition-all animate-in fade-in duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="bg-blue-50 text-blue-700 text-xs font-black px-2 py-0.5 rounded-md border border-blue-200">
+                  Step 3
+                </span>
+                <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0">
+                  <Eye size={13} />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-800 text-sm">
+                    신청서 서식 실시간 미리보기 ({files[0].name.length > 35 ? files[0].name.slice(0, 35) + '...' : files[0].name})
+                  </span>
+                  <span className="text-[11px] text-slate-400 ml-2">시트: [{previewSheetName || '기본시트'}]</span>
+                </div>
               </div>
-              <div className="font-bold text-slate-800 text-sm mb-0.5">
-                취합할 엑셀 파일들을 여기에 끌어다 놓으세요
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold hidden sm:inline">
+                  마우스 1클릭으로 헤더 끝 행 지정
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewOpen(!isPreviewOpen)}
+                  className="text-xs text-slate-600 hover:text-slate-900 font-semibold px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+                >
+                  {isPreviewOpen ? '미리보기 접기 ▲' : '미리보기 펼치기 ▼'}
+                </button>
               </div>
-              <div className="text-[11px] text-slate-400 mb-2.5">
-                수십~수백 개 .xlsx 파일 또는 폴더 일괄 선택 지원
+            </div>
+
+            {autoDetectedBadge && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-800 text-xs px-3 py-1.5 rounded-xl font-medium flex items-center justify-between">
+                <span>{autoDetectedBadge}</span>
+                <span className="text-[10px] text-blue-600 font-bold">다른 행을 클릭하면 즉시 변경됩니다</span>
               </div>
-              <span className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1 rounded-lg transition-colors">
-                {files.length > 0 ? `파일 직접 선택 (${files.length}개 로드됨)` : '파일 직접 선택'}
+            )}
+
+            {isPreviewOpen && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+                  <span>🔵 1행 ~ <strong>{headerEndRow}행</strong>: 공통 헤더로 1회 유지</span>
+                  <span>🟢 <strong>{headerEndRow + 1}행</strong>부터: 각 기관/학교별 본문 결합 시작</span>
+                </div>
+
+                <div className="overflow-x-auto border border-slate-200 rounded-xl max-h-[300px] overflow-y-auto shadow-inner bg-slate-50/50">
+                  <table className="w-full text-xs text-left border-collapse select-none bg-white">
+                    <thead className="bg-slate-100 text-slate-600 sticky top-0 z-10 shadow-2xs">
+                      <tr>
+                        <th className="py-1.5 px-2 border-b border-r border-slate-300 w-12 text-center font-bold bg-slate-200">행</th>
+                        <th className="py-1.5 px-2 border-b border-r border-slate-300 w-28 text-center font-bold bg-slate-100">헤더/본문 경계</th>
+                        {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'].map(col => (
+                          <th key={col} className="py-1.5 px-2 border-b border-r border-slate-300 min-w-[70px] text-center font-bold bg-slate-100">
+                            {col}열
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewRows.map(row => {
+                        const isHeader = row.rowNum <= headerEndRow;
+                        const isHeaderEdge = row.rowNum === headerEndRow;
+                        const isStartData = row.rowNum === headerEndRow + 1;
+
+                        return (
+                          <tr
+                            key={row.rowNum}
+                            onClick={() => handleSelectHeaderEndRow(row.rowNum)}
+                            title={`${row.rowNum}행을 헤더 끝으로 지정하려면 클릭하세요`}
+                            className={`border-b border-slate-200 transition-colors cursor-pointer group ${
+                              isHeaderEdge
+                                ? 'bg-blue-100 border-b-2 border-b-blue-600 font-semibold'
+                                : isHeader
+                                  ? 'bg-blue-50/70 hover:bg-blue-100/70'
+                                  : isStartData
+                                    ? 'bg-emerald-50 hover:bg-emerald-100/70'
+                                    : 'hover:bg-slate-50'
+                            }`}
+                          >
+                            <td className={`py-1 px-2 text-center border-r border-slate-200 font-mono font-bold ${
+                              isHeaderEdge ? 'text-blue-700 bg-blue-200/50' : 'text-slate-500'
+                            }`}>
+                              {row.rowNum}
+                            </td>
+                            <td className="py-1 px-2 text-center border-r border-slate-200 whitespace-nowrap">
+                              {isHeaderEdge ? (
+                                <span className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-xs">
+                                  ✂️ 헤더 끝 ({row.rowNum}행)
+                                </span>
+                              ) : isHeader ? (
+                                <span className="text-blue-600 text-[10px] font-semibold">
+                                  🔵 헤더 영역
+                                </span>
+                              ) : isStartData ? (
+                                <span className="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-xs">
+                                  🟢 본문 시작 ({row.rowNum}행)
+                                </span>
+                              ) : (
+                                <span className="text-slate-400 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+                                  여기를 클릭 ➔
+                                </span>
+                              )}
+                            </td>
+                            {row.cells.map((cellText, cIdx) => (
+                              <td
+                                key={cIdx}
+                                className={`py-1 px-2 border-r border-slate-200 truncate max-w-[130px] ${
+                                  isHeaderEdge ? 'text-blue-950 font-medium' : isHeader ? 'text-blue-900' : 'text-slate-700'
+                                }`}
+                                title={cellText}
+                              >
+                                {cellText || <span className="text-slate-300 font-normal">-</span>}
+                              </td>
+                            ))}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* 파일 업로드 전 슬림 안내 바 */
+          <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-4 text-center text-slate-400 flex items-center justify-center gap-2.5">
+            <Eye size={16} className="text-slate-400 shrink-0" />
+            <span className="text-xs font-medium text-slate-500">
+              [Step 3] 엑셀 파일을 업로드하면 이곳에 전체 너비 실시간 시트 뷰어가 펼쳐지며 마우스 1클릭으로 헤더를 확정할 수 있습니다.
+            </span>
+          </div>
+        )}
+
+        {/* ⚙️ [Step 4] 범용 수합 3원칙 설정 패널 */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3.5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-50 text-blue-700 text-xs font-black px-2 py-0.5 rounded-md border border-blue-200">
+                Step 4
+              </span>
+              <span className="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                <SlidersHorizontal size={15} className="text-blue-600" />
+                범용 수합 3원칙 설정
               </span>
             </div>
 
-            {/* 🧪 표준 샘플 테스트 액션 바 & 초기화 */}
-            <div className="flex gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/80 rounded-2xl p-2.5 shadow-2xs">
+            {/* ⚡ 업무별 1초 원클릭 프리셋 버튼 3종 가로 배치 */}
+            <div className="flex items-center gap-1.5 overflow-x-auto">
+              <span className="text-slate-500 font-bold text-xs shrink-0 mr-1">⚡ 1초 프리셋:</span>
               <button
                 type="button"
-                onClick={handleLoadSampleFiles}
-                disabled={isProcessing}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-                title="136개 가상학교 엑셀 샘플 파일 일괄 로드"
-              >
-                <FlaskConical size={14} />
-                <span>🧪 [테스트] 136개 가상학교 샘플 로드</span>
-              </button>
-              <a
-                href="/samples/sample_136_schools.zip"
-                download="sample_136_schools.zip"
-                className="flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs font-bold py-2 px-2.5 rounded-xl transition-colors shrink-0 shadow-2xs"
-                title="136개 가상학교 샘플 엑셀 ZIP 다운로드"
-              >
-                <Archive size={13} />
-                <span>ZIP 다운</span>
-              </a>
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={isProcessing || (files.length === 0 && targetSchools.length === 0)}
-                className="flex items-center justify-center gap-1 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs font-bold py-2 px-2.5 rounded-xl transition-colors shrink-0 shadow-2xs disabled:opacity-40 cursor-pointer"
-                title="모든 파일 및 통계 초기화 (0개소 제로 상태)"
-              >
-                <RotateCcw size={13} />
-                <span>초기화</span>
-              </button>
-            </div>
-
-            {/* 범용 수합 3원칙 설정 패널 */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3.5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                <span className="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
-                  <SlidersHorizontal size={15} className="text-blue-600" />
-                  범용 수합 3원칙 설정
-                </span>
-                <span className="text-[11px] text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded">
-                  서식·수식 100% 보존
-                </span>
-              </div>
-
-              {/* ⚡ 업무별 1초 원클릭 프리셋 */}
-              <div>
-                <label className="text-slate-600 font-bold text-xs block mb-1.5">⚡ 업무별 1초 프리셋</label>
-                <div className="grid grid-cols-3 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => applyPreset('food')}
-                    className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
-                      activePreset === 'food'
-                        ? 'bg-blue-50 text-blue-700 border-blue-300 shadow-xs ring-2 ring-blue-100'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                    }`}
-                  >
-                    🍱 블록 서식<br/><span className="text-[10px] font-normal text-slate-500">(16줄 고정)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyPreset('labor')}
-                    className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
-                      activePreset === 'labor'
-                        ? 'bg-purple-50 text-purple-700 border-purple-300 shadow-xs ring-2 ring-purple-100'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                    }`}
-                  >
-                    👨‍🍳 가변 서식<br/><span className="text-[10px] font-normal text-slate-500">(동적 감지)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyPreset('general')}
-                    className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
-                      activePreset === 'general'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-xs ring-2 ring-emerald-100'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                    }`}
-                  >
-                    📋 일반 목록<br/><span className="text-[10px] font-normal text-slate-500">(헤더 1회 유지)</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 3원칙 컴팩트 컨트롤 */}
-              <div className="space-y-2.5 text-xs">
-                {/* 1. 공통 헤더 1회 유지 */}
-                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-slate-700 flex items-center gap-1">
-                      <span className="w-3.5 h-3.5 bg-blue-600 text-white rounded-full text-[9px] flex items-center justify-center font-bold">1</span>
-                      공통 헤더 1회 유지
-                    </span>
-                    <span className="text-[11px] text-slate-500">1행 ~ {headerEndRow}행</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-600 shrink-0">헤더 끝 행:</span>
-                    <input 
-                      type="number" 
-                      value={headerEndRow} 
-                      onChange={e => {
-                        setHeaderEndRow(Number(e.target.value));
-                        setActivePreset('custom');
-                      }}
-                      className="w-16 bg-white border border-slate-200 rounded-lg px-2 py-0.5 text-slate-800 text-center font-bold"
-                    />
-                    <span className="text-slate-400 text-[10px]">행까지 서식/결재란 유지</span>
-                  </div>
-                </div>
-
-                {/* 2. 본문 추출 방식 */}
-                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-slate-700 flex items-center gap-1">
-                      <span className="w-3.5 h-3.5 bg-purple-600 text-white rounded-full text-[9px] flex items-center justify-center font-bold">2</span>
-                      본문 데이터 추출 방식
-                    </span>
-                    <label className="flex items-center gap-1 cursor-pointer text-purple-700 font-semibold text-[11px]">
-                      <input 
-                        type="checkbox"
-                        checked={isAutoDetectRows}
-                        onChange={e => {
-                          setIsAutoDetectRows(e.target.checked);
-                          setActivePreset('custom');
-                        }}
-                        className="rounded text-purple-600"
-                      />
-                      <span>가변행 자동 감지</span>
-                    </label>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mt-1">
-                    <div>
-                      <span className="text-slate-600 block mb-0.5">본문 시작행</span>
-                      <input 
-                        type="number" 
-                        value={blockStartRow} 
-                        onChange={e => {
-                          setBlockStartRow(Number(e.target.value));
-                          setActivePreset('custom');
-                        }}
-                        className="w-full bg-white border border-slate-200 rounded-lg px-2 py-0.5 text-slate-800 font-bold"
-                      />
-                    </div>
-                    <div>
-                      <span className="text-slate-600 block mb-0.5">
-                        {isAutoDetectRows ? '기준 행수(최소)' : '기관당 고정 행수'}
-                      </span>
-                      <input 
-                        type="number" 
-                        value={blockRowCount} 
-                        onChange={e => {
-                          setBlockRowCount(Number(e.target.value));
-                          setActivePreset('custom');
-                        }}
-                        className="w-full bg-white border border-slate-200 rounded-lg px-2 py-0.5 text-slate-800 font-bold"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. 취합 순서 정렬 */}
-                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-slate-700 flex items-center gap-1">
-                      <span className="w-3.5 h-3.5 bg-emerald-600 text-white rounded-full text-[9px] flex items-center justify-center font-bold">3</span>
-                      취합 순서 정렬
-                    </span>
-                    <span className="text-[10px] text-emerald-700 font-semibold">자동 정렬</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1 mt-1">
-                    <button
-                      type="button"
-                      onClick={() => setSortMode('seq')}
-                      className={`py-1 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
-                        sortMode === 'seq' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      A열 연번순
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSortMode('name')}
-                      className={`py-1 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
-                        sortMode === 'name' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      가나다순
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSortMode('filename')}
-                      className={`py-1 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
-                        sortMode === 'filename' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      파일명순
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* K-에듀파인 세부 설정 */}
-              {mode === 'edufine' && (
-                <div className="space-y-2 text-xs pt-2 border-t border-slate-100">
-                  <div>
-                    <label className="text-slate-600 font-medium block mb-1">에듀파인 교부 세부사업명</label>
-                    <input 
-                      type="text" 
-                      value={edufineBizName} 
-                      onChange={e => setEdufineBizName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-slate-600 font-medium block mb-1">교부금액 열 번호 (I열 = 9열)</label>
-                    <input 
-                      type="number" 
-                      value={edufineAmountCol} 
-                      onChange={e => setEdufineAmountCol(Number(e.target.value))}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 🚀 실행 버튼 (스크롤 없이 상시 노출!) */}
-              <button
-                disabled={files.length === 0 || isProcessing}
-                onClick={runMerge}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  files.length === 0 || isProcessing
-                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                    : mode === 'edufine'
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 hover:shadow-lg'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200 hover:shadow-lg'
+                onClick={() => applyPreset('food')}
+                className={`py-1 px-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                  activePreset === 'food'
+                    ? 'bg-blue-50 text-blue-700 border-blue-300 shadow-xs ring-2 ring-blue-100'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                 }`}
               >
-                {isProcessing ? (
-                  <>
-                    <RefreshCw className="animate-spin" size={18} />
-                    <span>병합 처리 중... ({progress}%)</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={18} />
-                    <span>{files.length > 0 ? `${files.length}개 파일 일괄 수합 실행` : '엑셀 파일을 추가해주세요'}</span>
-                  </>
-                )}
+                🍱 블록 서식 (16줄 고정)
               </button>
-
-              {/* 하단 전체 초기화 버튼 */}
-              {(files.length > 0 || targetSchools.length > 0) && (
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  disabled={isProcessing}
-                  className="w-full text-center text-xs text-slate-400 hover:text-rose-600 font-semibold py-1.5 transition-colors cursor-pointer flex items-center justify-center gap-1"
-                  title="업로드된 모든 파일과 통계를 비우고 처음 상태로 돌아갑니다."
-                >
-                  <RotateCcw size={12} />
-                  <span>전체 초기화 (0개소 제로 상태)</span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => applyPreset('labor')}
+                className={`py-1 px-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                  activePreset === 'labor'
+                    ? 'bg-purple-50 text-purple-700 border-purple-300 shadow-xs ring-2 ring-purple-100'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                }`}
+              >
+                👨‍🍳 가변 서식 (동적 감지)
+              </button>
+              <button
+                type="button"
+                onClick={() => applyPreset('general')}
+                className={`py-1 px-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                  activePreset === 'general'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-xs ring-2 ring-emerald-100'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                }`}
+              >
+                📋 일반 목록 (헤더 1회 유지)
+              </button>
             </div>
-
           </div>
 
-          {/* ▶ 우측: 시각적 검증 & 대시보드 (7칸) */}
-          <div className="lg:col-span-7 space-y-4">
-            
-            {/* 👀 [와이드 뷰어] 신청서 엑셀 상단 시트 뷰어 & 스마트 헤더 지정기 */}
-            {files.length > 0 && previewRows.length > 0 ? (
-              <div className="bg-white rounded-2xl border-2 border-blue-300 p-4 space-y-3 shadow-md transition-all animate-in fade-in duration-300">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0">
-                      <Eye size={15} />
-                    </span>
-                    <div>
-                      <span className="font-bold text-slate-800 text-sm block">
-                        신청서 상단 미리보기 ({files[0].name.length > 30 ? files[0].name.slice(0, 30) + '...' : files[0].name})
-                      </span>
-                      <span className="text-[11px] text-slate-400">시트명: [{previewSheetName || '기본시트'}]</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsPreviewOpen(!isPreviewOpen)}
-                      className="text-xs text-slate-500 hover:text-slate-800 font-semibold px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
-                    >
-                      {isPreviewOpen ? '미리보기 접기 ▲' : '미리보기 펼치기 ▼'}
-                    </button>
-                  </div>
-                </div>
-
-                {autoDetectedBadge && (
-                  <div className="bg-blue-50 border border-blue-200 text-blue-800 text-xs px-3 py-1.5 rounded-xl font-medium flex items-center justify-between">
-                    <span>{autoDetectedBadge}</span>
-                    <span className="text-[10px] text-blue-600 font-bold">다른 행을 클릭하면 즉시 변경됩니다</span>
-                  </div>
-                )}
-
-                {isPreviewOpen && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-                      <span>🔵 1행 ~ <strong>{headerEndRow}행</strong>: 공통 헤더로 1회 유지</span>
-                      <span>🟢 <strong>{headerEndRow + 1}행</strong>부터: 각 기관/학교별 본문 결합 시작</span>
-                    </div>
-
-                    <div className="overflow-x-auto border border-slate-200 rounded-xl max-h-[300px] overflow-y-auto shadow-inner bg-slate-50/50">
-                      <table className="w-full text-xs text-left border-collapse select-none bg-white">
-                        <thead className="bg-slate-100 text-slate-600 sticky top-0 z-10 shadow-2xs">
-                          <tr>
-                            <th className="py-1.5 px-2 border-b border-r border-slate-300 w-12 text-center font-bold bg-slate-200">행</th>
-                            <th className="py-1.5 px-2 border-b border-r border-slate-300 w-28 text-center font-bold bg-slate-100">헤더/본문 경계</th>
-                            {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'].map(col => (
-                              <th key={col} className="py-1.5 px-2 border-b border-r border-slate-300 min-w-[70px] text-center font-bold bg-slate-100">
-                                {col}열
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {previewRows.map(row => {
-                            const isHeader = row.rowNum <= headerEndRow;
-                            const isHeaderEdge = row.rowNum === headerEndRow;
-                            const isStartData = row.rowNum === headerEndRow + 1;
-
-                            return (
-                              <tr
-                                key={row.rowNum}
-                                onClick={() => handleSelectHeaderEndRow(row.rowNum)}
-                                title={`${row.rowNum}행을 헤더 끝으로 지정하려면 클릭하세요`}
-                                className={`border-b border-slate-200 transition-colors cursor-pointer group ${
-                                  isHeaderEdge
-                                    ? 'bg-blue-100 border-b-2 border-b-blue-600 font-semibold'
-                                    : isHeader
-                                      ? 'bg-blue-50/70 hover:bg-blue-100/70'
-                                      : isStartData
-                                        ? 'bg-emerald-50 hover:bg-emerald-100/70'
-                                        : 'hover:bg-slate-50'
-                                }`}
-                              >
-                                <td className={`py-1 px-2 text-center border-r border-slate-200 font-mono font-bold ${
-                                  isHeaderEdge ? 'text-blue-700 bg-blue-200/50' : 'text-slate-500'
-                                }`}>
-                                  {row.rowNum}
-                                </td>
-                                <td className="py-1 px-2 text-center border-r border-slate-200 whitespace-nowrap">
-                                  {isHeaderEdge ? (
-                                    <span className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-xs">
-                                      ✂️ 헤더 끝 ({row.rowNum}행)
-                                    </span>
-                                  ) : isHeader ? (
-                                    <span className="text-blue-600 text-[10px] font-semibold">
-                                      🔵 헤더 영역
-                                    </span>
-                                  ) : isStartData ? (
-                                    <span className="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-xs">
-                                      🟢 본문 시작 ({row.rowNum}행)
-                                    </span>
-                                  ) : (
-                                    <span className="text-slate-400 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
-                                      여기를 클릭 ➔
-                                    </span>
-                                  )}
-                                </td>
-                                {row.cells.map((cellText, cIdx) => (
-                                  <td
-                                    key={cIdx}
-                                    className={`py-1 px-2 border-r border-slate-200 truncate max-w-[130px] ${
-                                      isHeaderEdge ? 'text-blue-950 font-medium' : isHeader ? 'text-blue-900' : 'text-slate-700'
-                                    }`}
-                                    title={cellText}
-                                  >
-                                    {cellText || <span className="text-slate-300 font-normal">-</span>}
-                                  </td>
-                                ))}
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+          {/* 가로 3분할 3원칙 컨트롤 그리드 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            {/* 1. 공통 헤더 1회 유지 */}
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-700 flex items-center gap-1">
+                  <span className="w-4 h-4 bg-blue-600 text-white rounded-full text-[10px] flex items-center justify-center font-bold">1</span>
+                  공통 헤더 1회 유지
+                </span>
+                <span className="text-[11px] text-blue-600 font-bold">1행 ~ {headerEndRow}행</span>
               </div>
-            ) : (
-              /* 파일 업로드 전 대기 안내 배너 */
-              <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-400 space-y-2">
-                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
-                  <FileSpreadsheet size={24} />
-                </div>
-                <div className="font-bold text-slate-700 text-sm">
-                  좌측에서 엑셀 서식을 업로드하면 실시간 엑셀 시트 뷰어가 여기에 표시됩니다.
-                </div>
-                <div className="text-xs text-slate-400">
-                  MS 엑셀을 따로 열지 않고도 화면에서 바로 보고 마우스 1클릭으로 헤더를 확정할 수 있습니다.
-                </div>
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-slate-600 shrink-0">헤더 끝 행:</span>
+                <input 
+                  type="number" 
+                  value={headerEndRow} 
+                  onChange={e => {
+                    setHeaderEndRow(Number(e.target.value));
+                    setActivePreset('custom');
+                  }}
+                  className="w-20 bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-slate-800 text-center font-bold text-xs"
+                />
+                <span className="text-slate-400 text-[10px]">행까지 서식 유지</span>
               </div>
-            )}
+            </div>
 
-            {/* 처리 프로그레스 바 */}
-            {isProcessing && (
-              <div className="bg-white rounded-2xl border border-blue-200 p-4 space-y-2 shadow-md">
-                <div className="flex justify-between text-xs font-bold text-blue-900">
-                  <span>{statusMessage}</span>
-                  <span>{progress}%</span>
+            {/* 2. 본문 추출 방식 */}
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-700 flex items-center gap-1">
+                  <span className="w-4 h-4 bg-purple-600 text-white rounded-full text-[10px] flex items-center justify-center font-bold">2</span>
+                  본문 데이터 추출 방식
+                </span>
+                <label className="flex items-center gap-1 cursor-pointer text-purple-700 font-semibold text-[11px]">
+                  <input 
+                    type="checkbox"
+                    checked={isAutoDetectRows}
+                    onChange={e => {
+                      setIsAutoDetectRows(e.target.checked);
+                      setActivePreset('custom');
+                    }}
+                    className="rounded text-purple-600"
+                  />
+                  <span>가변행 자동 감지</span>
+                </label>
+              </div>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <span className="text-slate-600 block mb-0.5 text-[11px]">본문 시작행</span>
+                  <input 
+                    type="number" 
+                    value={blockStartRow} 
+                    onChange={e => {
+                      setBlockStartRow(Number(e.target.value));
+                      setActivePreset('custom');
+                    }}
+                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800 font-bold text-xs text-center"
+                  />
                 </div>
-                <div className="w-full bg-blue-100 rounded-full h-2.5 overflow-hidden">
-                  <div 
-                    className="bg-blue-600 h-full rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
+                <div>
+                  <span className="text-slate-600 block mb-0.5 text-[11px]">
+                    {isAutoDetectRows ? '기준 행수(최소)' : '기관당 고정 행수'}
+                  </span>
+                  <input 
+                    type="number" 
+                    value={blockRowCount} 
+                    onChange={e => {
+                      setBlockRowCount(Number(e.target.value));
+                      setActivePreset('custom');
+                    }}
+                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800 font-bold text-xs text-center"
                   />
                 </div>
               </div>
-            )}
-
-            {/* 통계 신호등 요약 카드 4종 */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
-                <div className="text-[11px] text-slate-500 font-medium">총 관리 대상수</div>
-                <div className="text-lg font-black text-slate-800 mt-0.5">{targetSchools.length}개소</div>
-              </div>
-              <div className="bg-white border border-emerald-200 rounded-xl p-3 shadow-xs">
-                <div className="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  정상 매칭
-                </div>
-                <div className="text-lg font-black text-emerald-700 mt-0.5">
-                  {processedList.filter(p => p.status === 'matched').length}개소
-                </div>
-              </div>
-              <div className="bg-white border border-rose-200 rounded-xl p-3 shadow-xs">
-                <div className="text-[11px] text-rose-600 font-medium flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                  미제출 기관
-                </div>
-                <div className="text-lg font-black text-rose-700 mt-0.5">{missingSchools.length}개소</div>
-              </div>
-              <div className="bg-white border border-amber-200 rounded-xl p-3 shadow-xs">
-                <div className="text-[11px] text-amber-600 font-medium">중복/확인필요</div>
-                <div className="text-lg font-black text-amber-700 mt-0.5">
-                  {processedList.filter(p => p.status === 'duplicate' || p.status === 'unmatched').length}건
-                </div>
-              </div>
             </div>
 
-            {/* 결과 다운로드 카드 */}
-            {mergedBlob && (
-              <div className="bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in">
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <div className="w-11 h-11 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
-                    <FileCheck2 size={22} />
-                  </div>
-                  <div>
-                    <div className="font-bold text-emerald-950 text-sm sm:text-base">{mergedFileName}</div>
-                    <div className="text-[11px] text-emerald-700 mt-0.5">
-                      100% 서식 및 수식 보존 완료 · {((mergedBlob.size) / (1024 * 1024)).toFixed(2)} MB
-                    </div>
-                  </div>
-                </div>
+            {/* 3. 취합 순서 정렬 */}
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-700 flex items-center gap-1">
+                  <span className="w-4 h-4 bg-emerald-600 text-white rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+                  취합 순서 정렬
+                </span>
+                <span className="text-[10px] text-emerald-700 font-semibold">자동 정렬</span>
+              </div>
+              <div className="grid grid-cols-3 gap-1 pt-1">
                 <button
-                  onClick={handleDownload}
-                  className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                  type="button"
+                  onClick={() => setSortMode('seq')}
+                  className={`py-1.5 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                    sortMode === 'seq' ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
                 >
-                  <Download size={16} />
-                  <span>마스터 엑셀 다운로드</span>
+                  A열 연번순
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortMode('name')}
+                  className={`py-1.5 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                    sortMode === 'name' ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  가나다순
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortMode('filename')}
+                  className={`py-1.5 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                    sortMode === 'filename' ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  파일명순
                 </button>
               </div>
-            )}
+            </div>
+          </div>
 
-            {/* 미제출교 독촉 명단 박스 */}
-            {missingSchools.length > 0 && (
-              <div className="bg-white rounded-2xl border border-rose-200 p-4 shadow-sm space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-rose-900 text-xs sm:text-sm flex items-center gap-1.5">
-                    <AlertCircle size={15} className="text-rose-600" />
-                    미제출 기관·학교 명단 ({missingSchools.length}개소)
-                  </span>
-                  <button
-                    onClick={copyMissingList}
-                    className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-lg font-bold transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    {copiedNotification ? (
-                      <>
-                        <Check size={13} className="text-emerald-600" />
-                        <span className="text-emerald-700">복사 완료!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={13} />
-                        <span>독촉 명단 1초 복사</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-                <div className="max-h-32 overflow-y-auto bg-rose-50/50 rounded-xl p-2.5 text-xs text-rose-950 font-medium divide-y divide-rose-100/60">
-                  {missingSchools.map((s, idx) => (
-                    <div key={idx} className="py-0.5 flex justify-between">
-                      <span>{s.seq}. {s.name}</span>
-                      <span className="text-rose-500 text-[11px]">{s.type || '미제출'}</span>
-                    </div>
-                  ))}
-                </div>
+          {/* K-에듀파인 세부 설정 */}
+          {mode === 'edufine' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-100">
+              <div>
+                <label className="text-slate-600 font-medium block mb-1">에듀파인 교부 세부사업명</label>
+                <input 
+                  type="text" 
+                  value={edufineBizName} 
+                  onChange={e => setEdufineBizName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none font-medium"
+                />
               </div>
-            )}
-
-            {/* 기관/학교별 실시간 처리 리스트 */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-2.5">
-              <div className="font-bold text-slate-800 text-xs sm:text-sm flex items-center justify-between">
-                <span>기관/학교별 처리 현황 ({processedList.length}건)</span>
-                <span className="text-[11px] text-slate-400 font-normal">연번 순 정렬</span>
-              </div>
-              <div className="max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
-                {processedList.length === 0 ? (
-                  <div className="text-center py-6 text-slate-400 text-xs">
-                    파일을 업로드하면 실시간 검증 결과가 여기에 표시됩니다.
-                  </div>
-                ) : (
-                  processedList.map((item, idx) => (
-                    <div key={idx} className="py-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {item.status === 'matched' && <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />}
-                        {item.status === 'unmatched' && <AlertTriangle size={15} className="text-amber-500 shrink-0" />}
-                        {item.status === 'duplicate' && <AlertCircle size={15} className="text-rose-500 shrink-0" />}
-                        {item.status === 'error' && <AlertCircle size={15} className="text-rose-600 shrink-0" />}
-                        <span className="font-medium text-slate-800">{item.schoolName}</span>
-                        <span className="text-slate-400 text-[10px] truncate max-w-[200px]">({item.name})</span>
-                      </div>
-                      <div>
-                        {item.status === 'matched' && (
-                          <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">정상</span>
-                        )}
-                        {item.status === 'duplicate' && (
-                          <span className="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold">중복</span>
-                        )}
-                        {item.status === 'unmatched' && (
-                          <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-[10px] font-bold">불일치</span>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
+              <div>
+                <label className="text-slate-600 font-medium block mb-1">교부금액 열 번호 (I열 = 9열)</label>
+                <input 
+                  type="number" 
+                  value={edufineAmountCol} 
+                  onChange={e => setEdufineAmountCol(Number(e.target.value))}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 font-medium"
+                />
               </div>
             </div>
+          )}
+        </div>
 
+        {/* 🚀 [Step 5] 취합 실행 및 결과 대시보드 */}
+        <div className="space-y-4">
+          {/* 대형 실행 버튼 */}
+          <button
+            disabled={files.length === 0 || isProcessing}
+            onClick={runMerge}
+            className={`w-full py-4 rounded-2xl font-black text-base shadow-lg flex items-center justify-center gap-2.5 transition-all cursor-pointer ${
+              files.length === 0 || isProcessing
+                ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                : mode === 'edufine'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-200 hover:shadow-xl active:scale-[0.99]'
+                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-200 hover:shadow-xl active:scale-[0.99]'
+            }`}
+          >
+            {isProcessing ? (
+              <>
+                <RefreshCw className="animate-spin" size={20} />
+                <span>병합 처리 중... ({progress}%)</span>
+              </>
+            ) : (
+              <>
+                <Sparkles size={20} />
+                <span>{files.length > 0 ? `${files.length}개 파일 일괄 수합 실행 (서식·수식 100% 보존)` : '엑셀 파일을 먼저 등록해주세요'}</span>
+              </>
+            )}
+          </button>
+
+          {/* 처리 프로그레스 바 */}
+          {isProcessing && (
+            <div className="bg-white rounded-2xl border border-blue-200 p-4 space-y-2 shadow-md">
+              <div className="flex justify-between text-xs font-bold text-blue-900">
+                <span>{statusMessage}</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="w-full bg-blue-100 rounded-full h-2.5 overflow-hidden">
+                <div 
+                  className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* 통계 신호등 요약 카드 4종 (가로 4열) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+              <div className="text-xs text-slate-500 font-medium">총 관리 대상수</div>
+              <div className="text-xl font-black text-slate-800 mt-0.5">{targetSchools.length}개소</div>
+            </div>
+            <div className="bg-white border border-emerald-200 rounded-xl p-3.5 shadow-xs">
+              <div className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                정상 매칭
+              </div>
+              <div className="text-xl font-black text-emerald-700 mt-0.5">
+                {processedList.filter(p => p.status === 'matched').length}개소
+              </div>
+            </div>
+            <div className="bg-white border border-rose-200 rounded-xl p-3.5 shadow-xs">
+              <div className="text-xs text-rose-600 font-medium flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                미제출 기관
+              </div>
+              <div className="text-xl font-black text-rose-700 mt-0.5">{missingSchools.length}개소</div>
+            </div>
+            <div className="bg-white border border-amber-200 rounded-xl p-3.5 shadow-xs">
+              <div className="text-xs text-amber-600 font-medium">중복/확인필요</div>
+              <div className="text-xl font-black text-amber-700 mt-0.5">
+                {processedList.filter(p => p.status === 'duplicate' || p.status === 'unmatched').length}건
+              </div>
+            </div>
+          </div>
+
+          {/* 결과 다운로드 카드 */}
+          {mergedBlob && (
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-500 rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
+                  <FileCheck2 size={24} />
+                </div>
+                <div>
+                  <div className="font-bold text-emerald-950 text-sm sm:text-base">{mergedFileName}</div>
+                  <div className="text-xs text-emerald-700 mt-0.5 font-medium">
+                    100% 서식 및 수식 보존 완료 · {((mergedBlob.size) / (1024 * 1024)).toFixed(2)} MB
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={handleDownload}
+                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+              >
+                <Download size={18} />
+                <span>마스터 엑셀 다운로드</span>
+              </button>
+            </div>
+          )}
+
+          {/* 미제출교 독촉 명단 박스 */}
+          {missingSchools.length > 0 && (
+            <div className="bg-white rounded-2xl border border-rose-200 p-4 shadow-sm space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-rose-900 text-xs sm:text-sm flex items-center gap-1.5">
+                  <AlertCircle size={15} className="text-rose-600" />
+                  미제출 기관·학교 명단 ({missingSchools.length}개소)
+                </span>
+                <button
+                  onClick={copyMissingList}
+                  className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-lg font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  {copiedNotification ? (
+                    <>
+                      <Check size={13} className="text-emerald-600" />
+                      <span className="text-emerald-700">복사 완료!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={13} />
+                      <span>독촉 명단 1초 복사</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <div className="max-h-36 overflow-y-auto bg-rose-50/50 rounded-xl p-2.5 text-xs text-rose-950 font-medium divide-y divide-rose-100/60">
+                {missingSchools.map((s, idx) => (
+                  <div key={idx} className="py-1 flex justify-between">
+                    <span>{s.seq}. {s.name}</span>
+                    <span className="text-rose-500 text-[11px]">{s.type || '미제출'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 기관/학교별 실시간 처리 리스트 */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-2.5">
+            <div className="font-bold text-slate-800 text-xs sm:text-sm flex items-center justify-between">
+              <span>기관/학교별 처리 현황 ({processedList.length}건)</span>
+              <span className="text-[11px] text-slate-400 font-normal">연번 순 정렬</span>
+            </div>
+            <div className="max-h-60 overflow-y-auto divide-y divide-slate-100 text-xs">
+              {processedList.length === 0 ? (
+                <div className="text-center py-6 text-slate-400 text-xs">
+                  파일을 업로드하면 실시간 검증 결과가 여기에 표시됩니다.
+                </div>
+              ) : (
+                processedList.map((item, idx) => (
+                  <div key={idx} className="py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {item.status === 'matched' && <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />}
+                      {item.status === 'unmatched' && <AlertTriangle size={15} className="text-amber-500 shrink-0" />}
+                      {item.status === 'duplicate' && <AlertCircle size={15} className="text-rose-500 shrink-0" />}
+                      {item.status === 'error' && <AlertCircle size={15} className="text-rose-600 shrink-0" />}
+                      <span className="font-medium text-slate-800">{item.schoolName}</span>
+                      <span className="text-slate-400 text-[10px] truncate max-w-[250px]">({item.name})</span>
+                    </div>
+                    <div>
+                      {item.status === 'matched' && (
+                        <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">정상</span>
+                      )}
+                      {item.status === 'duplicate' && (
+                        <span className="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold">중복</span>
+                      )}
+                      {item.status === 'unmatched' && (
+                        <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-[10px] font-bold">불일치</span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
