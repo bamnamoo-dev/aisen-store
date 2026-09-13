@@ -1662,95 +1662,95 @@ export default function ExcelMergePage() {
           onClick={() => setIsManualOpen(false)}
         >
           <div 
-            className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200"
+            className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-xl w-full overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 모달 헤더 */}
-            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-xs shadow-xs">
-                  <BookOpen size={20} className="text-amber-300" />
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-5 sm:p-6 flex items-center justify-between">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-xs shadow-xs shrink-0">
+                  <BookOpen size={22} className="text-amber-300" />
                 </div>
                 <div>
-                  <h3 className="font-black text-base sm:text-lg tracking-tight">
+                  <h3 className="font-black text-lg sm:text-xl tracking-tight">
                     AI-SEN 엑셀수합 3초 가이드
                   </h3>
-                  <p className="text-blue-100 text-xs mt-0.5">
+                  <p className="text-blue-100 text-sm mt-0.5 font-medium">
                     단 3단계로 수십 개 학교 서식을 하나로 통합합니다
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsManualOpen(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-white"
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-white shrink-0"
                 title="닫기"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
             {/* 핵심 3단계 카드 */}
-            <div className="p-5 sm:p-6 space-y-3">
+            <div className="p-5 sm:p-6 space-y-3.5">
               
               {/* 1단계 */}
-              <div className="flex items-center gap-3.5 bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl">
-                <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-4 sm:p-4.5 rounded-2xl">
+                <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
                   1
                 </div>
-                <div className="space-y-0.5">
-                  <div className="font-extrabold text-slate-800 text-xs sm:text-sm">
+                <div className="space-y-1">
+                  <div className="font-black text-slate-900 text-base sm:text-lg">
                     엑셀 파일 등록
                   </div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-sm sm:text-base text-slate-600 font-medium leading-snug">
                     취합할 파일들을 드롭존에 한 번에 끌어다 놓습니다.
                   </div>
                 </div>
               </div>
 
               {/* 2단계 */}
-              <div className="flex items-center gap-3.5 bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl">
-                <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-4 sm:p-4.5 rounded-2xl">
+                <div className="w-11 h-11 rounded-2xl bg-indigo-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
                   2
                 </div>
-                <div className="space-y-0.5">
-                  <div className="font-extrabold text-slate-800 text-xs sm:text-sm">
+                <div className="space-y-1">
+                  <div className="font-black text-slate-900 text-base sm:text-lg">
                     헤더 확인 (자동 감지)
                   </div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-sm sm:text-base text-slate-600 font-medium leading-snug">
                     미리보기에서 헤더 끝 행을 확인합니다. (클릭으로 즉시 변경 가능)
                   </div>
                 </div>
               </div>
 
               {/* 3단계 */}
-              <div className="flex items-center gap-3.5 bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl">
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-4 sm:p-4.5 rounded-2xl">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
                   3
                 </div>
-                <div className="space-y-0.5">
-                  <div className="font-extrabold text-slate-800 text-xs sm:text-sm">
+                <div className="space-y-1">
+                  <div className="font-black text-slate-900 text-base sm:text-lg">
                     [수합 실행] & 다운로드
                   </div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-sm sm:text-base text-slate-600 font-medium leading-snug">
                     2초 만에 완벽 서식 보존 마스터 엑셀이 생성됩니다.
                   </div>
                 </div>
               </div>
 
               {/* 팁 요약 2종 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
-                <div className="bg-blue-50/70 border border-blue-200/70 rounded-xl p-3 flex items-start gap-2.5">
-                  <Layers size={16} className="text-blue-600 shrink-0 mt-0.5" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-3.5 flex items-start gap-3">
+                  <Layers size={19} className="text-blue-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-extrabold text-blue-900 text-xs sm:text-sm block">모드 선택</span>
-                    <span className="text-blue-800/90 text-xs leading-relaxed">일반 서식은 <strong>블록 서식</strong>, 1줄 명부는 <strong>단순 목록</strong></span>
+                    <span className="font-black text-blue-950 text-sm sm:text-base block">모드 선택</span>
+                    <span className="text-blue-800/90 text-xs sm:text-sm font-medium leading-relaxed">일반 서식은 <strong>블록 서식</strong>, 1줄 명부는 <strong>단순 목록</strong></span>
                   </div>
                 </div>
-                <div className="bg-emerald-50/70 border border-emerald-200/70 rounded-xl p-3 flex items-start gap-2.5">
-                  <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+                <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3.5 flex items-start gap-3">
+                  <ShieldCheck size={19} className="text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-extrabold text-emerald-900 text-xs sm:text-sm block">100% 로컬 보안</span>
-                    <span className="text-emerald-800/90 text-xs leading-relaxed">서버 전송 없이 내 PC 메모리에서 안전 처리</span>
+                    <span className="font-black text-emerald-950 text-sm sm:text-base block">100% 로컬 보안</span>
+                    <span className="text-emerald-800/90 text-xs sm:text-sm font-medium leading-relaxed">서버 전송 없이 내 PC 메모리에서 안전 처리</span>
                   </div>
                 </div>
               </div>
@@ -1758,11 +1758,11 @@ export default function ExcelMergePage() {
             </div>
 
             {/* 모달 하단 푸터 버튼 */}
-            <div className="bg-slate-50 border-t border-slate-100 p-4 flex justify-end">
+            <div className="bg-slate-50 border-t border-slate-100 p-4 sm:p-5 flex justify-end">
               <button
                 type="button"
                 onClick={() => setIsManualOpen(false)}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold px-7 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-black px-8 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer"
               >
                 확인
               </button>
