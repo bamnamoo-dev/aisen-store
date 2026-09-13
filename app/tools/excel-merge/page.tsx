@@ -1033,15 +1033,15 @@ export default function ExcelMergePage() {
           </div>
         </div>
 
-        {/* 📂 [Step 2] 취합 파일 업로드 & 테스트 샘플 바 (콤팩트 슬림형) */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        {/* 📂 [Step 2] 취합 파일 업로드 & 테스트 샘플 바 (눈에 띄는 컬러 테두리 강조형) */}
+        <div className="bg-white rounded-2xl border-2 border-indigo-200 hover:border-indigo-300 p-4 sm:p-5 shadow-sm space-y-3 transition-colors">
+          <div className="flex items-center justify-between border-b border-indigo-100 pb-2.5">
             <div className="flex items-center gap-2">
-              <span className="bg-indigo-50 text-indigo-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-md border border-indigo-200">
+              <span className="bg-indigo-100 text-indigo-800 text-xs sm:text-sm font-black px-2.5 py-1 rounded-md border border-indigo-300">
                 Step 2
               </span>
               <span className="font-black text-slate-800 text-base sm:text-lg flex items-center gap-1.5">
-                <Upload size={18} className="text-indigo-600" />
+                <Upload size={19} className="text-indigo-600" />
                 취합할 엑셀 서식 등록
               </span>
             </div>
@@ -1053,12 +1053,12 @@ export default function ExcelMergePage() {
             )}
           </div>
 
-          {/* 세로 높이를 슬림하게 압축한 콤팩트 가로형 드롭존 */}
+          {/* 눈에 확실하게 띄는 블루/인디고 컬러 점선 테두리 드롭존 */}
           <div 
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleFileDrop}
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-indigo-200 hover:border-indigo-500 bg-indigo-50/20 hover:bg-indigo-50/40 rounded-xl px-4 py-3.5 sm:py-4 text-center sm:text-left cursor-pointer transition-all flex flex-col sm:flex-row items-center justify-between gap-3 group hover:shadow-xs"
+            className="border-2 border-dashed border-indigo-500 hover:border-indigo-600 bg-indigo-50/60 hover:bg-indigo-50/90 rounded-xl px-5 py-4 sm:py-4.5 text-center sm:text-left cursor-pointer transition-all flex flex-col sm:flex-row items-center justify-between gap-3.5 group shadow-2xs hover:shadow-xs"
           >
             <input 
               ref={fileInputRef}
@@ -1068,21 +1068,21 @@ export default function ExcelMergePage() {
               className="hidden" 
               onChange={handleFileInputChange}
             />
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
-                <Upload size={22} />
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-sm">
+                <Upload size={24} className="text-white" />
               </div>
               <div>
-                <div className="font-extrabold text-slate-800 text-base sm:text-lg">
+                <div className="font-black text-indigo-950 text-base sm:text-lg">
                   취합할 엑셀 파일들을 이곳에 끌어다 놓으세요
                 </div>
-                <div className="text-xs sm:text-sm text-slate-600 font-medium">
+                <div className="text-xs sm:text-sm text-indigo-800/80 font-semibold">
                   수십~수백 개 .xlsx 파일 일괄 선택 지원 (로컬 브라우저 0초 무부하 보안)
                 </div>
               </div>
             </div>
 
-            <span className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold px-4.5 py-2.5 rounded-xl transition-all shadow-2xs group-hover:shadow-xs shrink-0">
+            <span className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl transition-all shadow-sm group-hover:shadow-md shrink-0 active:scale-95">
               {files.length > 0 ? `📂 파일 다시 선택 (${files.length}개)` : '📂 엑셀 파일 직접 선택'}
             </span>
           </div>
@@ -1093,10 +1093,10 @@ export default function ExcelMergePage() {
               type="button"
               onClick={handleLoadSampleFiles}
               disabled={isProcessing}
-              className="flex-1 min-w-[200px] flex items-center justify-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-bold py-2.5 px-4 rounded-xl shadow-2xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex-1 min-w-[200px] flex items-center justify-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-300 text-xs sm:text-sm font-bold py-2 px-4 rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-2xs"
               title="136개 가상학교 엑셀 샘플 파일 일괄 로드"
             >
-              <FlaskConical size={16} />
+              <FlaskConical size={16} className="text-purple-600" />
               <span>🧪 [테스트] 136개 가상학교 샘플 1초 로드</span>
             </button>
             <a
