@@ -692,12 +692,13 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  135여 개 학교가 보낸 급식비·인건비 등 복합 서식을 2초 만에 단일 마스터 엑셀로 일괄 취합하고 K-에듀파인 교부 양식으로 자동 변환합니다.
+                  수십~수백 개 학교가 보낸 급식비·늘봄 등 복합 서식을 원스크린에서 3초 만에 단일 마스터 엑셀로 일괄 취합하고 K-에듀파인 교부 양식으로 자동 변환합니다.
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">수식/서식/병합셀 100% 보존</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">끝 행까지 가변 감지</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">수식/서식 100% 보존</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">서울 1,319개교 매핑</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">독촉 명단 1초 복사</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">오프라인 폐쇄망 지원</span>
                 </div>
               </div>
 
