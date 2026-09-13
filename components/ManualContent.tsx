@@ -697,7 +697,7 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">끝 행까지 가변 감지</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">수식/서식 100% 보존</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">서울 1,319개교 매핑</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">자체 명부 로컬 저장</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">독촉 명단 1초 복사</span>
                 </div>
               </div>
