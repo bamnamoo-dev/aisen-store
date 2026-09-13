@@ -345,7 +345,11 @@ export default function ExcelMergePage() {
               const dstCell = dstRow.getCell(colNumber);
 
               // 1. 값 및 수식 복사
-              if (cell.formula) {
+              // 빗금(대각선 사선) 셀 방어: 서식상 빗금 친 공란 셀에는 값이 입력되지 않도록 정제
+              const hasDiagonal = cell.border?.diagonal && (cell.border.diagonal.up || cell.border.diagonal.down);
+              if (hasDiagonal && !cell.formula && (!cell.value || typeof cell.value !== 'object')) {
+                dstCell.value = null;
+              } else if (cell.formula) {
                 dstCell.value = {
                   formula: shiftFormula(cell.formula, rowOffset),
                   result: cell.result
