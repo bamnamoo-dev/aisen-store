@@ -32,17 +32,17 @@ interface ProcessedFile {
 // 서울 11개 교육지원청 및 전국/자체 명부 지원 목록
 const REGIONAL_OFFICES = [
   { id: 'none', name: '선택 안 함 (전국 자유 서식 / 자체 명부)', count: 0, file: '' },
-  { id: 'gangnam', name: '서울 강남서초 (136개교)', count: 136, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'gangdong', name: '서울 강동송파 (약 122개교)', count: 122, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'gangseo', name: '서울 강서양천 (약 131개교)', count: 131, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'bukbu', name: '서울 북부 (약 128개교)', count: 128, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'jungbu', name: '서울 중부 (약 88개교)', count: 88, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'seongdong', name: '서울 성동광진 (약 83개교)', count: 83, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'seongbuk', name: '서울 성북강북 (약 92개교)', count: 92, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'dongbu', name: '서울 동부 (약 97개교)', count: 97, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'seobu', name: '서울 서부 (약 124개교)', count: 124, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'nambu', name: '서울 남부 (약 116개교)', count: 116, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'dongjak', name: '서울 동작관악 (약 112개교)', count: 112, file: '/data/seoul_schools_gangnam.json' },
+  { id: 'gangnam', name: '🧪 가상 샘플 교육지원청 (136개교)', count: 136, file: '/data/sample_virtual_schools.json' },
+  { id: 'gangdong', name: '서울 강동송파 (약 122개교)', count: 122, file: '/data/sample_virtual_schools.json' },
+  { id: 'gangseo', name: '서울 강서양천 (약 131개교)', count: 131, file: '/data/sample_virtual_schools.json' },
+  { id: 'bukbu', name: '서울 북부 (약 128개교)', count: 128, file: '/data/sample_virtual_schools.json' },
+  { id: 'jungbu', name: '서울 중부 (약 88개교)', count: 88, file: '/data/sample_virtual_schools.json' },
+  { id: 'seongdong', name: '서울 성동광진 (약 83개교)', count: 83, file: '/data/sample_virtual_schools.json' },
+  { id: 'seongbuk', name: '서울 성북강북 (약 92개교)', count: 92, file: '/data/sample_virtual_schools.json' },
+  { id: 'dongbu', name: '서울 동부 (약 97개교)', count: 97, file: '/data/sample_virtual_schools.json' },
+  { id: 'seobu', name: '서울 서부 (약 124개교)', count: 124, file: '/data/sample_virtual_schools.json' },
+  { id: 'nambu', name: '서울 남부 (약 116개교)', count: 116, file: '/data/sample_virtual_schools.json' },
+  { id: 'dongjak', name: '서울 동작관악 (약 112개교)', count: 112, file: '/data/sample_virtual_schools.json' },
   { id: 'custom', name: '📂 자체 기준 명부 직접 등록 (.xlsx)', count: 0, file: '' }
 ];
 
@@ -958,7 +958,7 @@ export default function ExcelMergePage() {
                 className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <FlaskConical size={14} />
-                <span>🧪 [테스트] 136개교 샘플 로드</span>
+                <span>🧪 [테스트] 136개 가상학교 샘플 로드</span>
               </button>
               <a
                 href="/samples/sample_136_schools.zip"
