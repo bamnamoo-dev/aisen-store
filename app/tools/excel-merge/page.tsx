@@ -31,23 +31,10 @@ interface ProcessedFile {
   rowCount?: number;
 }
 
-// 서울시 전체 및 11개 교육지원청, 전국/자체 명부 지원 목록
-const REGIONAL_OFFICES = [
-  { id: 'none', name: '선택 안 함 (전국 자유 서식 / 자체 명부)', count: 0, file: '' },
-  { id: 'seoul_all', name: '🏛️ 서울특별시교육청 전체 (1,319개교)', count: 1319, file: '/data/seoul_schools_all.json' },
-  { id: 'gangnam', name: '📍 강남서초교육지원청 (131개교)', count: 131, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'gangdong', name: '📍 강동송파교육지원청 (152개교)', count: 152, file: '/data/seoul_schools_gangdong.json' },
-  { id: 'gangseo', name: '📍 강서양천교육지원청 (144개교)', count: 144, file: '/data/seoul_schools_gangseo.json' },
-  { id: 'nambu', name: '📍 남부교육지원청 (132개교)', count: 132, file: '/data/seoul_schools_nambu.json' },
-  { id: 'seobu', name: '📍 서부교육지원청 (151개교)', count: 151, file: '/data/seoul_schools_seobu.json' },
-  { id: 'bukbu', name: '📍 북부교육지원청 (138개교)', count: 138, file: '/data/seoul_schools_bukbu.json' },
-  { id: 'jungbu', name: '📍 중부교육지원청 (101개교)', count: 101, file: '/data/seoul_schools_jungbu.json' },
-  { id: 'dongjak', name: '📍 동작관악교육지원청 (100개교)', count: 100, file: '/data/seoul_schools_dongjak.json' },
-  { id: 'dongbu', name: '📍 동부교육지원청 (95개교)', count: 95, file: '/data/seoul_schools_dongbu.json' },
-  { id: 'seongbuk', name: '📍 성북강북교육지원청 (94개교)', count: 94, file: '/data/seoul_schools_seongbuk.json' },
-  { id: 'seongdong', name: '📍 성동광진교육지원청 (81개교)', count: 81, file: '/data/seoul_schools_seongdong.json' },
-  { id: 'virtual_sample', name: '🧪 [테스트] 가상 136개교 샘플 교육지원청', count: 136, file: '/data/sample_virtual_schools.json' },
-  { id: 'custom', name: '📂 자체 기준 명부 직접 등록 (.xlsx)', count: 0, file: '' }
+// 기준 명부 옵션 (실무 최적화: '명부 없음' 기본 + '자체 기준 명부')
+const ROSTER_OPTIONS = [
+  { id: 'none', name: '명부 없음 (자유 수합 / 미제출 검증 생략)' },
+  { id: 'custom', name: '📂 자체 기준 명부 직접 등록 (.xlsx)' }
 ];
 
 export default function ExcelMergePage() {
@@ -144,7 +131,7 @@ export default function ExcelMergePage() {
     }
   };
 
-  // 기준 명부 로드 (기본 지원청 JSON 또는 로컬 영구 저장된 자체 명부)
+  // 기준 명부 로드 (자체 기준 명부 또는 선택 안 함)
   useEffect(() => {
     if (selectedRegion === 'none') {
       setTargetSchools([]);
@@ -158,17 +145,8 @@ export default function ExcelMergePage() {
       }
       return;
     }
-    const office = REGIONAL_OFFICES.find(o => o.id === selectedRegion);
-    if (office && office.file) {
-      fetch(office.file)
-        .then(res => res.json())
-        .then((data: SchoolItem[]) => {
-          setTargetSchools(data);
-          setCustomRosterName('');
-        })
-        .catch(err => {
-          console.error('명부 로드 실패:', err);
-        });
+    if (selectedRegion === 'virtual_sample') {
+      return; // handleLoadSampleFiles에서 직접 세팅
     }
   }, [selectedRegion, savedCustomRoster]);
 
@@ -1041,23 +1019,26 @@ export default function ExcelMergePage() {
               onChange={e => setSelectedRegion(e.target.value)}
               className="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
             >
-              {REGIONAL_OFFICES.map(office => {
-                if (office.id === 'custom') {
+              {ROSTER_OPTIONS.map(opt => {
+                if (opt.id === 'custom') {
                   const label = savedCustomRoster 
                     ? `💾 [내 PC 저장] ${savedCustomRoster.name}`
                     : '📂 자체 기준 명부 직접 등록 (.xlsx)';
                   return (
-                    <option key={office.id} value={office.id}>
+                    <option key={opt.id} value={opt.id}>
                       {label}
                     </option>
                   );
                 }
                 return (
-                  <option key={office.id} value={office.id}>
-                    {office.name}
+                  <option key={opt.id} value={opt.id}>
+                    {opt.name}
                   </option>
                 );
               })}
+              {selectedRegion === 'virtual_sample' && (
+                <option value="virtual_sample">🧪 [테스트] 가상 136개교 샘플 명부</option>
+              )}
             </select>
 
             <input 
