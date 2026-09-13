@@ -10,7 +10,7 @@ import {
   Layers, Copy, RefreshCw, Sparkles, FileText, ArrowRight, ShieldCheck, 
   HelpCircle, ChevronDown, Check, Send, DownloadCloud, FileCheck2, School,
   FlaskConical, Archive, Eye, FileUp, Building2, SlidersHorizontal, BookOpen,
-  RotateCcw, X
+  RotateCcw, X, ClipboardList
 } from 'lucide-react';
 
 interface SchoolItem {
@@ -77,6 +77,8 @@ export default function ExcelMergePage() {
   const [edufineBlob, setEdufineBlob] = useState<Blob | null>(null);
   const [edufineFileName, setEdufineFileName] = useState('');
   const [copiedNotification, setCopiedNotification] = useState(false);
+  const [activeReportTab, setActiveReportTab] = useState<'all' | 'missing' | 'error' | 'duplicate' | 'matched'>('missing');
+  const [copiedReportType, setCopiedReportType] = useState<string | null>(null);
 
   // 엑셀 시트 상단 미리보기 & 스마트 헤더 선택기 상태
   const [previewRows, setPreviewRows] = useState<Array<{ rowNum: number; cells: string[] }>>([]);
@@ -698,6 +700,8 @@ export default function ExcelMergePage() {
     setSelectedSheetIndex(-1);
     setAvailableSheets([]);
     setAutoDetectedBadge('');
+    setActiveReportTab('missing');
+    setCopiedReportType(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (rosterInputRef.current) rosterInputRef.current.value = '';
   };
@@ -763,6 +767,24 @@ export default function ExcelMergePage() {
         return;
       }
 
+      // 🌟 기준 템플릿의 헤더 지문(Fingerprint) 수집 (1행 ~ headerEndRow 영역의 핵심 컬럼/제목 단어들)
+      const templateHeaderWords = new Set<string>();
+      for (let r = 1; r <= Math.max(headerEndRow, 3); r++) {
+        const row = targetWs.getRow(r);
+        row.eachCell({ includeEmpty: false }, (c: any) => {
+          const val = c.value;
+          const txt = String(val && typeof val === 'object' ? (val.result || val.formula || '') : (val || '')).trim();
+          if (txt.length >= 2) {
+            const clean = txt.replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g, ' ');
+            clean.split(/\s+/).forEach(w => {
+              if (w.length >= 2 && !/^\d+$/.test(w)) {
+                templateHeaderWords.add(w.toLowerCase());
+              }
+            });
+          }
+        });
+      }
+
       // 2. 각 파일 순회 및 연번/학교명 추출 (PDF, 비엑셀, 서식오류 파일 자동 감지 & 패스)
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -819,7 +841,7 @@ export default function ExcelMergePage() {
           }
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
 
-          // 🚨 C. 서식 자체를 잘못 낸 경우 (서식 불일치/행 수 부족/엉뚱한 양식 감지)
+          // 🚨 C-1. 서식 자체를 잘못 낸 경우 (행 수 극단적 부족)
           const totalRows = ws.rowCount || 0;
           if (totalRows < blockStartRow && totalRows <= 3) {
             processed.push({
@@ -830,6 +852,43 @@ export default function ExcelMergePage() {
               errorMsg: '서식 불일치 (행 수 부족/다른 양식)'
             });
             continue;
+          }
+
+          // 🚨 C-2. 서식 지문(Fingerprint) 대조: 아예 다른 양식의 파일 자동 감지 및 취합데이터 100% 제외
+          if (templateHeaderWords.size >= 3) {
+            let matchedHeaderWords = 0;
+            const scannedWords = new Set<string>();
+            const scanMaxRow = Math.min(ws.rowCount || 0, Math.max(headerEndRow + 3, 20));
+
+            for (let r = 1; r <= scanMaxRow; r++) {
+              const row = ws.getRow(r);
+              row.eachCell({ includeEmpty: false }, (c: any) => {
+                const val = c.value;
+                const txt = String(val && typeof val === 'object' ? (val.result || val.formula || '') : (val || '')).trim();
+                if (txt.length >= 2) {
+                  const clean = txt.replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g, ' ');
+                  clean.split(/\s+/).forEach(w => {
+                    const lower = w.toLowerCase();
+                    if (lower.length >= 2 && templateHeaderWords.has(lower) && !scannedWords.has(lower)) {
+                      scannedWords.add(lower);
+                      matchedHeaderWords++;
+                    }
+                  });
+                }
+              });
+            }
+
+            // 템플릿 헤더 단어가 3개 이상 존재하는데, 제출 파일 상단에서 일치하는 단어가 0개이면 100% 다른 서식!
+            if (matchedHeaderWords === 0) {
+              processed.push({
+                name: file.name,
+                size: file.size,
+                schoolName: fallbackSchoolName,
+                status: 'error',
+                errorMsg: '서식 불일치 (다른 양식 제출 - 자동 제외)'
+              });
+              continue; // 🚀 취합 데이터(matchedMap)에 절대 결합하지 않고 즉시 패스!
+            }
           }
 
           let rawSchoolName = '';
@@ -1283,25 +1342,90 @@ export default function ExcelMergePage() {
   // 기존 호환용 다운로드 핸들러
   const handleDownload = handleDownloadMaster;
 
-  // 미제출 및 오류(PDF/서식불일치) 학교 명단 클립보드 복사
-  const copyMissingList = () => {
+  // 1. 종합 취합 결과 보고서 클립보드 1초 복사 (K-에듀파인 메신저/공문 보고용)
+  const copySummaryReport = () => {
+    const matchedCount = processedList.filter(p => p.status === 'matched').length;
     const errorItems = processedList.filter(p => p.status === 'error');
-    if (missingSchools.length === 0 && errorItems.length === 0) return;
+    const duplicateItems = processedList.filter(p => p.status === 'duplicate');
+    const targetCount = targetSchools.length > 0 ? targetSchools.length : (matchedCount + missingSchools.length);
 
-    let text = '';
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    let report = `[📢 AI-SEN 엑셀 수합 취합 결과 종합 보고]\n`;
+    report += `• 취합 일시: ${dateStr}\n`;
+    report += `• 총 관리 대상: ${targetCount}개소\n`;
+    report += `• 정상 수합: ${matchedCount}개소\n`;
+    report += `• 미제출 기관: ${missingSchools.length}개소\n`;
+    report += `• 서식오류/제외: ${errorItems.length}건\n`;
+    report += `• 중복 제출: ${duplicateItems.length}건\n`;
+
     if (missingSchools.length > 0) {
-      text += `[미제출 기관·학교 독촉 명단 (${missingSchools.length}개소)]\n` + 
-              missingSchools.map(s => `${s.seq}. ${s.name}`).join('\n');
-    }
-    if (errorItems.length > 0) {
-      if (text) text += '\n\n';
-      text += `[서식오류·비엑셀(PDF) 재제출 요청 명단 (${errorItems.length}건)]\n` + 
-              errorItems.map((item, idx) => `${idx + 1}. ${item.schoolName} (${item.name}) - ${item.errorMsg || '서식 오류'}`).join('\n');
+      report += `\n[🔴 미제출 기관·학교 독촉 명단 (${missingSchools.length}개소)]\n`;
+      report += missingSchools.map((s, idx) => `${idx + 1}. ${s.name}${s.code ? ` (${s.code})` : ''}`).join('\n');
     }
 
-    navigator.clipboard.writeText(text);
+    if (errorItems.length > 0) {
+      report += `\n\n[⚠️ 서식오류 및 다른양식 제출 (재제출 요청 필요 - ${errorItems.length}건)]\n`;
+      report += errorItems.map((item, idx) => `${idx + 1}. ${item.schoolName} (${item.name}) - 사유: ${item.errorMsg || '서식 불일치'}`).join('\n');
+    }
+
+    if (duplicateItems.length > 0) {
+      report += `\n\n[🟡 중복 제출 기관 명단 (${duplicateItems.length}건)]\n`;
+      report += duplicateItems.map((item, idx) => `${idx + 1}. ${item.schoolName} (${item.name})`).join('\n');
+    }
+
+    navigator.clipboard.writeText(report);
+    setCopiedReportType('summary');
     setCopiedNotification(true);
-    setTimeout(() => setCopiedNotification(false), 2000);
+    setTimeout(() => {
+      setCopiedReportType(null);
+      setCopiedNotification(false);
+    }, 2500);
+  };
+
+  // 2. 미제출 기관만 복사 (독촉 쪽지/메신저용)
+  const copyMissingList = () => {
+    if (missingSchools.length === 0) return;
+    const text = `[미제출 기관·학교 독촉 명단 (${missingSchools.length}개소)]\n` + 
+      missingSchools.map((s, idx) => `${idx + 1}. ${s.name}${s.code ? ` (${s.code})` : ''}`).join('\n');
+    navigator.clipboard.writeText(text);
+    setCopiedReportType('missing');
+    setCopiedNotification(true);
+    setTimeout(() => {
+      setCopiedReportType(null);
+      setCopiedNotification(false);
+    }, 2500);
+  };
+
+  // 3. 서식오류 / 다른양식 제출 기관만 복사 (재제출 요청용)
+  const copyErrorList = () => {
+    const errorItems = processedList.filter(p => p.status === 'error');
+    if (errorItems.length === 0) return;
+    const text = `[서식 오류 및 다른양식 제출 재제출 요청 명단 (${errorItems.length}건)]\n` + 
+      errorItems.map((item, idx) => `${idx + 1}. ${item.schoolName} (${item.name}) - 사유: ${item.errorMsg || '서식 불일치'}`).join('\n');
+    navigator.clipboard.writeText(text);
+    setCopiedReportType('error');
+    setCopiedNotification(true);
+    setTimeout(() => {
+      setCopiedReportType(null);
+      setCopiedNotification(false);
+    }, 2500);
+  };
+
+  // 4. 중복 제출 기관만 복사
+  const copyDuplicateList = () => {
+    const duplicateItems = processedList.filter(p => p.status === 'duplicate');
+    if (duplicateItems.length === 0) return;
+    const text = `[중복 제출 기관 명단 (${duplicateItems.length}건)]\n` + 
+      duplicateItems.map((item, idx) => `${idx + 1}. ${item.schoolName} (${item.name})`).join('\n');
+    navigator.clipboard.writeText(text);
+    setCopiedReportType('duplicate');
+    setCopiedNotification(true);
+    setTimeout(() => {
+      setCopiedReportType(null);
+      setCopiedNotification(false);
+    }, 2500);
   };
 
   // 오프라인 폐쇄망 전용 단독 실행기(.html) 다운로드
@@ -2174,89 +2298,389 @@ export default function ExcelMergePage() {
                     <span>K-에듀파인 전용 다운로드</span>
                   </button>
                 )}
-              </div>
-            </div>
-          )}
 
-          {/* 미제출교 독촉 명단 박스 */}
-          {missingSchools.length > 0 && (
-            <div className="bg-white rounded-2xl border border-rose-200 p-4 sm:p-5 shadow-sm space-y-2.5 sm:space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-rose-900 text-xs sm:text-sm flex items-center gap-1.5">
-                  <AlertCircle size={15} className="text-rose-600 shrink-0" />
-                  미제출 기관·학교 명단 ({missingSchools.length}개소)
-                </span>
+                {/* 3. 📋 종합 취합 결과 보고서 1초 복사 */}
                 <button
-                  onClick={copyMissingList}
-                  className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-colors flex items-center gap-1 cursor-pointer shrink-0 min-h-[32px]"
+                  onClick={copySummaryReport}
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 text-white font-black px-4 sm:px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm min-h-[42px]"
+                  title="미제출교, 서식오류, 정상취합 현황이 포함된 종합 결과 보고서를 복사합니다."
                 >
-                  {copiedNotification ? (
+                  {copiedReportType === 'summary' ? (
                     <>
-                      <Check size={13} className="text-emerald-600" />
-                      <span className="text-emerald-700 font-black">복사 완료!</span>
+                      <Check size={15} className="text-emerald-300" />
+                      <span className="text-emerald-200">종합 보고서 복사완료!</span>
                     </>
                   ) : (
                     <>
-                      <Copy size={13} />
-                      <span>독촉 명단 1초 복사</span>
+                      <ClipboardList size={15} />
+                      <span>📋 종합 보고서 1초 복사</span>
                     </>
                   )}
                 </button>
               </div>
-              <div className="max-h-40 overflow-y-auto bg-rose-50/50 rounded-xl p-2.5 sm:p-3 text-xs text-rose-950 font-medium divide-y divide-rose-100/60">
-                {missingSchools.map((s, idx) => (
-                  <div key={idx} className="py-1 flex justify-between gap-2">
-                    <span className="truncate">{s.seq}. {s.name}</span>
-                    <span className="text-rose-500 text-[11px] shrink-0">{s.type || '미제출'}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
 
-          {/* 기관/학교별 실시간 처리 리스트 */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-2.5 sm:space-y-3">
-            <div className="font-bold text-slate-800 text-xs sm:text-sm flex items-center justify-between">
-              <span>기관/학교별 처리 현황 ({processedList.length}건)</span>
-              <span className="text-[11px] text-slate-400 font-normal">연번 순 정렬</span>
-            </div>
-            <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 text-xs">
-              {processedList.length === 0 ? (
-                <div className="text-center py-6 text-slate-400 text-xs">
-                  파일을 업로드하면 실시간 검증 결과가 여기에 표시됩니다.
+          {/* 🌟 취합 결과 종합 관리 & 기관 리스트 (미제출 / 서식오류·다른양식 / 중복 / 정상) */}
+          {(processedList.length > 0 || missingSchools.length > 0) && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+              {/* 헤더 & 전용 1초 복사 바 */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <h4 className="font-black text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                    <span>기관·학교별 제출 현황 및 서식 검증 리스트</span>
+                    <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">
+                      총 {targetSchools.length > 0 ? `${targetSchools.length}개소 관리` : `${processedList.length}건 처리`}
+                    </span>
+                  </h4>
+                  <p className="text-slate-400 text-xs mt-0.5 font-medium">
+                    미제출 기관 독촉, 다른 양식 제출교 재제출 요청, 중복 파일 명단을 분리 확인하고 1초 복사할 수 있습니다.
+                  </p>
                 </div>
-              ) : (
-                processedList.map((item, idx) => (
-                  <div key={idx} className="py-2.5 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-                      {item.status === 'matched' && <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />}
-                      {item.status === 'unmatched' && <AlertTriangle size={15} className="text-amber-500 shrink-0" />}
-                      {item.status === 'duplicate' && <AlertCircle size={15} className="text-rose-500 shrink-0" />}
-                      {item.status === 'error' && <AlertCircle size={15} className="text-rose-600 shrink-0" />}
-                      <span className="font-medium text-slate-800 truncate">{item.schoolName}</span>
-                      <span className="text-slate-400 text-[10px] truncate hidden sm:inline">({item.name})</span>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-1">
-                      {item.status === 'matched' && (
-                        <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">정상</span>
+
+                {/* 탭별 1초 복사 버튼 그룹 */}
+                <div className="flex items-center gap-2 shrink-0">
+                  {activeReportTab === 'missing' && missingSchools.length > 0 && (
+                    <button
+                      onClick={copyMissingList}
+                      className="text-xs bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      {copiedReportType === 'missing' ? (
+                        <>
+                          <Check size={14} className="text-emerald-600" />
+                          <span className="text-emerald-700 font-black">미제출 명단 복사완료!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={14} />
+                          <span>미제출 독촉 명단 1초 복사</span>
+                        </>
                       )}
-                      {item.status === 'duplicate' && (
-                        <span className="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold">중복</span>
+                    </button>
+                  )}
+
+                  {activeReportTab === 'error' && processedList.some(p => p.status === 'error') && (
+                    <button
+                      onClick={copyErrorList}
+                      className="text-xs bg-amber-50 hover:bg-amber-100 active:bg-amber-200 text-amber-800 border border-amber-300 px-3 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      {copiedReportType === 'error' ? (
+                        <>
+                          <Check size={14} className="text-emerald-600" />
+                          <span className="text-emerald-700 font-black">재제출 명단 복사완료!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={14} />
+                          <span>재제출 요청 명단 1초 복사</span>
+                        </>
                       )}
-                      {item.status === 'unmatched' && (
-                        <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-[10px] font-bold">불일치</span>
+                    </button>
+                  )}
+
+                  {activeReportTab === 'duplicate' && processedList.some(p => p.status === 'duplicate') && (
+                    <button
+                      onClick={copyDuplicateList}
+                      className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-3 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      {copiedReportType === 'duplicate' ? (
+                        <>
+                          <Check size={14} className="text-emerald-600" />
+                          <span className="text-emerald-700 font-black">중복 명단 복사완료!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={14} />
+                          <span>중복 명단 1초 복사</span>
+                        </>
                       )}
-                      {item.status === 'error' && (
-                        <span className="bg-rose-100 text-rose-800 border border-rose-200 px-2 py-0.5 rounded text-[10px] font-bold" title={item.errorMsg || '서식/파일 오류'}>
-                          {item.errorMsg || '오류(제외)'}
-                        </span>
-                      )}
-                    </div>
+                    </button>
+                  )}
+
+                  {/* 상시 노출 종합 보고서 복사 버튼 */}
+                  <button
+                    onClick={copySummaryReport}
+                    className="text-xs bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    title="공문/에듀파인 메신저용 종합 보고서를 클립보드에 복사합니다."
+                  >
+                    {copiedReportType === 'summary' ? (
+                      <>
+                        <Check size={14} className="text-emerald-600" />
+                        <span className="text-emerald-700 font-black">종합 보고서 복사완료!</span>
+                      </>
+                    ) : (
+                      <>
+                        <ClipboardList size={14} />
+                        <span>종합 보고서 1초 복사</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* 스마트 5대 서브 탭 바 */}
+              {(() => {
+                const errCount = processedList.filter(p => p.status === 'error').length;
+                const dupCount = processedList.filter(p => p.status === 'duplicate').length;
+                const matchedCount = processedList.filter(p => p.status === 'matched').length;
+                const missingCount = missingSchools.length;
+
+                return (
+                  <div className="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setActiveReportTab('missing')}
+                      className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                        activeReportTab === 'missing'
+                          ? 'bg-white text-rose-700 shadow-xs font-black'
+                          : 'text-slate-600 hover:text-rose-700'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${missingCount > 0 ? 'bg-rose-500 animate-pulse' : 'bg-slate-300'}`} />
+                      <span>미제출 기관</span>
+                      <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-black ${
+                        missingCount > 0 ? 'bg-rose-100 text-rose-700' : 'bg-slate-200 text-slate-500'
+                      }`}>
+                        {missingCount}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveReportTab('error')}
+                      className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                        activeReportTab === 'error'
+                          ? 'bg-white text-rose-800 shadow-xs font-black'
+                          : 'text-slate-600 hover:text-rose-700'
+                      }`}
+                    >
+                      <AlertCircle size={13} className={errCount > 0 ? 'text-rose-600' : 'text-slate-400'} />
+                      <span>서식오류 / 다른양식 (취합제외)</span>
+                      <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-black ${
+                        errCount > 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-200 text-slate-500'
+                      }`}>
+                        {errCount}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveReportTab('duplicate')}
+                      className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                        activeReportTab === 'duplicate'
+                          ? 'bg-white text-amber-700 shadow-xs font-black'
+                          : 'text-slate-600 hover:text-amber-700'
+                      }`}
+                    >
+                      <span>중복 제출</span>
+                      <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-black ${
+                        dupCount > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-500'
+                      }`}>
+                        {dupCount}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveReportTab('matched')}
+                      className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                        activeReportTab === 'matched'
+                          ? 'bg-white text-emerald-700 shadow-xs font-black'
+                          : 'text-slate-600 hover:text-emerald-700'
+                      }`}
+                    >
+                      <CheckCircle2 size={13} className="text-emerald-500" />
+                      <span>정상 수합 완료</span>
+                      <span className="text-[11px] bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded-full font-black">
+                        {matchedCount}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveReportTab('all')}
+                      className={`px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                        activeReportTab === 'all'
+                          ? 'bg-white text-blue-700 shadow-xs font-black'
+                          : 'text-slate-600 hover:text-blue-700'
+                      }`}
+                    >
+                      <span>전체 파일 처리 현황</span>
+                      <span className="text-[11px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-full font-black">
+                        {processedList.length}
+                      </span>
+                    </button>
                   </div>
-                ))
-              )}
+                );
+              })()}
+
+              {/* 탭별 본문 내용 */}
+              <div className="min-h-[160px] max-h-80 overflow-y-auto pr-1">
+                {/* 1. 미제출 탭 */}
+                {activeReportTab === 'missing' && (
+                  missingSchools.length === 0 ? (
+                    <div className="text-center py-10 text-slate-400 text-xs">
+                      <CheckCircle2 size={32} className="mx-auto text-emerald-500 mb-2 opacity-80" />
+                      <span className="text-emerald-700 font-bold block text-sm">모든 대상 학교가 정상 제출되었습니다!</span>
+                      <span>미제출 기관이 0개소입니다.</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <div className="p-2.5 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-900 font-medium flex items-center justify-between">
+                        <span>아래 {missingSchools.length}개 기관은 아직 서류를 제출하지 않았습니다. 독촉 공문 또는 메신저 쪽지를 발송하세요.</span>
+                        <span className="text-[11px] text-rose-600 font-bold">총 {missingSchools.length}개소</span>
+                      </div>
+                      <div className="divide-y divide-rose-100 bg-rose-50/40 rounded-xl p-2 text-xs">
+                        {missingSchools.map((s, idx) => (
+                          <div key={idx} className="py-2 px-2 flex items-center justify-between gap-2 hover:bg-rose-100/40 rounded-lg transition-colors">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-rose-800 w-7 text-right shrink-0">{s.seq}.</span>
+                              <span className="font-bold text-slate-800">{s.name}</span>
+                              {s.code && <span className="text-slate-400 text-[11px]">({s.code})</span>}
+                            </div>
+                            <span className="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[10px] font-bold shrink-0">
+                              미제출
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                )}
+
+                {/* 2. 서식오류 / 다른양식 탭 */}
+                {activeReportTab === 'error' && (
+                  (() => {
+                    const errorFiles = processedList.filter(p => p.status === 'error');
+                    if (errorFiles.length === 0) {
+                      return (
+                        <div className="text-center py-10 text-slate-400 text-xs">
+                          <CheckCircle2 size={32} className="mx-auto text-emerald-500 mb-2 opacity-80" />
+                          <span className="text-emerald-700 font-bold block text-sm">서식 오류 파일이 없습니다!</span>
+                          <span>모든 제출 파일이 유효한 서식으로 확인되었습니다.</span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="space-y-1.5">
+                        <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-medium">
+                          ⚠️ 아래 <strong>{errorFiles.length}개 파일</strong>은 <strong>아예 다른 양식을 제출했거나 비엑셀(PDF) 등 오류</strong>가 발생하여 <span className="text-rose-700 font-bold underline">취합 데이터에서 자동으로 안전하게 제외</span>되었습니다. 올바른 서식으로 재제출을 요청하세요.
+                        </div>
+                        <div className="divide-y divide-slate-100 text-xs">
+                          {errorFiles.map((item, idx) => (
+                            <div key={idx} className="py-2.5 px-2 flex items-center justify-between gap-2 hover:bg-rose-50/50 rounded-lg transition-colors">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-slate-800 truncate">{item.schoolName}</span>
+                                  <span className="text-slate-400 text-[10px] truncate hidden sm:inline">({item.name})</span>
+                                </div>
+                                <div className="text-[11px] text-rose-600 mt-0.5 font-medium flex items-center gap-1">
+                                  <AlertCircle size={12} className="shrink-0" />
+                                  <span>{item.errorMsg || '서식 불일치 (취합 제외)'}</span>
+                                </div>
+                              </div>
+                              <div className="shrink-0 flex items-center gap-1.5">
+                                <span className="bg-rose-100 text-rose-800 border border-rose-200 px-2 py-0.5 rounded text-[10px] font-black">
+                                  {item.errorMsg?.includes('비엑셀') ? '비엑셀(PDF)' : '다른서식 (제외)'}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()
+                )}
+
+                {/* 3. 중복 제출 탭 */}
+                {activeReportTab === 'duplicate' && (
+                  (() => {
+                    const dupFiles = processedList.filter(p => p.status === 'duplicate');
+                    if (dupFiles.length === 0) {
+                      return (
+                        <div className="text-center py-10 text-slate-400 text-xs">
+                          <CheckCircle2 size={32} className="mx-auto text-emerald-500 mb-2 opacity-80" />
+                          <span>중복 제출된 파일이 없습니다.</span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="space-y-1.5">
+                        <div className="p-2.5 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-900 font-medium">
+                          동일 기관에서 중복 제출된 파일 {dupFiles.length}건입니다. 최초로 유효하게 처리된 파일이 취합에 반영되었습니다.
+                        </div>
+                        <div className="divide-y divide-slate-100 text-xs">
+                          {dupFiles.map((item, idx) => (
+                            <div key={idx} className="py-2.5 px-2 flex items-center justify-between gap-2 hover:bg-amber-50/50 rounded-lg">
+                              <div className="min-w-0">
+                                <span className="font-bold text-slate-800">{item.schoolName}</span>
+                                <span className="text-slate-400 text-[11px] ml-1">({item.name})</span>
+                              </div>
+                              <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px] font-bold shrink-0">
+                                중복 (연번 {item.matchedSeq || '-'})
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()
+                )}
+
+                {/* 4. 정상 수합 완료 탭 */}
+                {activeReportTab === 'matched' && (
+                  (() => {
+                    const matchedFiles = processedList.filter(p => p.status === 'matched');
+                    if (matchedFiles.length === 0) {
+                      return (
+                        <div className="text-center py-10 text-slate-400 text-xs">
+                          정상 수합된 내역이 아직 없습니다.
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="divide-y divide-slate-100 text-xs">
+                        {matchedFiles.map((item, idx) => (
+                          <div key={idx} className="py-2 px-2 flex items-center justify-between gap-2 hover:bg-emerald-50/40 rounded-lg">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="font-bold text-emerald-800 w-8 text-right shrink-0">{item.matchedSeq || idx + 1}.</span>
+                              <span className="font-bold text-slate-800 truncate">{item.schoolName}</span>
+                              <span className="text-slate-400 text-[10px] truncate hidden sm:inline">({item.name})</span>
+                            </div>
+                            <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold shrink-0">
+                              정상 결합
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()
+                )}
+
+                {/* 5. 전체 보기 탭 */}
+                {activeReportTab === 'all' && (
+                  <div className="divide-y divide-slate-100 text-xs">
+                    {processedList.map((item, idx) => (
+                      <div key={idx} className="py-2 px-2 flex items-center justify-between gap-2 hover:bg-slate-50 rounded-lg">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {item.status === 'matched' && <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />}
+                          {item.status === 'error' && <AlertCircle size={14} className="text-rose-600 shrink-0" />}
+                          {item.status === 'duplicate' && <AlertTriangle size={14} className="text-amber-500 shrink-0" />}
+                          <span className="font-bold text-slate-800 truncate">{item.schoolName}</span>
+                          <span className="text-slate-400 text-[10px] truncate hidden sm:inline">({item.name})</span>
+                        </div>
+                        <div className="shrink-0">
+                          {item.status === 'matched' && <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">정상</span>}
+                          {item.status === 'error' && <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-black">{item.errorMsg || '오류'}</span>}
+                          {item.status === 'duplicate' && <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px] font-bold">중복</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
       </main>
