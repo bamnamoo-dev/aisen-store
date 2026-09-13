@@ -59,6 +59,7 @@ const ADMIN_DOC_ITEMS = [
 const SPACE_HEALING_ITEMS = [
   { name: 'AI-SEN 시설대관', href: '/tools/gym-calc', icon: <Calculator size={20} className="text-rose-600" />, isExternal: false, badge: '조례' },
   { name: 'AI-SEN 교실배치', href: '/tools/classmap', icon: <LayoutGrid size={20} className="text-rose-600" />, isExternal: false, badge: '도면' },
+  { name: 'AI-SEN 엑셀수합', href: '/tools/excel-merge', icon: <FileSpreadsheet size={20} className="text-rose-600" />, isExternal: false, badge: '수합' },
   { name: 'AI-SEN 힐링게임', href: '/tools/watermelon', icon: <span className="text-base">🍉</span>, isExternal: false, badge: '게임' },
 ];
 

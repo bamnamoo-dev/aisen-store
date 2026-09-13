@@ -601,9 +601,9 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
           </div>
         )}
 
-        {/* ─── TAB 5: 🔴 공간 · 시설 · 힐링 ─── */}
+        {/* ─── TAB 5: 🔴 공간 · 시설 · 수합 · 힐링 ─── */}
         {activeTab === 'space' && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
             {/* 1. AI-SEN 시설대관 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
@@ -672,6 +672,42 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                   className="inline-flex items-center gap-1.5 text-sm font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl transition-colors"
                 >
                   <span>교실배치 바로가기</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+
+            {/* 3. AI-SEN 엑셀수합 */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-2xs">
+                      <FileSpreadsheet size={20} />
+                    </div>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 엑셀수합</h4>
+                  </div>
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                    수합·교부 마스터
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                  135여 개 학교가 보낸 급식비·인건비 등 복합 서식을 2초 만에 단일 마스터 엑셀로 일괄 취합하고 K-에듀파인 교부 양식으로 자동 변환합니다.
+                </p>
+                <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">수식/서식/병합셀 100% 보존</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">독촉 명단 1초 복사</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">오프라인 폐쇄망 지원</span>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
+                <Link
+                  href="/tools/excel-merge"
+                  onClick={onToolClick}
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl transition-colors"
+                >
+                  <span>엑셀수합 바로가기</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
