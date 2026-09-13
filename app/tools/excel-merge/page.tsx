@@ -2219,6 +2219,8 @@ export default function ExcelMergePage() {
         title="AI-SEN 엑셀수합" 
         icon={<FileSpreadsheet size={15} className="text-blue-600" />}
         themeColor="blue"
+        badgeText="v1.2.2 서울최적화"
+
         extraAction={
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
