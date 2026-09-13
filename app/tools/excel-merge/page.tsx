@@ -486,7 +486,7 @@ export default function ExcelMergePage() {
     return detectedRow;
   };
 
-  // 🛡️ 한셀/비표준 메타데이터 reading 'company' 크래시 방어 및 자동 치유 엑셀 로더
+  // 🛡️ 한셀/비표준 메타데이터 reading 'company' 크래시 방어 및 2단계 자동 치유 엑셀 로더
   const loadWorkbookSafely = async (file: File, ExcelJS: any): Promise<any> => {
     const buffer = await file.arrayBuffer();
     const wb = new ExcelJS.Workbook();
@@ -495,33 +495,70 @@ export default function ExcelMergePage() {
       return wb;
     } catch (err: any) {
       const errMsg = String(err?.message || '');
-      // 🚨 한셀/특정 오피스 환경에서 docProps/app.xml의 Company 등 속성 누락 시 자동 보정 치유
-      if (errMsg.includes('company') || errMsg.includes('creator') || errMsg.includes('undefined')) {
-        try {
-          const zip = await JSZip.loadAsync(buffer);
-          const cleanAppXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+      // 🚨 1단계 치유: JSZip으로 [Content_Types].xml에 Override 등록 및 docProps/app.xml 강제 주입
+      try {
+        const zip = await JSZip.loadAsync(buffer);
+
+        // 1-1. [Content_Types].xml에 extended-properties+xml Override 등록 (ExcelJS 필수)
+        const ctFile = zip.file('[Content_Types].xml') || zip.file('[content_types].xml');
+        if (ctFile) {
+          let ctText = await ctFile.async('string');
+          let modified = false;
+          if (!ctText.includes('extended-properties+xml')) {
+            ctText = ctText.replace('</Types>', '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>');
+            modified = true;
+          }
+          if (!ctText.includes('core-properties+xml')) {
+            ctText = ctText.replace('</Types>', '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>');
+            modified = true;
+          }
+          if (modified) {
+            zip.file('[Content_Types].xml', ctText);
+          }
+        }
+
+        // 1-2. docProps/app.xml 표준 규격 주입
+        const cleanAppXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
   <Application>Microsoft Excel</Application>
-  <DocSecurity>0</DocSecurity>
-  <ScaleCrop>false</ScaleCrop>
-  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>1</vt:i4></vt:variant></vt:vector></HeadingPairs>
-  <TitlesOfParts><vt:vector size="1" baseType="lpstr"><vt:lpstr>Sheet1</vt:lpstr></vt:vector></TitlesOfParts>
   <Company></Company>
-  <LinksUpToDate>false</LinksUpToDate>
-  <SharedDoc>false</SharedDoc>
-  <HyperlinksChanged>false</HyperlinksChanged>
-  <AppVersion>16.0300</AppVersion>
+  <Manager></Manager>
 </Properties>`;
-          zip.file('docProps/app.xml', cleanAppXml);
+        zip.file('docProps/app.xml', cleanAppXml);
 
-          const healedBuffer = await zip.generateAsync({ type: 'arraybuffer' });
-          const healedWb = new ExcelJS.Workbook();
-          await healedWb.xlsx.load(healedBuffer);
-          return healedWb;
-        } catch (healErr) {
-          throw err;
+        // 1-3. docProps/core.xml 표준 규격 주입
+        if (!zip.file('docProps/core.xml') && !zip.file('docprops/core.xml')) {
+          const cleanCoreXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:creator>AI-SEN</dc:creator>
+</cp:coreProperties>`;
+          zip.file('docProps/core.xml', cleanCoreXml);
         }
+
+        const healedBuffer = await zip.generateAsync({ type: 'arraybuffer' });
+        const healedWb = new ExcelJS.Workbook();
+        await healedWb.xlsx.load(healedBuffer);
+        return healedWb;
+      } catch (healErr1: any) {
+        // 1단계 실패 시 2단계 시도
       }
+
+      // 🚨 2단계 치유: SheetJS(XLSX)를 통한 100% 무오차 표준 버퍼 재생성 (Round-trip)
+      try {
+        const XLSX = (window as any).XLSX;
+        if (XLSX) {
+          const sWb = XLSX.read(buffer, { type: 'array' });
+          const cleanBuffer = XLSX.write(sWb, { type: 'array', bookType: 'xlsx' });
+          const healedWb2 = new ExcelJS.Workbook();
+          await healedWb2.xlsx.load(cleanBuffer);
+          return healedWb2;
+        }
+      } catch (healErr2: any) {
+        // 2단계 실패
+      }
+
+      // 모든 치유 실패 시 원래 에러 throw
       throw err;
     }
   };
@@ -1554,6 +1591,10 @@ export default function ExcelMergePage() {
         src="/vendor/exceljs.min.js" 
         strategy="afterInteractive" 
         onLoad={() => setExcelJsLoaded(true)}
+      />
+      <Script 
+        src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" 
+        strategy="afterInteractive" 
       />
 
       {/* 스마트 통합 헤더 */}
