@@ -348,14 +348,29 @@ export default function ExcelMergePage() {
     }
   };
 
-  // 학교명 정규화 (공백, 괄호, 특수기호, 전국 17개 시도 접두어 제거 비교용)
+  // 학교명 정규화 (공백, 괄호, 특수기호, 전국 17개 시도 접두어 제거 비교용 & 서울고·경기고 등 고유 교명 보호)
   const normalizeSchoolName = (name: string): string => {
     if (!name) return '';
-    return String(name)
+    const clean = String(name)
       .replace(/[\s\u3000\u00A0\(\)\[\]_·\-\.\,\r\n\t]/g, '')
+      .trim();
+
+    // 🚨 1. 고유 교명 보호 (서울고, 경기고, 서울중, 경기중, 부산고 등 지역명이 고유 교명인 학교 완벽 보호)
+    if (/^(서울|경기|인천|부산|대구|광주|대전|울산|세종|강원|충북|충남|전북|전남|경북|경남|제주)(초등학교|중학교|고등학교|초등|초|여고|여중|고|중)$/.test(clean)) {
+      return clean;
+    }
+
+    // 🚨 2. 광역시도 풀네임 접두어 제거 (예: 서울특별시서울고등학교 -> 서울고등학교)
+    if (/^(서울특별시|경기도|인천광역시|부산광역시|대구광역시|광주광역시|대전광역시|울산광역시|세종특별자치시|강원특별자치도|제주특별자치도)(서울|경기|인천|부산|대구|광주|대전|울산|세종|강원|충북|충남|전북|전남|경북|경남|제주)(초등학교|중학교|고등학교|초등|초|여고|여중|고|중)$/.test(clean)) {
+      return clean.replace(/^(서울특별시|경기도|인천광역시|부산광역시|대구광역시|광주광역시|대전광역시|울산광역시|세종특별자치시|강원특별자치도|제주특별자치도)/, '');
+    }
+
+    // 3. 일반 학교 시도 접두어 일괄 제거 (예: 서울개원초등학교 -> 개원초등학교)
+    return clean
       .replace(/^(서울특별시|서울시?|서울|경기도|경기|인천광역시|인천시?|인천|강원특별자치도|강원도?|강원|충청북도|충북도?|충북|충청남도|충남도?|충남|전북특별자치도|전라북도|전북도?|전북|전라남도|전남도?|전남|경상북도|경북도?|경북|경상남도|경남도?|경남|제주특별자치도|제주도?|제주|세종특별자치시|세종시?|세종|대전광역시|대전시?|대전|대구광역시|대구시?|대구|광주광역시|광주시?|광주|울산광역시|울산시?|울산|부산광역시|부산시?|부산)/g, '')
       .trim();
   };
+
 
   // 학교명 스마트 매칭 (초등학교/초, 중학교/중 약칭 및 파일명/본문 학교명 정밀 탐색)
   const findMatchingSchool = (rawName: string): SchoolItem | undefined => {
@@ -930,15 +945,24 @@ export default function ExcelMergePage() {
         setProgress(pct);
         setStatusMessage(`파일 분석 중 (${i + 1}/${files.length}): ${file.name}`);
 
-        // 학교명 사전 추출 (파일명 기반 - 공문 접미어/연도 등 유연 정제)
+        // 학교명 사전 추출 (파일명 기반 - 공문 접미어/연도 등 유연 정제 및 정규식 학교명 직접 추출)
         const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
         const cleanFileName = nameWithoutExt
           .replace(/\b20[2-3]\d\b/g, '')
           .replace(/(신청서|신청|서식|조사표|명세서|취합본|제출본|수합용|결과보고|계획서|양식|최종|수정|제출|안내)/g, ' ')
           .trim();
-        // 원본 파일명 및 정제된 파일명 양쪽 모두에서 매칭 시도
-        const matchedSchoolByName = findMatchingSchool(cleanFileName) || findMatchingSchool(nameWithoutExt);
-        const fallbackSchoolName = matchedSchoolByName?.name || cleanFileName || file.name;
+
+        // 파일명 내 학교명 패턴 직접 추출 (예: (서울개원초등학교_도미정) -> 서울개원초등학교, ((서울고등학교_강성희)...) -> 서울고등학교)
+        const schoolPatternMatch = nameWithoutExt.match(/([가-힣]{2,10}(?:초등학교|중학교|고등학교|특수학교|유치원|학교|초등|초|여고|여중|고|중))/);
+        const extractedSchoolFromName = schoolPatternMatch ? schoolPatternMatch[1] : '';
+
+        // 원본 파일명, 정제 파일명, 추출 학교명 3중으로 명부 매칭 시도
+        const matchedSchoolByName = 
+          (extractedSchoolFromName ? findMatchingSchool(extractedSchoolFromName) : undefined) ||
+          findMatchingSchool(cleanFileName) || 
+          findMatchingSchool(nameWithoutExt);
+        const fallbackSchoolName = matchedSchoolByName?.name || extractedSchoolFromName || cleanFileName || file.name;
+
 
         // 🚨 A. 확장자 검사: 비엑셀 파일(PDF, HWP, 이미지 등) 즉시 패스 & 오류 카운팅
         const ext = file.name.split('.').pop()?.toLowerCase() || '';
@@ -1122,14 +1146,17 @@ export default function ExcelMergePage() {
               }
             }
           } else {
-            rawSchoolName = cleanFileName;
+            rawSchoolName = extractedSchoolFromName || cleanFileName;
           }
 
           if (!rawSchoolName) {
-            rawSchoolName = cleanFileName;
+            rawSchoolName = extractedSchoolFromName || cleanFileName;
           }
 
-          const matchedSchool = findMatchingSchool(rawSchoolName) || matchedSchoolByName;
+          const matchedSchool = findMatchingSchool(rawSchoolName) || 
+            (extractedSchoolFromName ? findMatchingSchool(extractedSchoolFromName) : undefined) || 
+            matchedSchoolByName;
+
 
           // 🌟 기준 명부가 등록되어 있는 경우 -> 명부의 연번(seq)을 100% 최우선 적용하여 칼정렬!
           let finalSeq = (i + 1);
