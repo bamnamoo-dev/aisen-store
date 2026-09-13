@@ -383,7 +383,7 @@ export default function ExcelMergePage() {
     });
   };
 
-  // 🛡️ 셀 값 및 수식 안전 복사 함수 (Shared Formula 오류 100% 원천 방어)
+  // 🛡️ 셀 값 및 수식 안전 복사 함수 (Shared Formula 및 잘못된 신청서 수식 완벽 방어)
   const copyCellValueSafely = (cell: any, rowOffset: number) => {
     if (!cell) return null;
 
@@ -393,30 +393,39 @@ export default function ExcelMergePage() {
       return null;
     }
 
-    // 2. 단독 수식(formula)이 명시된 셀 -> 오프셋만큼 행 번호 이동 보존
-    if (cell.formula) {
+    // 2. 🚨 공유 수식(sharedFormula) 클론 최우선 방어:
+    // 학교 담당자가 임의로 행을 편집/삭제하여 마스터가 깨진 경우 'Shared Formula master must exist...' 크래시 발생
+    // 따라서 cell.model.sharedFormula 또는 cell.value.sharedFormula가 감지되면 무조건 계산된 결과값(숫자/텍스트)으로 안전 전환!
+    const isShared = Boolean(
+      cell.model?.sharedFormula || 
+      cell.sharedFormula || 
+      (cell.value && typeof cell.value === 'object' && 'sharedFormula' in cell.value) ||
+      (cell.model && cell.model.shareType === 'shared' && !cell.model.formula)
+    );
+
+    if (isShared) {
+      const safeResult = cell.model?.result !== undefined 
+        ? cell.model.result 
+        : (cell.value && typeof cell.value === 'object' && cell.value.result !== undefined 
+            ? cell.value.result 
+            : (cell.result !== undefined ? cell.result : (typeof cell.value === 'number' || typeof cell.value === 'string' ? cell.value : null)));
+      return safeResult;
+    }
+
+    // 3. 단독 수식(formula)이 정상 명시된 셀 -> 오프셋만큼 행 번호 이동 보존
+    if (cell.formula && !cell.model?.sharedFormula) {
       return {
         formula: shiftFormula(cell.formula, rowOffset),
         result: cell.result !== undefined ? cell.result : null
       };
     }
 
-    // 3. cell.value가 객체이고 formula 속성을 가진 경우
-    if (cell.value && typeof cell.value === 'object' && cell.value.formula) {
+    // 4. cell.value가 객체이고 formula 속성을 가진 경우
+    if (cell.value && typeof cell.value === 'object' && cell.value.formula && !cell.value.sharedFormula) {
       return {
         formula: shiftFormula(cell.value.formula, rowOffset),
         result: cell.value.result !== undefined ? cell.value.result : (cell.result !== undefined ? cell.result : null)
       };
-    }
-
-    // 4. 🚨 공유 수식(sharedFormula) 클론 방어:
-    // ExcelJS에서 마스터 좌표와 클론 좌표가 어긋나면 'Shared Formula master must exist...' 크래시 발생
-    // 따라서 sharedFormula 클론 셀은 깨진 수식 대신 안전하게 이미 계산된 결과값(result)으로 변환
-    if (cell.sharedFormula || (cell.value && typeof cell.value === 'object' && cell.value.sharedFormula)) {
-      const safeResult = (cell.value && typeof cell.value === 'object' && cell.value.result !== undefined)
-        ? cell.value.result
-        : (cell.result !== undefined ? cell.result : null);
-      return safeResult;
     }
 
     // 5. 일반 객체형 셀 값인 경우 (RichText, Date, Hyperlink 등)
@@ -1126,15 +1135,42 @@ export default function ExcelMergePage() {
       });
 
       // 5. 최종 파일 빌드 전 워크시트 내 잔존 공유 수식(Shared Formula) 전수 안전 살균
-      // (원본 템플릿에 남아있던 고아 sharedFormula 셀로 인한 빌드 크래시 100% 원천 차단)
+      // (cell.model 내부의 sharedFormula 속성까지 100% 제거하여 ExcelJS 크래시 원천 차단)
       templateWb.eachSheet((ws: any) => {
-        ws.eachRow({ includeEmpty: false }, (row: any) => {
-          row.eachCell({ includeEmpty: false }, (cell: any) => {
-            if (cell.sharedFormula || (cell.value && typeof cell.value === 'object' && cell.value.sharedFormula)) {
-              const safeVal = (cell.value && typeof cell.value === 'object' && cell.value.result !== undefined)
-                ? cell.value.result
-                : (cell.result !== undefined ? cell.result : (typeof cell.value === 'object' ? null : cell.value));
+        ws.eachRow({ includeEmpty: true }, (row: any) => {
+          row.eachCell({ includeEmpty: true }, (cell: any) => {
+            const hasShared = Boolean(
+              cell.model?.sharedFormula || 
+              cell.sharedFormula || 
+              (cell.value && typeof cell.value === 'object' && cell.value.sharedFormula)
+            );
+
+            if (hasShared) {
+              const safeVal = cell.model?.result !== undefined
+                ? cell.model.result
+                : ((cell.value && typeof cell.value === 'object' && cell.value.result !== undefined)
+                    ? cell.value.result
+                    : (cell.result !== undefined ? cell.result : null));
+              
               cell.value = safeVal;
+              if (cell.model) {
+                delete cell.model.sharedFormula;
+                delete cell.model.shareType;
+                delete cell.model.ref;
+                if (!cell.model.formula) {
+                  cell.model.type = typeof safeVal === 'number' ? 2 : (typeof safeVal === 'string' ? 3 : (safeVal === null ? 0 : 2));
+                  cell.model.value = safeVal;
+                }
+              }
+            }
+
+            // 마스터 없는 불완전 수식 셀(type 6) 완벽 방어
+            if (cell.model && cell.model.type === 6 && !cell.model.formula) {
+              const safeVal = cell.model.result !== undefined ? cell.model.result : null;
+              cell.model.type = typeof safeVal === 'number' ? 2 : (typeof safeVal === 'string' ? 3 : 0);
+              cell.model.value = safeVal;
+              delete cell.model.sharedFormula;
+              delete cell.model.shareType;
             }
           });
         });
