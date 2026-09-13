@@ -3721,10 +3721,10 @@ export default function ExcelMergePage() {
                   <div className="bg-white/90 border border-blue-100 rounded-xl p-3.5 space-y-1">
                     <div className="font-black text-purple-950 text-sm sm:text-base flex items-center gap-1.5">
                       <span className="text-purple-600 font-black">③</span>
-                      <span>K-에듀파인 학교코드 직결</span>
+                      <span>오제출·외부 파일 안전 격리</span>
                     </div>
                     <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed">
-                      표준 B-기관코드(예: <code className="bg-slate-100 px-1 py-0.5 rounded text-purple-700 font-mono text-xs">B100001</code>)가 결과물에 자동 매핑되어 에듀파인 교부서식이 즉시 완성됩니다.
+                      관내 학교가 아닌 타 지역 파일이나 엉뚱한 총괄 파일이 실수로 섞여도 정상 번호 슬롯을 침범하지 못하도록 안전하게 격리합니다.
                     </p>
                   </div>
                 </div>
@@ -3860,9 +3860,9 @@ export default function ExcelMergePage() {
                         </div>
                         <div>
                           <h4 className="font-black text-slate-900 text-base sm:text-lg">
-                            결과 확인 및 2-Way 맞춤 다운로드
+                            결과 확인 및 엑셀 다운로드
                           </h4>
-                          <span className="text-xs text-blue-600 font-medium">행정 실무 맞춤 3대 다운로드 슬롯 완비</span>
+                          <span className="text-xs text-blue-600 font-medium">원클릭 고속 엑셀 저장</span>
                         </div>
                       </div>
                       <span className="text-xs bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-lg">
@@ -3874,20 +3874,20 @@ export default function ExcelMergePage() {
                       <div className="bg-white border border-slate-200 rounded-xl p-3 space-y-1">
                         <strong className="text-slate-900 block font-black text-sm">📥 마스터 엑셀 다운로드</strong>
                         <span className="text-slate-600 text-xs sm:text-[13px] leading-snug block">
-                          모든 학교의 서식·수식·셀병합이 100% 보존된 최종 마스터 취합본 파일
+                          모든 학교의 원본 서식·수식·셀병합이 100% 온전하게 보존된 최종 취합본
                         </span>
                       </div>
                       <div className="bg-white border border-blue-200 rounded-xl p-3 space-y-1">
-                        <strong className="text-blue-900 block font-black text-sm">🚀 K-에듀파인 전용 다운로드</strong>
+                        <strong className="text-blue-900 block font-black text-sm">📊 현재 목록 엑셀 (.xlsx)</strong>
                         <span className="text-blue-800 text-xs sm:text-[13px] leading-snug block">
-                          연번·학교명·학교코드가 직결되어 에듀파인에 즉시 일괄 업로드 가능한 양식
+                          현재 검색·정렬 조건과 자동필터(AutoFilter)가 적용된 검증 종합보고서
                         </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs sm:text-sm text-blue-950 font-medium">
-                    📊 <strong>[현재 목록 엑셀 (.xlsx)]</strong> 버튼을 누르면 현재 보고 계신 검색/정렬 조건 그대로 엑셀 자동필터(AutoFilter)가 걸린 종합보고서가 즉시 저장됩니다.
+                    💡 결과 리스트에서 검색하거나 <strong>[연번순 / 학교명순 / 파일명순]</strong> 정렬을 적용한 후 <strong>[현재 목록 엑셀]</strong>을 다운로드하면 해당 정렬 상태 그대로 저장됩니다.
                   </div>
                 </div>
 
