@@ -147,22 +147,24 @@ export default function DraftHelperPage() {
     if (!activeTemplate) return '';
     let body = activeTemplate.body_template;
 
-    // 학교명 치환
+    // 학교명 치환: 단일 패스(Single-Pass) 정규식으로 치환하여 결과물 내 재치환(예: 서울서울) 방지
     if (schoolName.trim()) {
-      body = body.replace(/○○○○학교/g, schoolName.trim());
-      body = body.replace(/○○초등학교/g, schoolName.trim());
-      body = body.replace(/○○학교/g, schoolName.trim());
+      const sName = schoolName.trim();
+      body = body.replace(/○○○○학교(장|운영위원회|의)?|○○초등학교|○○중학교|○○고등학교|○○학교/g, (match, suffix) => {
+        return suffix ? `${sName}${suffix}` : sName;
+      });
     }
 
     // 연도 치환
     if (targetYear.trim()) {
-      body = body.replace(/2026학년도/g, `${targetYear.trim()}학년도`);
-      body = body.replace(/2026년/g, `${targetYear.trim()}년`);
+      const y = targetYear.trim();
+      body = body.replace(/2026(학년도|년도|년|\.)/g, (match, suffix) => `${y}${suffix}`);
     }
 
     // 부서명 치환
     if (deptName.trim()) {
-      body = body.replace(/○○○○과/g, deptName.trim());
+      const dName = deptName.trim();
+      body = body.replace(/○○○○과|○○○○부|○○과/g, dName);
     }
 
     // 문서번호 치환
