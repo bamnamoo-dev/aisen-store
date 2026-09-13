@@ -1056,9 +1056,11 @@ export default function ExcelMergePage() {
           }
 
           // 🚨 C-3. 단일 학교 서식 아님 감지 (수십 개 시설이 나열된 총괄 대장 파일 침범 원천 차단)
+          // ✅ 임계값: 300행 고정 (blockRowCount 독립적) - 학교 1개 서식이 300행 초과하는 경우는 현실에 없음
+          // 총괄대장(전 학교 합산)은 보통 수천 행이므로 300으로도 안전하게 차단 가능
           if (mode === 'block') {
             const detectedRowsForCheck = findLastDataRow(ws, blockStartRow) - blockStartRow + 1;
-            if (detectedRowsForCheck > Math.max(45, blockRowCount * 2.5)) {
+            if (detectedRowsForCheck > 300) {
               processed.push({
                 name: file.name,
                 size: file.size,
@@ -1223,8 +1225,9 @@ export default function ExcelMergePage() {
           const detectedRows = isAutoDetectRows 
             ? Math.max(1, findLastDataRow(srcWs, blockStartRow) - blockStartRow + 1)
             : blockRowCount;
-          // 🛡️ 비정상 대용량 데이터 침범 방지 안전 캡 (최대 40행)
-          const actualRowCount = Math.min(detectedRows, Math.max(40, blockRowCount * 2));
+          // ✅ 캡 제거: C-3 체크(300행 임계값)에서 이미 총괄대장을 걸러냈으므로 이중 캡은 불필요
+          // 이전 Math.min(detectedRows, max(40,...)) 로직이 41~45행 데이터를 silent loss 하던 버그 수정
+          const actualRowCount = detectedRows;
 
           const dstStartRow = currentDstRow;
           const rowOffset = dstStartRow - blockStartRow;
