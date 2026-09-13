@@ -342,34 +342,40 @@ export default function ExcelMergePage() {
     }
   };
 
-  // 학교명 정규화 (공백, 괄호 등 제거 비교용)
+  // 학교명 정규화 (공백, 괄호, 특수기호, 접두어 '서울/서울특별시' 제거 비교용)
   const normalizeSchoolName = (name: string): string => {
     if (!name) return '';
-    return String(name).replace(/[\s\u3000\(\)\[\]_]/g, '').trim();
+    return String(name)
+      .replace(/[\s\u3000\u00A0\(\)\[\]_·\-\.\,\r\n\t]/g, '')
+      .replace(/^서울특별시|^서울시?|^서울/g, '')
+      .trim();
   };
 
-  // 학교명 매칭
+  // 학교명 스마트 매칭 (초등학교/초, 중학교/중 약칭 및 파일명/본문 학교명 정밀 탐색)
   const findMatchingSchool = (rawName: string): SchoolItem | undefined => {
-    if (!rawName) return undefined;
+    if (!rawName || targetSchools.length === 0) return undefined;
     const cleanRaw = normalizeSchoolName(rawName);
-    
-    // 1. 정확 일치
+    if (!cleanRaw) return undefined;
+
+    // 1. 정확 일치 (서울 접두어 제거 상태)
     let match = targetSchools.find(s => normalizeSchoolName(s.name) === cleanRaw);
     if (match) return match;
 
-    // 2. 부분 일치 (예: '개포초' -> '서울개포초등학교')
+    // 2. 부분 일치 (타겟 학교명이 원본 문자열에 포함되거나, 원본이 타겟에 포함)
     match = targetSchools.find(s => {
       const cleanTarget = normalizeSchoolName(s.name);
-      return cleanTarget.includes(cleanRaw) || cleanRaw.includes(cleanTarget);
+      if (!cleanTarget || cleanTarget.length < 2) return false;
+      return cleanRaw.includes(cleanTarget) || cleanTarget.includes(cleanRaw);
     });
     if (match) return match;
 
-    // 3. 접두어 '서울' 제외 비교
-    const stripSeoul = (s: string) => s.replace(/^서울/, '');
-    const cleanNoSeoul = stripSeoul(cleanRaw);
+    // 3. 약칭 매칭 ('초등학교' <-> '초', '중학교' <-> '중')
+    const toShort = (s: string) => s.replace(/초등학교|초등$/, '초').replace(/중학교$/, '중').replace(/고등학교|고등$/, '고');
+    const rawShort = toShort(cleanRaw);
     match = targetSchools.find(s => {
-      const targetNoSeoul = stripSeoul(normalizeSchoolName(s.name));
-      return targetNoSeoul.includes(cleanNoSeoul) || cleanNoSeoul.includes(targetNoSeoul);
+      const targetShort = toShort(normalizeSchoolName(s.name));
+      if (!targetShort || targetShort.length < 2) return false;
+      return rawShort.includes(targetShort) || targetShort.includes(rawShort);
     });
 
     return match;
@@ -1012,18 +1018,6 @@ export default function ExcelMergePage() {
           }
 
           const matchedSchool = findMatchingSchool(rawSchoolName);
-
-          // 🚨 C-4. 기준 명부 등록 상태에서 명부에 없는 엉뚱한 기관/부서 파일 취합 제외
-          if (targetSchools.length > 0 && !matchedSchool && !matchedSchoolByName) {
-            processed.push({
-              name: file.name,
-              size: file.size,
-              schoolName: rawSchoolName || fallbackSchoolName,
-              status: 'error',
-              errorMsg: '기준 명부 외 기관 (취합 대상 아님 - 자동 제외)'
-            });
-            continue; // 🚀 기준 명부 외 파일 취합 제외!
-          }
 
           // 🌟 기준 명부가 등록되어 있는 경우 -> 명부의 연번(seq)을 100% 최우선 적용하여 칼정렬!
           let finalSeq = (i + 1);
