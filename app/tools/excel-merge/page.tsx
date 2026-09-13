@@ -841,7 +841,7 @@ export default function ExcelMergePage() {
         }
       />
 
-      <main className="flex-1 max-w-[912px] w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-4.5">
+      <main className="flex-1 max-w-[1140px] w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-4.5">
         
         {/* 상단 슬로건 & 오프라인 단독 파일 다운로드 바 (세로 콤팩트 원라인) */}
         <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-2.5">
