@@ -348,12 +348,12 @@ export default function ExcelMergePage() {
     }
   };
 
-  // 학교명 정규화 (공백, 괄호, 특수기호, 접두어 '서울/서울특별시' 제거 비교용)
+  // 학교명 정규화 (공백, 괄호, 특수기호, 전국 17개 시도 접두어 제거 비교용)
   const normalizeSchoolName = (name: string): string => {
     if (!name) return '';
     return String(name)
       .replace(/[\s\u3000\u00A0\(\)\[\]_·\-\.\,\r\n\t]/g, '')
-      .replace(/^서울특별시|^서울시?|^서울/g, '')
+      .replace(/^(서울특별시|서울시?|서울|경기도|경기|인천광역시|인천시?|인천|강원특별자치도|강원도?|강원|충청북도|충북도?|충북|충청남도|충남도?|충남|전북특별자치도|전라북도|전북도?|전북|전라남도|전남도?|전남|경상북도|경북도?|경북|경상남도|경남도?|경남|제주특별자치도|제주도?|제주|세종특별자치시|세종시?|세종|대전광역시|대전시?|대전|대구광역시|대구시?|대구|광주광역시|광주시?|광주|울산광역시|울산시?|울산|부산광역시|부산시?|부산)/g, '')
       .trim();
   };
 
@@ -930,10 +930,14 @@ export default function ExcelMergePage() {
         setProgress(pct);
         setStatusMessage(`파일 분석 중 (${i + 1}/${files.length}): ${file.name}`);
 
-        // 학교명 사전 추출 (파일명 기반)
+        // 학교명 사전 추출 (파일명 기반 - 공문 접미어/연도 등 유연 정제)
         const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
-        const cleanFileName = nameWithoutExt.replace(/신청서|서식|2026/g, '').trim();
-        const matchedSchoolByName = findMatchingSchool(cleanFileName);
+        const cleanFileName = nameWithoutExt
+          .replace(/\b20[2-3]\d\b/g, '')
+          .replace(/(신청서|신청|서식|조사표|명세서|취합본|제출본|수합용|결과보고|계획서|양식|최종|수정|제출|안내)/g, ' ')
+          .trim();
+        // 원본 파일명 및 정제된 파일명 양쪽 모두에서 매칭 시도
+        const matchedSchoolByName = findMatchingSchool(cleanFileName) || findMatchingSchool(nameWithoutExt);
         const fallbackSchoolName = matchedSchoolByName?.name || cleanFileName || file.name;
 
         // 🚨 A. 확장자 검사: 비엑셀 파일(PDF, HWP, 이미지 등) 즉시 패스 & 오류 카운팅
@@ -1078,8 +1082,45 @@ export default function ExcelMergePage() {
 
           if (mode === 'block') {
             const targetRow = blockStartRow + schoolCellRowOffset;
-            const cellVal = ws.getCell(targetRow, schoolCellCol).value;
-            rawSchoolName = cellVal ? String(cellVal).trim() : '';
+            const primaryVal = ws.getCell(targetRow, schoolCellCol).value;
+            const candidate1 = primaryVal ? String(primaryVal).trim() : '';
+
+            // 1순위: 지정된 schoolCellCol 위치의 값이 학교명이면 채택
+            if (candidate1 && (findMatchingSchool(candidate1) || /(초등?학교|중학교|고등학교|특수학교|유치원|지원청|기관|학교)/.test(candidate1))) {
+              rawSchoolName = candidate1;
+            } else {
+              // 2순위: 헤더 행(headerEndRow)에서 '학교명', '기관명', '학교', '기관', '대상교' 컬럼 위치 자동 탐색
+              let autoDetectedCol = -1;
+              for (let c = 1; c <= 25; c++) {
+                const headerVal = String(ws.getCell(headerEndRow, c).value || '').trim();
+                if (/^(학교명|기관명|학교|기관|소속|대상교)$/.test(headerVal)) {
+                  autoDetectedCol = c;
+                  break;
+                }
+              }
+              if (autoDetectedCol > 0) {
+                const autoVal = ws.getCell(targetRow, autoDetectedCol).value;
+                if (autoVal) rawSchoolName = String(autoVal).trim();
+              }
+
+              // 3순위: 그래도 못 찾으면 targetRow의 1~15열 전체를 스캔하여 학교명 패턴 또는 명부 일치 셀 자동 포착
+              if (!rawSchoolName) {
+                for (let c = 1; c <= 15; c++) {
+                  const cellText = String(ws.getCell(targetRow, c).value || '').trim();
+                  if (cellText && cellText.length >= 2) {
+                    if (findMatchingSchool(cellText) || /(초등?학교|중학교|고등학교|특수학교|유치원)$/.test(cellText)) {
+                      rawSchoolName = cellText;
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // 4순위: candidate1이 비어있지 않다면 일단 후보로 설정
+              if (!rawSchoolName && candidate1) {
+                rawSchoolName = candidate1;
+              }
+            }
           } else {
             rawSchoolName = cleanFileName;
           }
@@ -1088,7 +1129,7 @@ export default function ExcelMergePage() {
             rawSchoolName = cleanFileName;
           }
 
-          const matchedSchool = findMatchingSchool(rawSchoolName);
+          const matchedSchool = findMatchingSchool(rawSchoolName) || matchedSchoolByName;
 
           // 🌟 기준 명부가 등록되어 있는 경우 -> 명부의 연번(seq)을 100% 최우선 적용하여 칼정렬!
           let finalSeq = (i + 1);
