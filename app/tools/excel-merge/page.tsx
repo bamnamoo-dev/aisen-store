@@ -41,12 +41,47 @@ export default function ExcelMergePage() {
   const [excelJsLoaded, setExcelJsLoaded] = useState(false);
   const [mode, setMode] = useState<'block' | 'simple' | 'edufine'>('block');
   
-  // 블록 모드 설정 (신청, 신청서 등)
+  // 3단계 범용 수합 설정
+  const [activePreset, setActivePreset] = useState<'food' | 'labor' | 'general' | 'custom'>('food');
   const [sheetKeyword, setSheetKeyword] = useState('신청');
-  const [blockStartRow, setBlockStartRow] = useState(18);
-  const [blockRowCount, setBlockRowCount] = useState(16);
-  const [schoolCellCol, setSchoolCellCol] = useState(5); // E열
-  const [schoolCellRowOffset, setSchoolCellRowOffset] = useState(0); // 시작행 기준 0이면 18행, 2면 20행
+  const [headerEndRow, setHeaderEndRow] = useState(17);       // 1단계: 1~N행 헤더 유지 (1회만)
+  const [blockStartRow, setBlockStartRow] = useState(18);     // 2단계: 학교별 본문 시작 행
+  const [blockRowCount, setBlockRowCount] = useState(16);     // 2단계: 학교당 블록 행 수 (가변행 감지 시 기준)
+  const [isAutoDetectRows, setIsAutoDetectRows] = useState(false); // 가변행 자동감지 (빈 줄 전까지 동적 수합)
+  const [sortMode, setSortMode] = useState<'seq' | 'name' | 'filename'>('seq'); // 3단계: 연번순 정렬
+  const [schoolCellCol, setSchoolCellCol] = useState(5);      // E열 = 학교명 (인건비는 F열=6열)
+  const [schoolCellRowOffset, setSchoolCellRowOffset] = useState(0); 
+
+  // 업무별 1초 원클릭 프리셋
+  const applyPreset = (presetType: 'food' | 'labor' | 'general') => {
+    setActivePreset(presetType);
+    if (presetType === 'food') {
+      setMode('block');
+      setSheetKeyword('신청');
+      setHeaderEndRow(17);
+      setBlockStartRow(18);
+      setBlockRowCount(16);
+      setIsAutoDetectRows(false);
+      setSchoolCellCol(5);
+      setSortMode('seq');
+    } else if (presetType === 'labor') {
+      setMode('block');
+      setSheetKeyword('인건비');
+      setHeaderEndRow(15);
+      setBlockStartRow(16);
+      setBlockRowCount(1);
+      setIsAutoDetectRows(true);
+      setSchoolCellCol(6); // F16 학교명
+      setSortMode('seq');
+    } else if (presetType === 'general') {
+      setMode('simple');
+      setHeaderRowCount(1);
+      setHeaderEndRow(1);
+      setBlockStartRow(2);
+      setIsAutoDetectRows(true);
+      setSortMode('seq');
+    }
+  };
   
   // 단순 표 모드 설정
   const [headerRowCount, setHeaderRowCount] = useState(1);
@@ -125,6 +160,30 @@ export default function ExcelMergePage() {
       if (rowAbs === '$') return match; // 절대참조 행은 고정
       return `${colAbs}${col}${rowAbs}${parseInt(row, 10) + rowOffset}`;
     });
+  };
+
+  // 가변 데이터 행 감지 함수 (빈 줄 전까지의 실제 작성 행 수 스캔)
+  const findLastDataRow = (ws: any, startRow: number, maxCol: number = 40): number => {
+    let last = startRow;
+    let emptyStreak = 0;
+    for (let r = startRow; r < startRow + 300; r++) {
+      let hasVal = false;
+      for (let c = 1; c <= maxCol; c++) {
+        const v = ws.getCell(r, c).value;
+        if (v !== null && v !== undefined && String(v).trim() !== '') {
+          hasVal = true;
+          break;
+        }
+      }
+      if (hasVal) {
+        last = r;
+        emptyStreak = 0;
+      } else {
+        emptyStreak++;
+        if (emptyStreak >= 2) break;
+      }
+    }
+    return last;
   };
 
   // 파일 업로드 처리
@@ -244,8 +303,11 @@ export default function ExcelMergePage() {
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
 
           let rawSchoolName = '';
+          const col1Val = ws.getCell(blockStartRow, 1).value;
+          const parsedColSeq = parseInt(String(col1Val), 10);
+
           if (mode === 'block') {
-            // E열(학교명 열) 확인
+            // 지정된 학교명 열 확인 (식품비 E열=5, 인건비 F열=6)
             const targetRow = blockStartRow + schoolCellRowOffset;
             const cellVal = ws.getCell(targetRow, schoolCellCol).value;
             rawSchoolName = cellVal ? String(cellVal).trim() : '';
@@ -254,43 +316,41 @@ export default function ExcelMergePage() {
             rawSchoolName = file.name.replace(/\.[^/.]+$/, '').replace(/신청서|서식|2026/g, '').trim();
           }
 
-          const matchedSchool = findMatchingSchool(rawSchoolName);
-
-          if (!matchedSchool) {
-            processed.push({
-              name: file.name,
-              size: file.size,
-              schoolName: rawSchoolName || '(확인불가)',
-              status: 'unmatched',
-              errorMsg: '명단 불일치 (학교명을 확인해주세요)'
-            });
-            continue;
+          if (!rawSchoolName) {
+            // fallback: 파일명에서 추출
+            rawSchoolName = file.name.replace(/\.[^/.]+$/, '').replace(/신청서|서식|2026/g, '').trim();
           }
 
-          if (matchedMap.has(matchedSchool.seq)) {
+          const matchedSchool = findMatchingSchool(rawSchoolName);
+          const finalSeq = (!isNaN(parsedColSeq) && parsedColSeq > 0) 
+            ? parsedColSeq 
+            : (matchedSchool?.seq || (i + 1));
+          const finalSchoolName = matchedSchool?.name || rawSchoolName || `학교_${finalSeq}`;
+
+          if (matchedMap.has(finalSeq)) {
             processed.push({
               name: file.name,
               size: file.size,
-              schoolName: matchedSchool.name,
-              matchedSeq: matchedSchool.seq,
+              schoolName: finalSchoolName,
+              matchedSeq: finalSeq,
               status: 'duplicate',
-              errorMsg: `중복 제출교 (${matchedSchool.name})`
+              errorMsg: `중복 제출교 (연번 ${finalSeq})`
             });
             continue;
           }
 
           // 정상 매칭
-          matchedMap.set(matchedSchool.seq, {
+          matchedMap.set(finalSeq, {
             file,
-            school: matchedSchool,
+            school: { seq: finalSeq, name: finalSchoolName },
             data: ws
           });
 
           processed.push({
             name: file.name,
             size: file.size,
-            schoolName: matchedSchool.name,
-            matchedSeq: matchedSchool.seq,
+            schoolName: finalSchoolName,
+            matchedSeq: finalSeq,
             status: 'matched'
           });
 
@@ -318,22 +378,28 @@ export default function ExcelMergePage() {
       const sortedSeqs = Array.from(matchedMap.keys()).sort((a, b) => a - b);
 
       if (mode === 'block') {
-        // [모드 2: 서식 블록형 취합]
-        // 템플릿의 시작행(blockStartRow)부터 각 학교 블록을 평행이동 복사
+        // [모드 2: 서식 블록형 취합 - 가변행/고정블록 겸용]
+        let currentDstRow = blockStartRow;
+
         for (let idx = 0; idx < sortedSeqs.length; idx++) {
           const seq = sortedSeqs[idx];
           const info = matchedMap.get(seq)!;
           const srcWs = info.data;
           
-          const dstStartRow = blockStartRow + (idx * blockRowCount);
+          // 학교별 실제 복사 행 수 계산 (가변행 모드 vs 고정행 모드)
+          const actualRowCount = isAutoDetectRows 
+            ? Math.max(1, findLastDataRow(srcWs, blockStartRow) - blockStartRow + 1)
+            : blockRowCount;
+
+          const dstStartRow = currentDstRow;
           const rowOffset = dstStartRow - blockStartRow;
 
           const pct = 65 + Math.floor((idx / sortedSeqs.length) * 25);
           setProgress(pct);
-          setStatusMessage(`블록 이어붙이기 (${idx + 1}/${sortedSeqs.length}): ${info.school.name}`);
+          setStatusMessage(`학교 데이터 결합 (${idx + 1}/${sortedSeqs.length}): ${info.school.name} (${actualRowCount}행)`);
 
           // 행별 셀 복사 (값, 서식, 수식)
-          for (let r = 0; r < blockRowCount; r++) {
+          for (let r = 0; r < actualRowCount; r++) {
             const srcRowNum = blockStartRow + r;
             const dstRowNum = dstStartRow + r;
             const srcRow = srcWs.getRow(srcRowNum);
@@ -372,10 +438,9 @@ export default function ExcelMergePage() {
             });
           }
 
-          // 14개 병합 셀 오프셋 이동 적용
+          // 병합 셀 오프셋 이동 적용
           if (idx > 0 && srcWs.model && srcWs.model.merges) {
             srcWs.model.merges.forEach((mergeRange: string) => {
-              // mergeRange 예: "A16:D16", "E16:E31"
               const parts = mergeRange.split(':');
               if (parts.length === 2) {
                 const match1 = parts[0].match(/([A-Z]+)(\d+)/);
@@ -387,7 +452,7 @@ export default function ExcelMergePage() {
                   const row2 = parseInt(match2[2], 10);
 
                   // 블록 범위 내의 병합 셀만 이동
-                  if (row1 >= blockStartRow && row2 < blockStartRow + blockRowCount) {
+                  if (row1 >= blockStartRow && row2 < blockStartRow + actualRowCount) {
                     const newMerge = `${col1}${row1 + rowOffset}:${col2}${row2 + rowOffset}`;
                     try {
                       targetWs.mergeCells(newMerge);
@@ -399,6 +464,8 @@ export default function ExcelMergePage() {
               }
             });
           }
+
+          currentDstRow += actualRowCount;
         }
       } else if (mode === 'edufine') {
         // [모드 3: K-에듀파인 교부용 양식 변환]
@@ -672,63 +739,178 @@ export default function ExcelMergePage() {
               </a>
             </div>
 
-            {/* 세부 옵션 아코디언 */}
+            {/* 범용 수합 3원칙 설정 패널 */}
             <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <span className="font-bold text-slate-800 text-sm flex items-center gap-2">
                   <Sparkles size={16} className="text-blue-600" />
-                  스마트 서식 감지 설정
+                  범용 엑셀 수합 3원칙 설정
                 </span>
                 <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded">
-                  자동 인식 가동 중
+                  서식·수식 100% 보존
                 </span>
               </div>
 
-              {mode === 'block' && (
-                <div className="space-y-3 text-xs">
-                  <div>
-                    <label className="text-slate-600 font-medium block mb-1">대상 시트 키워드</label>
-                    <input 
-                      type="text" 
-                      value={sheetKeyword} 
-                      onChange={e => setSheetKeyword(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
+              {/* ⚡ 업무별 1초 원클릭 프리셋 */}
+              <div>
+                <label className="text-slate-600 font-bold text-xs block mb-2">⚡ 업무별 1초 프리셋</label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => applyPreset('food')}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
+                      activePreset === 'food'
+                        ? 'bg-blue-50 text-blue-700 border-blue-300 shadow-xs ring-2 ring-blue-100'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    🍱 식품관리비<br/><span className="text-[10px] font-normal text-slate-500">(16줄 고정)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyPreset('labor')}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
+                      activePreset === 'labor'
+                        ? 'bg-purple-50 text-purple-700 border-purple-300 shadow-xs ring-2 ring-purple-100'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    👨‍🍳 급식 인건비<br/><span className="text-[10px] font-normal text-slate-500">(가변행 감지)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyPreset('general')}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
+                      activePreset === 'general'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-xs ring-2 ring-emerald-100'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    📋 일반 서식·표<br/><span className="text-[10px] font-normal text-slate-500">(헤더 1회 유지)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 3원칙 세부 설정 영역 */}
+              <div className="space-y-3 pt-2 text-xs">
+                {/* 1. 공통 헤더 1회 유지 */}
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                      <span className="w-4 h-4 bg-blue-600 text-white rounded-full text-[10px] flex items-center justify-center font-bold">1</span>
+                      공통 헤더 1회 유지
+                    </span>
+                    <span className="text-[11px] text-slate-500">1행 ~ {headerEndRow}행 보존</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-600 shrink-0">헤더 끝 행:</span>
+                    <input 
+                      type="number" 
+                      value={headerEndRow} 
+                      onChange={e => {
+                        const val = Number(e.target.value);
+                        setHeaderEndRow(val);
+                        setActivePreset('custom');
+                      }}
+                      className="w-20 bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-800 text-center font-bold"
+                    />
+                    <span className="text-slate-400 text-[11px]">행까지 서식/결재란 유지</span>
+                  </div>
+                </div>
+
+                {/* 2. 본문 추출 방식 */}
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                      <span className="w-4 h-4 bg-purple-600 text-white rounded-full text-[10px] flex items-center justify-center font-bold">2</span>
+                      학교별 본문 추출 방식
+                    </span>
+                    <label className="flex items-center gap-1 cursor-pointer text-purple-700 font-semibold text-[11px]">
+                      <input 
+                        type="checkbox"
+                        checked={isAutoDetectRows}
+                        onChange={e => {
+                          setIsAutoDetectRows(e.target.checked);
+                          setActivePreset('custom');
+                        }}
+                        className="rounded text-purple-600"
+                      />
+                      <span>가변행 감지(빈 줄 전까지)</span>
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
                     <div>
-                      <label className="text-slate-600 font-medium block mb-1">데이터 시작 행</label>
+                      <span className="text-slate-600 block mb-1">본문 시작행</span>
                       <input 
                         type="number" 
                         value={blockStartRow} 
-                        onChange={e => setBlockStartRow(Number(e.target.value))}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800"
+                        onChange={e => {
+                          setBlockStartRow(Number(e.target.value));
+                          setActivePreset('custom');
+                        }}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-800 font-bold"
                       />
                     </div>
                     <div>
-                      <label className="text-slate-600 font-medium block mb-1">학교당 블록 행 수</label>
+                      <span className="text-slate-600 block mb-1">
+                        {isAutoDetectRows ? '기준 행수(최소)' : '학교당 고정 행수'}
+                      </span>
                       <input 
                         type="number" 
                         value={blockRowCount} 
-                        onChange={e => setBlockRowCount(Number(e.target.value))}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800"
+                        onChange={e => {
+                          setBlockRowCount(Number(e.target.value));
+                          setActivePreset('custom');
+                        }}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-800 font-bold"
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="text-slate-600 font-medium block mb-1">학교명 위치 (E열 = 5열)</label>
-                    <input 
-                      type="number" 
-                      value={schoolCellCol} 
-                      onChange={e => setSchoolCellCol(Number(e.target.value))}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800"
-                    />
+                </div>
+
+                {/* 3. 취합 순서 정렬 */}
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                      <span className="w-4 h-4 bg-emerald-600 text-white rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+                      학교별 결합 정렬 순서
+                    </span>
+                    <span className="text-[11px] text-emerald-700 font-semibold">자동 연번 정렬</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => setSortMode('seq')}
+                      className={`py-1.5 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                        sortMode === 'seq' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      A열 연번순
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSortMode('name')}
+                      className={`py-1.5 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                        sortMode === 'name' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      학교명 가나다순
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSortMode('filename')}
+                      className={`py-1.5 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                        sortMode === 'filename' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      제출 파일명순
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
 
               {mode === 'edufine' && (
-                <div className="space-y-3 text-xs">
+                <div className="space-y-3 text-xs pt-2 border-t border-slate-100">
                   <div>
                     <label className="text-slate-600 font-medium block mb-1">에듀파인 교부 세부사업명</label>
                     <input 
