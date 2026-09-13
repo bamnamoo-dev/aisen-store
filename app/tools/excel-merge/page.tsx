@@ -526,6 +526,20 @@ export default function ExcelMergePage() {
       setProgress(100);
       setFiles(sampleFiles);
       setMergedBlob(null);
+
+      // 가상 136개교 기준 명부 및 표준 B-기관코드(B1000001~) 자동 연동
+      const sampleSchools: SchoolItem[] = [];
+      fileNames.forEach((name, idx) => {
+        const cleanName = name.replace(/\.[^/.]+$/, '').replace(/2026_|신청서|서식/g, '').trim();
+        const seq = idx + 1;
+        sampleSchools.push({
+          seq,
+          code: `B10${String(seq).padStart(5, '0')}`,
+          name: cleanName
+        });
+      });
+      setTargetSchools(sampleSchools);
+
       setStatusMessage(`표준 136개교 샘플이 로드되었습니다. (${sampleFiles.length}개 파일)`);
     } catch (e: any) {
       alert('샘플 파일 로드 실패: ' + e.message);
@@ -633,7 +647,7 @@ export default function ExcelMergePage() {
 
           matchedMap.set(finalSeq, {
             file,
-            school: { seq: finalSeq, name: finalSchoolName },
+            school: { seq: finalSeq, name: finalSchoolName, code: matchedSchool?.code },
             data: ws
           });
 
@@ -853,8 +867,9 @@ export default function ExcelMergePage() {
           if (!isNaN(parsed)) amount = parsed;
         }
 
-        // 자체 명부에 등록된 학교코드가 있으면 100% 우선 적용
-        const codeStr = info.school.code || (info.school.seq ? `SCH_${String(info.school.seq).padStart(4, '0')}` : `SCH_${idx + 1}`);
+        // 자체 명부에 등록된 학교코드가 있으면 100% 우선 적용, 없으면 서울시교육청 표준 B-기관코드 형식(B1000001...) 자동 부여
+        const defaultCode = `B10${String(info.school.seq || (idx + 1)).padStart(5, '0')}`;
+        const codeStr = info.school.code || defaultCode;
 
         const rowData = {
           seq: idx + 1,
