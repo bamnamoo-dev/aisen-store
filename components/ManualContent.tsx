@@ -36,10 +36,10 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
 
   const tabs: { id: TabKey; label: string; dotColor: string }[] = [
     { id: 'intro', label: '🏛️ 포털 둘러보기', dotColor: 'bg-slate-700' },
-    { id: 'ai', label: '🔵 AI & 포털 허브', dotColor: 'bg-blue-600' },
+    { id: 'ai', label: '🔵 AI & 지침 포털', dotColor: 'bg-blue-600' },
     { id: 'finance', label: '🟢 회계 · 계약 · 예산', dotColor: 'bg-emerald-600' },
-    { id: 'admin', label: '🟣 행정 실무 · 서고', dotColor: 'bg-purple-600' },
-    { id: 'space', label: '🔴 공간 · 시설 · 힐링', dotColor: 'bg-rose-500' },
+    { id: 'admin', label: '🟣 행정 실무 · 엑셀', dotColor: 'bg-purple-600' },
+    { id: 'space', label: '🔴 서식 · 공간 · 힐링', dotColor: 'bg-rose-500' },
   ];
 
   return (
@@ -186,7 +186,43 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
               </div>
             </div>
 
-            {/* 2. AI-SEN 출장여비 */}
+            {/* 2. AI-SEN 행정서고 */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs">
+                      <FolderOpen size={20} />
+                    </div>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정서고</h4>
+                  </div>
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                    102권 공식
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                  학교회계, 계약, 인사, 시설, 물품 등 28개 분야 102권 서울시교육청 공식 업무 지침서 PDF를 웹 브라우저에서 0초 스트리밍으로 열람합니다.
+                </p>
+                <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">28개 분야 102권</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">고속 PDF 스트리밍</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">키워드 즉시 검색</span>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
+                <Link
+                  href="/archive"
+                  onClick={onToolClick}
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl transition-colors"
+                >
+                  <span>행정서고 바로가기</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+
+            {/* 3. AI-SEN 출장여비 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -224,7 +260,7 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
               </div>
             </div>
 
-            {/* 3. AI-SEN 소통게시판 */}
+            {/* 4. AI-SEN 소통게시판 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -255,42 +291,6 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                   className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl transition-colors"
                 >
                   <span>게시판 바로가기</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-            </div>
-
-            {/* 4. AI-SEN 행정서식 */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
-              <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs">
-                      <FileCheck size={20} />
-                    </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정서식</h4>
-                  </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
-                    71종+
-                  </span>
-                </div>
-                <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  인사, 복무, 계약, 학교 제증명 등 일선 교육행정 실무에서 매일 사용하는 필수 법정 서식 71종의 실시간 미리보기와 원클릭 HWPX/PDF 다운로드를 제공합니다.
-                </p>
-                <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">필수 서식 71종+</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">실시간 미리보기</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">0초 즉시 다운</span>
-                </div>
-              </div>
-
-              <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
-                <Link
-                  href="/forms"
-                  onClick={onToolClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl transition-colors"
-                >
-                  <span>행정서식 서고 바로가기</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -450,47 +450,83 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
           </div>
         )}
 
-        {/* ─── TAB 4: 🟣 행정 실무 · 서고 ─── */}
+        {/* ─── TAB 4: 🟣 행정 실무 · 엑셀 ─── */}
         {activeTab === 'admin' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* 1. AI-SEN 행정서고 */}
+            {/* 1. AI-SEN 엑셀수합 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs">
-                      <FolderOpen size={20} />
+                      <FileSpreadsheet size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정서고</h4>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 엑셀수합</h4>
                   </div>
                   <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
-                    102권 서고
+                    100% 범용
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  학교회계, 계약, 인사, 시설, 물품 등 28개 분야 102권 서울시교육청 공식 업무 길라잡이 PDF를 브라우저에서 실시간 스트리밍합니다.
+                  서식 블록형·단순 목록형 2대 모드로 어떤 엑셀이든 원형 보존 일괄 수합하고, K-에듀파인 교부서식을 동시 자동 생성합니다.
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">28개 분야 102권</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">고속 PDF 스트리밍</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">키워드 즉시 검색</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">서식/수식 100% 보존</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">에듀파인 교부 동시생성</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">자체 명부 학교코드 연동</span>
                 </div>
               </div>
 
               <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
                 <Link
-                  href="/archive"
+                  href="/tools/excel-merge"
                   onClick={onToolClick}
                   className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 px-4 py-2 rounded-xl transition-colors"
                 >
-                  <span>행정서고 바로가기</span>
+                  <span>엑셀수합 바로가기</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
 
-            {/* 2. AI-SEN 급여식대 */}
+            {/* 2. AI-SEN 엑셀분리 */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs">
+                      <Layers size={20} />
+                    </div>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 엑셀분리</h4>
+                  </div>
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                    초고속 분리
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                  수십 개의 시트가 포함된 대형 엑셀 문서를 0.2초 만에 개별 파일로 자동 쪼개어 단일 다운로드 및 ZIP 일괄 압축을 제공합니다.
+                </p>
+                <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">0.2초 초고속 분할</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">ZIP 압축 일괄 저장</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">개별 시트 즉시 다운</span>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
+                <Link
+                  href="/tools/sheet-splitter"
+                  onClick={onToolClick}
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 px-4 py-2 rounded-xl transition-colors"
+                >
+                  <span>엑셀분리 바로가기</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+
+            {/* 3. AI-SEN 급여식대 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -526,7 +562,7 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
               </div>
             </div>
 
-            {/* 3. AI-SEN 지출바인더 */}
+            {/* 4. AI-SEN 지출바인더 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -562,50 +598,50 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
               </div>
             </div>
 
-            {/* 4. AI-SEN 엑셀분리 */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
+          </div>
+        )}
+
+        {/* ─── TAB 5: 🔴 서식 · 공간 · 힐링 ─── */}
+        {activeTab === 'space' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            {/* 1. AI-SEN 행정서식 */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs">
-                      <FileSpreadsheet size={20} />
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-2xs">
+                      <FileCheck size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 엑셀분리</h4>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정서식</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
-                    시트 분할
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                    71종+
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  수십 개의 다중 탭 시트로 구성된 대형 엑셀 파일을 0.2초 만에 개별 파일로 분할하고 ZIP 압축 파일로 일괄 저장합니다.
+                  인사, 복무, 계약, 학교 제증명 등 일선 교육행정 실무에서 매일 사용하는 필수 법정 서식 71종의 실시간 미리보기와 원클릭 HWPX/PDF 다운로드를 제공합니다.
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">다중 시트 일괄 분할</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">0초 ZIP 압축</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">선택 다운로드</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">필수 서식 71종+</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">실시간 미리보기</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">0초 즉시 다운</span>
                 </div>
               </div>
 
               <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
                 <Link
-                  href="/tools/sheet-splitter"
+                  href="/forms"
                   onClick={onToolClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 px-4 py-2 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl transition-colors"
                 >
-                  <span>엑셀분리 바로가기</span>
+                  <span>행정서식 서고 바로가기</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
 
-          </div>
-        )}
-
-        {/* ─── TAB 5: 🔴 공간 · 시설 · 수합 · 힐링 ─── */}
-        {activeTab === 'space' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            {/* 1. AI-SEN 시설대관 */}
+            {/* 2. AI-SEN 시설대관 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -641,7 +677,7 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
               </div>
             </div>
 
-            {/* 2. AI-SEN 교실배치 */}
+            {/* 3. AI-SEN 교실배치 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -677,44 +713,7 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
               </div>
             </div>
 
-            {/* 3. AI-SEN 엑셀수합 */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
-              <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-2xs">
-                      <FileSpreadsheet size={20} />
-                    </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 엑셀수합</h4>
-                  </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
-                    수합·교부 마스터
-                  </span>
-                </div>
-                <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  수십~수백 개 학교가 보낸 급식비·늘봄 등 복합 서식을 원스크린에서 3초 만에 단일 마스터 엑셀로 일괄 취합하고 K-에듀파인 교부 양식으로 자동 변환합니다.
-                </p>
-                <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">끝 행까지 가변 감지</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">수식/서식 100% 보존</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">자체 명부 로컬 저장</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">독촉 명단 1초 복사</span>
-                </div>
-              </div>
-
-              <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
-                <Link
-                  href="/tools/excel-merge"
-                  onClick={onToolClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl transition-colors"
-                >
-                  <span>엑셀수합 바로가기</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-            </div>
-
-            {/* 3. AI-SEN 힐링게임 */}
+            {/* 4. AI-SEN 힐링게임 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
