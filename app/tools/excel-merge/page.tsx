@@ -768,7 +768,12 @@ export default function ExcelMergePage() {
       }
 
       // 🌟 기준 템플릿의 헤더 지문(Fingerprint) 수집 (1행 ~ headerEndRow 영역의 핵심 컬럼/제목 단어들)
+      const COMMON_ADMIN_STOPWORDS = new Set([
+        '구분', '연번', '비고', '공립', '사립', '초', '중', '고', '학교', '초등', '중등', '고등', '합계', '계', 'no', 'seq', 'id', '소계', '총계', '기타', '일련번호'
+      ]);
       const templateHeaderWords = new Set<string>();
+      const templateCoreWords = new Set<string>(); // 불용어 제외 핵심 업무 키워드 (급식, 인건, 산출, 단가 등)
+
       for (let r = 1; r <= Math.max(headerEndRow, 3); r++) {
         const row = targetWs.getRow(r);
         row.eachCell({ includeEmpty: false }, (c: any) => {
@@ -777,8 +782,12 @@ export default function ExcelMergePage() {
           if (txt.length >= 2) {
             const clean = txt.replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g, ' ');
             clean.split(/\s+/).forEach(w => {
-              if (w.length >= 2 && !/^\d+$/.test(w)) {
-                templateHeaderWords.add(w.toLowerCase());
+              const lower = w.toLowerCase();
+              if (lower.length >= 2 && !/^\d+$/.test(lower)) {
+                templateHeaderWords.add(lower);
+                if (!COMMON_ADMIN_STOPWORDS.has(lower)) {
+                  templateCoreWords.add(lower);
+                }
               }
             });
           }
@@ -854,9 +863,10 @@ export default function ExcelMergePage() {
             continue;
           }
 
-          // 🚨 C-2. 서식 지문(Fingerprint) 대조: 아예 다른 양식의 파일 자동 감지 및 취합데이터 100% 제외
-          if (templateHeaderWords.size >= 3) {
-            let matchedHeaderWords = 0;
+          // 🚨 C-2. 서식 지문(Fingerprint) 정밀 대조: 다른 업무 양식(석면/공사/인사 등) 자동 감지 및 100% 취합 제외
+          if (templateHeaderWords.size >= 2) {
+            let matchedCoreWords = 0;
+            let matchedTotalWords = 0;
             const scannedWords = new Set<string>();
             const scanMaxRow = Math.min(ws.rowCount || 0, Math.max(headerEndRow + 3, 20));
 
@@ -869,25 +879,48 @@ export default function ExcelMergePage() {
                   const clean = txt.replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g, ' ');
                   clean.split(/\s+/).forEach(w => {
                     const lower = w.toLowerCase();
-                    if (lower.length >= 2 && templateHeaderWords.has(lower) && !scannedWords.has(lower)) {
+                    if (lower.length >= 2 && !scannedWords.has(lower)) {
                       scannedWords.add(lower);
-                      matchedHeaderWords++;
+                      if (templateHeaderWords.has(lower)) {
+                        matchedTotalWords++;
+                        if (templateCoreWords.has(lower)) {
+                          matchedCoreWords++;
+                        }
+                      }
                     }
                   });
                 }
               });
             }
 
-            // 템플릿 헤더 단어가 3개 이상 존재하는데, 제출 파일 상단에서 일치하는 단어가 0개이면 100% 다른 서식!
-            if (matchedHeaderWords === 0) {
+            // 핵심 업무 단어가 2개 이상 정의되어 있는데 매칭이 0개이거나, 총 헤더 단어 일치가 1개 이하인 경우 완벽 차단!
+            const isDifferentForm = (templateCoreWords.size >= 2 && matchedCoreWords === 0) ||
+              (templateHeaderWords.size >= 4 && matchedTotalWords <= 1);
+
+            if (isDifferentForm) {
               processed.push({
                 name: file.name,
                 size: file.size,
                 schoolName: fallbackSchoolName,
                 status: 'error',
-                errorMsg: '서식 불일치 (다른 양식 제출 - 자동 제외)'
+                errorMsg: '서식 불일치 (다른 업무 양식 제출 - 자동 제외)'
               });
               continue; // 🚀 취합 데이터(matchedMap)에 절대 결합하지 않고 즉시 패스!
+            }
+          }
+
+          // 🚨 C-3. 단일 학교 서식 아님 감지 (수십 개 시설이 나열된 총괄 대장 파일 침범 원천 차단)
+          if (mode === 'block') {
+            const detectedRowsForCheck = findLastDataRow(ws, blockStartRow) - blockStartRow + 1;
+            if (detectedRowsForCheck > Math.max(45, blockRowCount * 2.5)) {
+              processed.push({
+                name: file.name,
+                size: file.size,
+                schoolName: fallbackSchoolName,
+                status: 'error',
+                errorMsg: `서식 불일치 (단일 학교 서식 아님 - 종합 대장 파일 ${detectedRowsForCheck}행 제외)`
+              });
+              continue; // 🚀 종합 대장 파일 취합 제외!
             }
           }
 
@@ -908,6 +941,18 @@ export default function ExcelMergePage() {
           }
 
           const matchedSchool = findMatchingSchool(rawSchoolName);
+
+          // 🚨 C-4. 기준 명부 등록 상태에서 명부에 없는 엉뚱한 기관/부서 파일 취합 제외
+          if (targetSchools.length > 0 && !matchedSchool && !matchedSchoolByName) {
+            processed.push({
+              name: file.name,
+              size: file.size,
+              schoolName: rawSchoolName || fallbackSchoolName,
+              status: 'error',
+              errorMsg: '기준 명부 외 기관 (취합 대상 아님 - 자동 제외)'
+            });
+            continue; // 🚀 기준 명부 외 파일 취합 제외!
+          }
 
           // 🌟 기준 명부가 등록되어 있는 경우 -> 명부의 연번(seq)을 100% 최우선 적용하여 칼정렬!
           let finalSeq = (i + 1);
@@ -1018,9 +1063,11 @@ export default function ExcelMergePage() {
           const info = matchedMap.get(seq)!;
           const srcWs = info.data;
           
-          const actualRowCount = isAutoDetectRows 
+          const detectedRows = isAutoDetectRows 
             ? Math.max(1, findLastDataRow(srcWs, blockStartRow) - blockStartRow + 1)
             : blockRowCount;
+          // 🛡️ 비정상 대용량 데이터 침범 방지 안전 캡 (최대 40행)
+          const actualRowCount = Math.min(detectedRows, Math.max(40, blockRowCount * 2));
 
           const dstStartRow = currentDstRow;
           const rowOffset = dstStartRow - blockStartRow;
