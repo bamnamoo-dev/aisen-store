@@ -58,7 +58,7 @@ export default function ExcelMergePage() {
   const [headerEndRow, setHeaderEndRow] = useState(17);       // 1단계: 1~N행 헤더 유지 (1회만)
   const [blockStartRow, setBlockStartRow] = useState(18);     // 2단계: 학교별 본문 시작 행
   const [blockRowCount, setBlockRowCount] = useState(16);     // 2단계: 학교당 블록 행 수 (가변행 감지 시 기준)
-  const [isAutoDetectRows, setIsAutoDetectRows] = useState(false); // 가변행 자동감지 (빈 줄 전까지 동적 수합)
+  const [isAutoDetectRows, setIsAutoDetectRows] = useState(true); // 가변행 자동감지 기본 활성화 (학교별 제출 행수 상이 시 데이터 누락 방지 안전 모드)
   const [sortMode, setSortMode] = useState<'seq' | 'name' | 'filename'>('seq'); // 3단계: 연번순 정렬
   const [schoolCellCol, setSchoolCellCol] = useState(5);      // E열 = 학교명 (인건비는 F열=6열)
   const [schoolCellRowOffset, setSchoolCellRowOffset] = useState(0); 
@@ -1256,7 +1256,10 @@ export default function ExcelMergePage() {
                   <span className="w-5 h-5 bg-purple-600 text-white rounded-full text-xs flex items-center justify-center font-bold">2</span>
                   본문 추출 방식
                 </span>
-                <label className="flex items-center gap-1.5 cursor-pointer text-purple-700 font-bold text-xs bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100">
+                <label 
+                  className="flex items-center gap-1.5 cursor-pointer text-purple-700 font-bold text-xs bg-purple-50 hover:bg-purple-100/70 px-2.5 py-1 rounded-md border border-purple-200 transition-colors shadow-2xs"
+                  title="학교마다 작성한 행 수가 달라도 데이터가 잘리거나 빈칸이 생기지 않도록 실제 작성 줄까지 자동 감지합니다."
+                >
                   <input 
                     type="checkbox"
                     checked={isAutoDetectRows}
@@ -1264,9 +1267,9 @@ export default function ExcelMergePage() {
                       setIsAutoDetectRows(e.target.checked);
                       setActivePreset('custom');
                     }}
-                    className="rounded text-purple-600"
+                    className="rounded text-purple-600 focus:ring-purple-500"
                   />
-                  <span>가변행 감지</span>
+                  <span>가변행 감지 (안전 권장)</span>
                 </label>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-slate-200/60">
