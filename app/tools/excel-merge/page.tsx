@@ -34,19 +34,19 @@ interface ProcessedFile {
 // 서울시 전체 및 11개 교육지원청, 전국/자체 명부 지원 목록
 const REGIONAL_OFFICES = [
   { id: 'none', name: '선택 안 함 (전국 자유 서식 / 자체 명부)', count: 0, file: '' },
-  { id: 'seoul_all', name: '🏛️ 서울특별시 전체 (1,319개교)', count: 1319, file: '/data/seoul_schools_all.json' },
-  { id: 'gangnam', name: '서울 강남서초 (131개교)', count: 131, file: '/data/seoul_schools_gangnam.json' },
-  { id: 'gangdong', name: '서울 강동송파 (152개교)', count: 152, file: '/data/seoul_schools_gangdong.json' },
-  { id: 'gangseo', name: '서울 강서양천 (144개교)', count: 144, file: '/data/seoul_schools_gangseo.json' },
-  { id: 'nambu', name: '서울 남부 (132개교)', count: 132, file: '/data/seoul_schools_nambu.json' },
-  { id: 'seobu', name: '서울 서부 (151개교)', count: 151, file: '/data/seoul_schools_seobu.json' },
-  { id: 'bukbu', name: '서울 북부 (138개교)', count: 138, file: '/data/seoul_schools_bukbu.json' },
-  { id: 'jungbu', name: '서울 중부 (101개교)', count: 101, file: '/data/seoul_schools_jungbu.json' },
-  { id: 'dongjak', name: '서울 동작관악 (100개교)', count: 100, file: '/data/seoul_schools_dongjak.json' },
-  { id: 'dongbu', name: '서울 동부 (95개교)', count: 95, file: '/data/seoul_schools_dongbu.json' },
-  { id: 'seongbuk', name: '서울 성북강북 (94개교)', count: 94, file: '/data/seoul_schools_seongbuk.json' },
-  { id: 'seongdong', name: '서울 성동광진 (81개교)', count: 81, file: '/data/seoul_schools_seongdong.json' },
-  { id: 'virtual_sample', name: '🧪 가상 샘플 교육지원청 (136개교)', count: 136, file: '/data/sample_virtual_schools.json' },
+  { id: 'seoul_all', name: '🏛️ 서울특별시교육청 전체 (1,319개교)', count: 1319, file: '/data/seoul_schools_all.json' },
+  { id: 'gangnam', name: '📍 강남서초교육지원청 (131개교)', count: 131, file: '/data/seoul_schools_gangnam.json' },
+  { id: 'gangdong', name: '📍 강동송파교육지원청 (152개교)', count: 152, file: '/data/seoul_schools_gangdong.json' },
+  { id: 'gangseo', name: '📍 강서양천교육지원청 (144개교)', count: 144, file: '/data/seoul_schools_gangseo.json' },
+  { id: 'nambu', name: '📍 남부교육지원청 (132개교)', count: 132, file: '/data/seoul_schools_nambu.json' },
+  { id: 'seobu', name: '📍 서부교육지원청 (151개교)', count: 151, file: '/data/seoul_schools_seobu.json' },
+  { id: 'bukbu', name: '📍 북부교육지원청 (138개교)', count: 138, file: '/data/seoul_schools_bukbu.json' },
+  { id: 'jungbu', name: '📍 중부교육지원청 (101개교)', count: 101, file: '/data/seoul_schools_jungbu.json' },
+  { id: 'dongjak', name: '📍 동작관악교육지원청 (100개교)', count: 100, file: '/data/seoul_schools_dongjak.json' },
+  { id: 'dongbu', name: '📍 동부교육지원청 (95개교)', count: 95, file: '/data/seoul_schools_dongbu.json' },
+  { id: 'seongbuk', name: '📍 성북강북교육지원청 (94개교)', count: 94, file: '/data/seoul_schools_seongbuk.json' },
+  { id: 'seongdong', name: '📍 성동광진교육지원청 (81개교)', count: 81, file: '/data/seoul_schools_seongdong.json' },
+  { id: 'virtual_sample', name: '🧪 [테스트] 가상 136개교 샘플 교육지원청', count: 136, file: '/data/sample_virtual_schools.json' },
   { id: 'custom', name: '📂 자체 기준 명부 직접 등록 (.xlsx)', count: 0, file: '' }
 ];
 
