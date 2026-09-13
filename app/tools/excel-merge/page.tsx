@@ -81,6 +81,8 @@ export default function ExcelMergePage() {
   // 엑셀 시트 상단 미리보기 & 스마트 헤더 선택기 상태
   const [previewRows, setPreviewRows] = useState<Array<{ rowNum: number; cells: string[] }>>([]);
   const [previewSheetName, setPreviewSheetName] = useState<string>('');
+  const [selectedSheetIndex, setSelectedSheetIndex] = useState<number>(-1); // -1: 자동, 0: 1번째 시트, 1: 2번째 시트, 2: 3번째 시트...
+  const [availableSheets, setAvailableSheets] = useState<Array<{ index: number; name: string }>>([]);
   const [isPreviewOpen, setIsPreviewOpen] = useState(true);
   const [autoDetectedBadge, setAutoDetectedBadge] = useState<string>('');
   const [isManualOpen, setIsManualOpen] = useState(false); // 실무 사용설명서 모달 열림 상태
@@ -473,8 +475,8 @@ export default function ExcelMergePage() {
     return detectedRow;
   };
 
-  // 첫 번째 파일의 상단 30행을 읽어 시각적 미리보기 구성 & 스마트 헤더 추천
-  const loadSheetPreview = async (file: File) => {
+  // 첫 번째 파일의 특정 시트를 읽어 시각적 미리보기 구성 & 스마트 헤더 추천
+  const loadSheetPreview = async (file: File, forceSheetIndex?: number) => {
     try {
       const ExcelJS = (window as any).ExcelJS;
       if (!ExcelJS) return;
@@ -482,11 +484,34 @@ export default function ExcelMergePage() {
       const wb = new ExcelJS.Workbook();
       await wb.xlsx.load(buffer);
 
-      let ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
-      if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
+      // 파일 내 전체 시트 목록 추출 (사용자 시트 탭 선택 UI용)
+      const sheets = wb.worksheets.map((s: any, idx: number) => ({ index: idx, name: s.name }));
+      setAvailableSheets(sheets);
+
+      // 대상 시트 결정 (강제 지정 인덱스 > 현재 선택 인덱스 > 시트명 일치 > 키워드 > 2번째/1번째)
+      const targetIdx = forceSheetIndex !== undefined ? forceSheetIndex : selectedSheetIndex;
+      let ws: any = null;
+
+      if (targetIdx >= 0 && wb.worksheets[targetIdx]) {
+        ws = wb.worksheets[targetIdx];
+      } else if (previewSheetName) {
+        ws = wb.worksheets.find((s: any) => s.name === previewSheetName);
+      } else if (sheetKeyword) {
+        ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
+      }
+
+      if (!ws) {
+        ws = wb.worksheets[1] || wb.worksheets[0];
+      }
       if (!ws) return;
 
+      const currentIdx = wb.worksheets.indexOf(ws);
       setPreviewSheetName(ws.name);
+      if (forceSheetIndex !== undefined) {
+        setSelectedSheetIndex(forceSheetIndex);
+      } else if (selectedSheetIndex === -1 && currentIdx >= 0) {
+        setSelectedSheetIndex(currentIdx);
+      }
 
       const rows: Array<{ rowNum: number; cells: string[] }> = [];
       const maxRowsToPreview = Math.min(30, ws.rowCount || 30);
@@ -516,12 +541,23 @@ export default function ExcelMergePage() {
       if (detected && detected > 0) {
         setHeaderEndRow(detected);
         setBlockStartRow(detected + 1);
-        setAutoDetectedBadge(`✨ 컬럼명 분석 결과 헤더 끝이 ${detected}행으로 자동 지정되었습니다.`);
+        setAutoDetectedBadge(`✨ [${ws.name}] 컬럼명 분석 결과 헤더 끝이 ${detected}행으로 자동 지정되었습니다.`);
       } else {
-        setAutoDetectedBadge('');
+        setAutoDetectedBadge(`현재 선택된 시트: [${ws.name}] (필요 시 아래 표에서 헤더 끝 행을 클릭하세요)`);
       }
     } catch (e) {
       console.error('시트 미리보기 파싱 실패:', e);
+    }
+  };
+
+  // 사용자가 시트 탭(몇 번째 시트인지)을 직접 클릭했을 때 전환
+  const handleSheetTabClick = (sheetIdx: number) => {
+    setSelectedSheetIndex(sheetIdx);
+    const validExcel = files.find(f => 
+      !f.name.startsWith('~$') && (f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls'))
+    );
+    if (validExcel) {
+      loadSheetPreview(validExcel, sheetIdx);
     }
   };
 
@@ -537,6 +573,8 @@ export default function ExcelMergePage() {
     } else if (files.length === 0) {
       setPreviewRows([]);
       setPreviewSheetName('');
+      setAvailableSheets([]);
+      setSelectedSheetIndex(-1);
       setAutoDetectedBadge('');
     }
   }, [files, sheetKeyword, excelJsLoaded]);
@@ -648,6 +686,8 @@ export default function ExcelMergePage() {
     setStatusMessage('');
     setPreviewRows([]);
     setPreviewSheetName('');
+    setSelectedSheetIndex(-1);
+    setAvailableSheets([]);
     setAutoDetectedBadge('');
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (rosterInputRef.current) rosterInputRef.current.value = '';
@@ -685,8 +725,18 @@ export default function ExcelMergePage() {
           const buf = await f.arrayBuffer();
           const wb = new ExcelJS.Workbook();
           await wb.xlsx.load(buf);
-          let ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
+
+          // 템플릿 대상 시트 (사용자 지정 순번 > 시트명 > 키워드 > 2번째/1번째 시트)
+          let ws: any = null;
+          if (selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
+            ws = wb.worksheets[selectedSheetIndex];
+          } else if (previewSheetName) {
+            ws = wb.worksheets.find((s: any) => s.name === previewSheetName);
+          } else if (sheetKeyword) {
+            ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
+          }
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
+
           if (ws) {
             templateFile = f;
             templateWb = wb;
@@ -738,7 +788,7 @@ export default function ExcelMergePage() {
           const wb = new ExcelJS.Workbook();
           await wb.xlsx.load(buffer);
 
-          // 🚨 B. 시트 검증: 워크시트가 없는 경우 패스
+          // 🚨 B. 시트 검증 및 취합 대상 시트 탐색 (지정 순번 > 시트명 일치 > 키워드 > 2번째/1번째)
           if (!wb.worksheets || wb.worksheets.length === 0) {
             processed.push({
               name: file.name,
@@ -750,7 +800,14 @@ export default function ExcelMergePage() {
             continue;
           }
 
-          let ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
+          let ws: any = null;
+          if (selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
+            ws = wb.worksheets[selectedSheetIndex];
+          } else if (previewSheetName) {
+            ws = wb.worksheets.find((s: any) => s.name === previewSheetName);
+          } else if (sheetKeyword) {
+            ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
+          }
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
 
           // 🚨 C. 서식 자체를 잘못 낸 경우 (서식 불일치/행 수 부족/엉뚱한 양식 감지)
@@ -1506,6 +1563,51 @@ export default function ExcelMergePage() {
                 </button>
               </div>
             </div>
+
+            {/* 📑 취합 대상 시트(몇 번째 시트인지) 원클릭 선택 바 */}
+            {availableSheets.length > 0 && (
+              <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-slate-100 border border-blue-200/80 rounded-xl p-3 shadow-2xs space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                  <span className="text-xs sm:text-sm font-black text-blue-950 flex items-center gap-1.5">
+                    <Layers size={16} className="text-blue-600" />
+                    취합할 시트(탭) 선택 :
+                    <span className="text-blue-700 font-extrabold ml-1">
+                      {selectedSheetIndex >= 0 ? `${selectedSheetIndex + 1}번째 시트` : '자동 감지'}
+                    </span>
+                    <span className="text-slate-500 font-semibold text-xs">([{previewSheetName || '기본시트'}])</span>
+                  </span>
+                  <span className="text-[11px] text-blue-700 font-medium hidden sm:inline">
+                    💡 아래 탭 버튼을 클릭하면 해당 시트로 즉시 전환되어 취합됩니다.
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                  {availableSheets.map((sh) => {
+                    const isSelected = selectedSheetIndex === sh.index || previewSheetName === sh.name;
+                    return (
+                      <button
+                        key={sh.index}
+                        type="button"
+                        onClick={() => handleSheetTabClick(sh.index)}
+                        className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-2xs ${
+                          isSelected
+                            ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-300 font-black scale-102'
+                            : 'bg-white text-slate-700 hover:bg-slate-50 hover:text-blue-600 border border-slate-200'
+                        }`}
+                        title={`${sh.index + 1}번째 시트: [${sh.name}] 로 취합`}
+                      >
+                        <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-black ${
+                          isSelected ? 'bg-white text-blue-600' : 'bg-slate-100 text-slate-600 border border-slate-200'
+                        }`}>
+                          {sh.index + 1}
+                        </span>
+                        <span className="truncate max-w-[160px] sm:max-w-[220px]">{sh.name}</span>
+                        {isSelected && <Check size={14} className="text-white shrink-0 stroke-[3]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {autoDetectedBadge && (
               <div className="bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm p-3 rounded-xl font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-1">
