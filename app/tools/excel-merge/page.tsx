@@ -504,11 +504,31 @@ export default function ExcelMergePage() {
     const wb = new ExcelJS.Workbook();
     try {
       await wb.xlsx.load(buffer);
-      return wb;
+      // 🚨 한셀/비표준 검증: 만약 파싱된 전체 행 수가 0이거나 행이 비정상 누락된 경우 치유 파이프라인으로 이동!
+      const totalParsedRows = wb.worksheets.reduce((sum: number, ws: any) => sum + (ws.rowCount || 0), 0);
+      if (totalParsedRows > 0) {
+        return wb;
+      }
+      throw new Error('한셀(Hancom Cell) x: 네임스페이스로 인한 빈 워크시트 감지');
     } catch (err: any) {
-      // 🚨 1단계 치유: JSZip으로 [Content_Types].xml 공백 정규화 및 docProps/app.xml 강제 주입
+      // 🚨 1단계 치유: JSZip으로 [Content_Types].xml 공백 정규화, 한셀 x: 접두사 제거, docProps/app.xml 강제 주입
       try {
         const zip = await JSZip.loadAsync(buffer);
+
+        // 1-0. 한셀(Hancom Cell) 특유의 <x:worksheet>, <x:row>, <x:c>, <x:sst>, <x:workbook> 접두사 전면 정규화
+        for (const filename of Object.keys(zip.files)) {
+          if (filename.endsWith('.xml') || filename.endsWith('.rels')) {
+            const fileObj = zip.file(filename);
+            if (fileObj) {
+              let text = await fileObj.async('string');
+              if (text.includes('<x:worksheet') || text.includes('<x:sst') || text.includes('<x:workbook') || text.includes('xmlns:x=')) {
+                text = text.replace(/<\/?x:([a-zA-Z0-9_]+)/g, (match) => match.replace('x:', ''))
+                           .replace(/xmlns:x=/g, 'xmlns=');
+                zip.file(filename, text);
+              }
+            }
+          }
+        }
 
         // 1-1. [Content_Types].xml의 등호 공백(PartName = "/docProps/app.xml") 정규화
         const ctFile = zip.file('[Content_Types].xml') || zip.file('[content_types].xml');
