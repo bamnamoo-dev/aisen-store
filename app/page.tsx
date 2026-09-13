@@ -369,11 +369,11 @@ const SERVICE_CARDS: ServiceCardItem[] = [
   {
     id: 'sen-forms',
     category: 'facility',
-    title: 'AI-SEN 행정서식',
-    description: '인사·복무·계약 등 71종 서식 실시간 미리보기 및 HWPX 다운',
-    badge: '71종 서식',
-    actionText: '서식 서고',
-    href: '/forms',
+    title: 'AI-SEN 기안 & 서식',
+    description: '에듀파인 기안문 237종 자동완성 & 인사·복무 서식 71종',
+    badge: '308종 완비',
+    actionText: '기안 & 서식',
+    href: '/tools/draft-helper',
     isExternal: false,
     icon: <FileCheck size={18} />,
     theme: {
@@ -525,7 +525,7 @@ export default function HomePage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="궁금한 지침(수의계약, 출장비, 강사료 등)이나 서식 검색..."
+              placeholder="궁금한 지침(수의계약, 출장비, 강사료 등)이나 기안문·서식 검색..."
               className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 pl-10 sm:pl-11 pr-24 sm:pr-28 py-2 sm:py-2.5 text-xs sm:text-[14px] focus:outline-none font-medium"
             />
             <button 

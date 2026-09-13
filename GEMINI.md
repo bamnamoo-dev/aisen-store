@@ -17,7 +17,7 @@
   - **1행 (AI & 지침 허브 🔵 4칸)**: AI-SEN 행정챗봇, AI-SEN 행정서고(102권), AI-SEN 출장여비, AI-SEN 소통게시판
   - **2행 (회계 & 계약 & 예산 🟢 4칸)**: **AI-SEN 계약**, **AI-SEN 공사원가**, AI-SEN 학교회계, AI-SEN 예산정산
   - **3행 (행정 실무 & 엑셀 🟣 4칸)**: **AI-SEN 엑셀수합**, AI-SEN 엑셀분리, AI-SEN 급여식대, AI-SEN 지출바인더
-  - **4행 (서식 & 시설 & 힐링 🔴 4칸)**: AI-SEN 행정서식(71종), AI-SEN 시설대관, AI-SEN 교실배치, AI-SEN 힐링게임
+  - **4행 (서식 & 시설 & 힐링 🔴 4칸)**: **AI-SEN 기안 & 서식(308종)**, AI-SEN 시설대관, AI-SEN 교실배치, AI-SEN 힐링게임
 - `/archive` : 28개 분야 102권 공식 지침서 스트리밍 서고
 - `/guide` : AI-SEN 포털 & 기능별 이용안내 (메인 포털 개요 및 15대 전문 행정 도구 5대 탭별 핵심 안내, 1360px 대형 와이드 뷰어)
 - `/tools` : 행정 미니프로그램 모음 및 관리자 등록/수정/삭제 포털
@@ -32,6 +32,7 @@
 | 구분 | 서비스명 | 로컬 폴더 경로 | 배포 / 서비스 URL | 기술 스택 및 주요 기능 |
 | :--- | :--- | :--- | :--- | :--- |
 | **메인 허브** | **아이센스토어 메인** | `\asisen-store\` | `https://aisen.store` (Vercel) | Next.js, Supabase, 포털 관제 |
+| **기안 도우미** | **AI-SEN 기안문 (237종)** | `\asisen-store\app\tools\draft-helper\` (내장) | `/tools/draft-helper` | Next.js, K-에듀파인 237종 공식 표준 서식 서울 최적화, 1초 스마트 인라인 치환, 무오차 클린 복사, 237종 마스터 엑셀 다운로드 |
 | **AI 챗봇** | **AI-SEN 행정챗봇 (v5.0.0, 3-Tier)** | `\sen-chatbot\`<br/>`\sen-chatbot-v2\`<br/>`\(0610)sen-chatbot\` | `https://chatbot.aisen.store` | FastMCP, LangChain/RAG, 102권 서고 쪽수 1:1 앵커링, 국가법령정보센터 연동 |
 | **에이전트 확장** | **AI-SEN 올인원 MCP (`aisen-mcp` v2.0)** | `\sen-chatbot-v2\aisen_mcp\` | `FastMCP/MCPServer 표준 stdio / Dual-Use` | 4대 도구(지침서 RAG, 관내/관외 2박3일/연수 여비 마크다운 표, 카카오 경로 유류비, 75종 HWPX 서식 2단계 스마트 폴백), 네이티브 1:1 벤치마크 100% 일치 |
 | **특화 정산** | **AI-SEN 출장여비 (v4.9.2)** | `\sen-chatbot\travel\` (내장) | `https://chatbot.aisen.store/travel` | 카카오 3개 경유지 길찾기, 오피넷 실시간 유가 1일 6회 자동 고시, 19종 법정 감액, A4 1p 인쇄 |

@@ -13,7 +13,9 @@ import {
   ExternalLink,
   Sparkles,
   SlidersHorizontal,
-  FolderOpen
+  FolderOpen,
+  ChevronRight,
+  FileText
 } from 'lucide-react';
 import ToolHeader from '@/components/ToolHeader';
 
@@ -211,8 +213,33 @@ export default function FormsPage() {
             </div>
           </div>
 
+          {/* 신규 탑재: K-에듀파인 237종 기안문 생성기 퀵 배너 */}
+          <div className="mt-4 p-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-blue-50 border border-blue-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs font-extrabold text-xs">
+                NEW
+              </div>
+              <div>
+                <div className="text-xs sm:text-[13.5px] font-black text-blue-950 flex items-center gap-1.5">
+                  <FileText size={14} className="text-blue-600" />
+                  <span>K-에듀파인 237종 공식 표준 기안문 도우미 신규 출시!</span>
+                </div>
+                <p className="text-[11px] sm:text-xs text-blue-700 font-medium mt-0.5">
+                  체험학습·학운위·계약 등 에듀파인 본문 뼈대 1초 자동치환 및 복사 깨짐 없는 클린 텍스트 지원
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/tools/draft-helper"
+              className="inline-flex items-center justify-center gap-1 px-4 py-2 text-xs font-black text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shrink-0 shadow-xs cursor-pointer"
+            >
+              <span>기안문 작성기 바로가기</span>
+              <ChevronRight size={13} />
+            </Link>
+          </div>
+
           {/* 3. 스마트 검색창 (초성 검색 & 클리어) */}
-          <div className="mt-5 sm:mt-6">
+          <div className="mt-4 sm:mt-5">
             <div className="relative flex items-center">
               <Search className="absolute left-3.5 sm:left-4 text-slate-400 pointer-events-none" size={18} />
               <input

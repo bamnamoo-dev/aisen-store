@@ -21,7 +21,8 @@ import {
   ArrowRight,
   ExternalLink,
   Info,
-  Sparkles
+  Sparkles,
+  FileText
 } from 'lucide-react';
 
 interface ManualContentProps {
@@ -605,37 +606,45 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
         {activeTab === 'space' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* 1. AI-SEN 행정서식 */}
+            {/* 1. AI-SEN 기안 & 서식 (308종) */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-2xs">
-                      <FileCheck size={20} />
+                      <FileText size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정서식</h4>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 기안 & 서식</h4>
                   </div>
                   <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
-                    71종+
+                    308종 완비
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  인사, 복무, 계약, 학교 제증명 등 일선 교육행정 실무에서 매일 사용하는 필수 법정 서식 71종의 실시간 미리보기와 원클릭 HWPX/PDF 다운로드를 제공합니다.
+                  K-에듀파인 237종 공식 표준 기안문 1초 스마트 치환 및 클린 복사와 인사·복무·계약 71종 HWPX 행정서식 원클릭 다운로드를 원스톱으로 제공합니다.
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">필수 서식 71종+</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">실시간 미리보기</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">0초 즉시 다운</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">기안문 237종</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">스마트 인라인 치환</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">에듀파인 클린복사</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">행정서식 71종</span>
                 </div>
               </div>
 
-              <div className="mt-5 pt-3.5 border-t border-slate-100 flex justify-end">
+              <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between gap-2">
                 <Link
                   href="/forms"
                   onClick={onToolClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl transition-colors"
+                  className="text-xs font-bold text-slate-500 hover:text-rose-600 underline"
                 >
-                  <span>행정서식 서고 바로가기</span>
+                  행정서식(71종)
+                </Link>
+                <Link
+                  href="/tools/draft-helper"
+                  onClick={onToolClick}
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3.5 py-2 rounded-xl transition-colors"
+                >
+                  <span>기안문 바로가기</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
