@@ -147,6 +147,60 @@ export default function ExcelMergePage() {
   }, [selectedRegion]);
 
   // 자체 기준 명부 엑셀(.xlsx) 업로드 파싱
+  // 자체 명부 표준 양식(.xlsx) 0초 즉시 다운로드
+  const handleDownloadRosterTemplate = () => {
+    const ExcelJS = (window as any).ExcelJS;
+    if (!ExcelJS) {
+      alert('ExcelJS 엔진을 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('기준명부');
+    
+    ws.columns = [
+      { header: '연번', key: 'seq', width: 10 },
+      { header: '기관/학교명', key: 'name', width: 28 },
+      { header: '비고 (선택)', key: 'note', width: 18 }
+    ];
+
+    // 헤더 스타일링
+    const headerRow = ws.getRow(1);
+    headerRow.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF2563EB' } // AI-SEN Blue
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow.height = 24;
+
+    // 예시 데이터 5행
+    const samples = [
+      { seq: 1, name: '가상001초등학교', note: '공립' },
+      { seq: 2, name: '가상002초등학교', note: '공립' },
+      { seq: 3, name: '가상003중학교', note: '공립' },
+      { seq: 4, name: '가상004중학교', note: '사립' },
+      { seq: 5, name: '가상005고등학교', note: '공립' },
+    ];
+
+    samples.forEach(item => {
+      const row = ws.addRow(item);
+      row.alignment = { vertical: 'middle' };
+      row.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+    });
+
+    wb.xlsx.writeBuffer().then((buffer: any) => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'AI-SEN_자체기준명부_표준양식.xlsx';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  };
+
+  // 자체 명부 엑셀 업로드 처리 (스마트 컬럼 감지 탑재)
   const handleRosterFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
@@ -165,38 +219,61 @@ export default function ExcelMergePage() {
       const customList: SchoolItem[] = [];
       let seqCounter = 1;
 
-      // 1행(헤더) 제외하고 2행부터 스캔
-      for (let r = 2; r <= Math.min(ws.rowCount, 1000); r++) {
+      // 1. 헤더 행(1~3행) 분석을 통한 학교명/연번 컬럼 스마트 탐색
+      let nameColIdx = 2; // 기본 B열
+      let seqColIdx = 1;  // 기본 A열
+      let startScanRow = 2;
+
+      for (let testR = 1; testR <= Math.min(ws.rowCount, 3); testR++) {
+        const row = ws.getRow(testR);
+        for (let c = 1; c <= Math.min(row.cellCount, 15); c++) {
+          const val = String(row.getCell(c).value || '').trim();
+          if (/학교|기관|소속|기관명|학교명|대상기관/.test(val)) {
+            nameColIdx = c;
+            startScanRow = testR + 1;
+          }
+          if (/연번|순번|번호|^No/i.test(val)) {
+            seqColIdx = c;
+          }
+        }
+      }
+
+      // 2. 데이터 행 스캔
+      for (let r = startScanRow; r <= Math.min(ws.rowCount, 1000); r++) {
         const row = ws.getRow(r);
-        const col1 = row.getCell(1).value;
-        const col2 = row.getCell(2).value;
+        const nameVal = row.getCell(nameColIdx).value;
+        const seqVal = row.getCell(seqColIdx).value;
 
         let name = '';
         let seq = seqCounter;
 
-        if (col2 !== null && col2 !== undefined && String(col2).trim() !== '') {
-          name = String(col2).trim();
-          const parsedSeq = parseInt(String(col1), 10);
+        if (nameVal !== null && nameVal !== undefined && String(nameVal).trim() !== '') {
+          name = String(nameVal).trim();
+          const parsedSeq = parseInt(String(seqVal), 10);
           if (!isNaN(parsedSeq) && parsedSeq > 0) seq = parsedSeq;
-        } else if (col1 !== null && col1 !== undefined && String(col1).trim() !== '') {
-          name = String(col1).trim();
+        } else {
+          // B열에 없으면 A열도 확인 (1개 컬럼 단일 명부 대응)
+          const col1 = row.getCell(1).value;
+          if (col1 !== null && col1 !== undefined && String(col1).trim() !== '') {
+            name = String(col1).trim();
+          }
         }
 
-        if (name) {
+        if (name && !/연번|학교명|기관명|합계|소계/.test(name)) {
           customList.push({ seq, name });
           seqCounter++;
         }
       }
 
       if (customList.length === 0) {
-        alert('명부 엑셀에서 학교/기관명을 찾을 수 없습니다. A열(연번) B열(이름) 서식을 확인해주세요.');
+        alert('명부 엑셀에서 학교/기관명을 찾을 수 없습니다. A열(연번), B열(학교명) 서식을 확인해주세요.');
         return;
       }
 
       setTargetSchools(customList);
       setSelectedRegion('custom');
       setCustomRosterName(`${file.name} (${customList.length}개소 등록됨)`);
-      alert(`자체 기준 명부가 성공적으로 등록되었습니다!\n총 ${customList.length}개 기관/학교를 기준으로 수합이 진행됩니다.`);
+      alert(`자체 기준 명부가 성공적으로 등록되었습니다!\n총 ${customList.length}개 기관/학교를 기준으로 수합 및 미제출 검증이 진행됩니다.`);
     } catch (err: any) {
       alert('명부 엑셀 파싱 실패: ' + err.message);
     }
@@ -935,6 +1012,15 @@ export default function ExcelMergePage() {
             >
               <FileUp size={13} className="text-blue-600" />
               <span>자체 명부</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadRosterTemplate}
+              className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-1 px-2 rounded-lg border border-blue-200 transition-colors cursor-pointer shrink-0"
+              title="자체 명부 표준 엑셀 양식(.xlsx)을 다운로드합니다. (A열: 연번, B열: 학교명)"
+            >
+              <Download size={12} />
+              <span>양식</span>
             </button>
 
             {customRosterName && (
