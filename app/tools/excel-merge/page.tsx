@@ -361,7 +361,12 @@ export default function ExcelMergePage() {
   const findMatchingSchool = (rawName: string): SchoolItem | undefined => {
     if (!rawName || targetSchools.length === 0) return undefined;
     const cleanRaw = normalizeSchoolName(rawName);
-    if (!cleanRaw) return undefined;
+    if (!cleanRaw || cleanRaw.length < 2) return undefined;
+
+    // 🚨 행정 일반 명사는 단독 매칭 방지 (예: E18 셀에 '공립', '초등학교' 등만 적혀있는 경우)
+    if (/^(공립|사립|국립|학교|초등학교|중학교|고등학교|특수학교|교육지원청|서울특별시|지원청)$/.test(cleanRaw)) {
+      return undefined;
+    }
 
     // 1. 정확 일치 (서울 접두어 제거 상태)
     let match = targetSchools.find(s => normalizeSchoolName(s.name) === cleanRaw);
@@ -371,7 +376,9 @@ export default function ExcelMergePage() {
     match = targetSchools.find(s => {
       const cleanTarget = normalizeSchoolName(s.name);
       if (!cleanTarget || cleanTarget.length < 2) return false;
-      return cleanRaw.includes(cleanTarget) || cleanTarget.includes(cleanRaw);
+      if (cleanRaw.includes(cleanTarget)) return true;
+      if (cleanRaw.length >= 3 && cleanTarget.includes(cleanRaw)) return true;
+      return false;
     });
     if (match) return match;
 
@@ -381,7 +388,9 @@ export default function ExcelMergePage() {
     match = targetSchools.find(s => {
       const targetShort = toShort(normalizeSchoolName(s.name));
       if (!targetShort || targetShort.length < 2) return false;
-      return rawShort.includes(targetShort) || targetShort.includes(rawShort);
+      if (rawShort.includes(targetShort)) return true;
+      if (rawShort.length >= 3 && targetShort.includes(rawShort)) return true;
+      return false;
     });
 
     return match;
@@ -1089,8 +1098,11 @@ export default function ExcelMergePage() {
             finalSeq = matchedSchool.seq;
           } else if (matchedSchoolByName?.seq) {
             finalSeq = matchedSchoolByName.seq;
-          } else if (!isNaN(parsedColSeq) && parsedColSeq > 0) {
+          } else if (!isNaN(parsedColSeq) && parsedColSeq > 0 && targetSchools.length === 0) {
             finalSeq = parsedColSeq;
+          } else if (targetSchools.length > 0) {
+            // 🚨 기준 명부가 있는데 매칭되지 않은 파일이 명부의 1~N번 슬롯(예: 50번 이수초, 51번 일원초)을 가로채지 못하도록 안전 격리!
+            finalSeq = 10000 + (i + 1);
           }
 
           const finalSchoolName = matchedSchool?.name || matchedSchoolByName?.name || rawSchoolName || `기관_${finalSeq}`;
