@@ -22,7 +22,8 @@ import {
   Calendar,
   Layers,
   ArrowLeft,
-  Bot
+  Bot,
+  FileCheck
 } from 'lucide-react';
 import ToolHeader from '@/components/ToolHeader';
 
