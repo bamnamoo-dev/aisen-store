@@ -945,32 +945,32 @@ export default function ExcelMergePage() {
           </div>
         </div>
 
-        {/* 📂 [Step 2] 취합 파일 업로드 & 테스트 샘플 바 */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
-            <div className="flex items-center gap-2.5">
-              <span className="bg-indigo-50 text-indigo-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-lg border border-indigo-200">
+        {/* 📂 [Step 2] 취합 파일 업로드 & 테스트 샘플 바 (콤팩트 슬림형) */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div className="flex items-center gap-2">
+              <span className="bg-indigo-50 text-indigo-700 text-xs font-black px-2 py-0.5 rounded-md border border-indigo-200">
                 Step 2
               </span>
-              <span className="font-black text-slate-800 text-base sm:text-lg flex items-center gap-2">
-                <Upload size={19} className="text-indigo-600" />
+              <span className="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-1.5">
+                <Upload size={17} className="text-indigo-600" />
                 취합할 엑셀 서식 등록
               </span>
             </div>
             {files.length > 0 && (
-              <span className="text-xs sm:text-sm bg-emerald-50 text-emerald-700 font-black px-3.5 py-1 rounded-xl border border-emerald-200 flex items-center gap-1.5">
-                <CheckCircle2 size={16} />
+              <span className="text-xs bg-emerald-50 text-emerald-700 font-bold px-3 py-0.5 rounded-lg border border-emerald-200 flex items-center gap-1">
+                <CheckCircle2 size={14} />
                 총 {files.length}개 파일 준비 완료
               </span>
             )}
           </div>
 
-          {/* 세로 비율을 대폭 강화한 깊이감 있는 드롭존 */}
+          {/* 세로 높이를 슬림하게 압축한 콤팩트 가로형 드롭존 */}
           <div 
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleFileDrop}
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-indigo-200 hover:border-indigo-500 bg-indigo-50/20 hover:bg-indigo-50/40 rounded-2xl p-10 sm:p-12 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3.5 group hover:shadow-sm min-h-[220px]"
+            className="border-2 border-dashed border-indigo-200 hover:border-indigo-500 bg-indigo-50/20 hover:bg-indigo-50/40 rounded-xl px-4 py-3.5 sm:py-4 text-center sm:text-left cursor-pointer transition-all flex flex-col sm:flex-row items-center justify-between gap-3 group hover:shadow-xs"
           >
             <input 
               ref={fileInputRef}
@@ -980,61 +980,63 @@ export default function ExcelMergePage() {
               className="hidden" 
               onChange={handleFileInputChange}
             />
-            <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-              <Upload size={30} />
-            </div>
-            <div className="space-y-1.5">
-              <div className="font-black text-slate-800 text-lg sm:text-xl">
-                취합할 엑셀 파일들을 이곳에 끌어다 놓으세요
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
+                <Upload size={20} />
               </div>
-              <div className="text-sm sm:text-base text-slate-500 font-medium">
-                수십~수백 개 .xlsx 파일 또는 폴더 일괄 선택 지원 (로컬 브라우저 0초 무부하 보안)
+              <div>
+                <div className="font-bold text-slate-800 text-sm sm:text-base">
+                  취합할 엑셀 파일들을 이곳에 끌어다 놓으세요
+                </div>
+                <div className="text-xs text-slate-500 font-medium">
+                  수십~수백 개 .xlsx 파일 일괄 선택 지원 (로컬 브라우저 0초 무부하 보안)
+                </div>
               </div>
             </div>
 
-            <span className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm sm:text-base font-extrabold px-6 py-3 rounded-xl transition-all shadow-xs group-hover:shadow-md">
-              {files.length > 0 ? `📂 파일 다시 선택 (${files.length}개 로드됨)` : '📂 엑셀 파일 직접 선택'}
+            <span className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl transition-all shadow-2xs group-hover:shadow-xs shrink-0">
+              {files.length > 0 ? `📂 파일 다시 선택 (${files.length}개)` : '📂 엑셀 파일 직접 선택'}
             </span>
           </div>
 
           {/* 🧪 테스트 샘플 액션 바 & 초기화 */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
             <button
               type="button"
               onClick={handleLoadSampleFiles}
               disabled={isProcessing}
-              className="flex-1 min-w-[220px] flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-bold py-3 px-4 rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex-1 min-w-[200px] flex items-center justify-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-bold py-2 px-3.5 rounded-xl shadow-2xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               title="136개 가상학교 엑셀 샘플 파일 일괄 로드"
             >
-              <FlaskConical size={16} />
+              <FlaskConical size={15} />
               <span>🧪 [테스트] 136개 가상학교 샘플 1초 로드</span>
             </button>
             <a
               href="/samples/sample_136_schools.zip"
               download="sample_136_schools.zip"
-              className="flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs sm:text-sm font-bold py-3 px-4 rounded-xl transition-colors shrink-0 shadow-xs"
+              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs font-bold py-2 px-3 rounded-xl transition-colors shrink-0 shadow-2xs"
               title="136개 가상학교 샘플 엑셀 ZIP 다운로드"
             >
-              <Archive size={15} />
+              <Archive size={14} />
               <span>ZIP 다운</span>
             </a>
             <button
               type="button"
               onClick={handleReset}
               disabled={isProcessing || (files.length === 0 && targetSchools.length === 0)}
-              className="flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs sm:text-sm font-bold py-3 px-4 rounded-xl transition-colors shrink-0 shadow-xs disabled:opacity-40 cursor-pointer"
+              className="flex items-center justify-center gap-1 bg-slate-50 hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs font-bold py-2 px-3 rounded-xl transition-colors shrink-0 shadow-2xs disabled:opacity-40 cursor-pointer"
               title="모든 파일 및 통계 초기화 (0개소 제로 상태)"
             >
-              <RotateCcw size={15} />
+              <RotateCcw size={14} />
               <span>초기화</span>
             </button>
           </div>
         </div>
 
-        {/* 👀 [Step 3] 실시간 서식 미리보기 & 스마트 헤더 지정 */}
+        {/* 👀 [Step 3] 실시간 서식 미리보기 & 스마트 헤더 지정 (대형 와이드 뷰어) */}
         {files.length > 0 && previewRows.length > 0 ? (
-          <div className="bg-white rounded-3xl border-2 border-blue-300 p-6 sm:p-7 space-y-4 shadow-md transition-all animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-3.5">
+          <div className="bg-white rounded-2xl border-2 border-blue-300 p-5 sm:p-6 space-y-3.5 shadow-md transition-all animate-in fade-in duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
                 <span className="bg-blue-50 text-blue-700 text-xs sm:text-sm font-black px-2.5 py-1 rounded-lg border border-blue-200">
                   Step 3
@@ -1079,7 +1081,7 @@ export default function ExcelMergePage() {
                   <span>🟢 <strong>{headerEndRow + 1}행</strong>부터: 각 기관/학교별 본문 결합 시작</span>
                 </div>
 
-                <div className="overflow-x-auto border border-slate-200 rounded-2xl max-h-[420px] overflow-y-auto shadow-inner bg-slate-50/50">
+                <div className="overflow-x-auto border border-slate-200 rounded-2xl min-h-[480px] max-h-[680px] overflow-y-auto shadow-inner bg-slate-50/50">
                   <table className="w-full text-xs sm:text-sm text-left border-collapse select-none bg-white">
                     <thead className="bg-slate-100 text-slate-600 sticky top-0 z-10 shadow-2xs">
                       <tr>
