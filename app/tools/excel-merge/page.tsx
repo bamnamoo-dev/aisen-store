@@ -1848,17 +1848,17 @@ export default function ExcelMergePage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* 모달 헤더 */}
-            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-5 sm:p-6 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-5 sm:p-6 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-xs shadow-xs shrink-0">
                   <BookOpen size={22} className="text-amber-300" />
                 </div>
                 <div>
                   <h3 className="font-black text-lg sm:text-xl tracking-tight">
-                    AI-SEN 엑셀수합 3초 가이드
+                    AI-SEN 엑셀수합 실무 시뮬레이션 가이드
                   </h3>
-                  <p className="text-blue-100 text-sm mt-0.5 font-medium">
-                    단 3단계로 수십 개 학교 서식을 하나로 통합합니다
+                  <p className="text-blue-100 text-xs sm:text-sm mt-0.5 font-medium">
+                    실제 행정 실무 진행 순서대로 빠짐없이 정리한 핵심 4단계 가이드
                   </p>
                 </div>
               </div>
@@ -1871,69 +1871,113 @@ export default function ExcelMergePage() {
               </button>
             </div>
 
-            {/* 핵심 3단계 카드 */}
-            <div className="p-5 sm:p-6 space-y-3.5">
+            {/* 모달 본문 (실제 실무 순서 4단계 + 사전팁 + 보안) */}
+            <div className="p-5 sm:p-6 space-y-3.5 max-h-[72vh] overflow-y-auto text-slate-800">
               
-              {/* 1단계 */}
-              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-4 sm:p-4.5 rounded-2xl">
-                <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
+              {/* 사전 준비 팁 (선택) */}
+              <div className="bg-blue-50/70 border border-blue-200/80 rounded-2xl p-4 flex items-start gap-3.5">
+                <span className="text-xl shrink-0 mt-0.5">💡</span>
+                <div className="text-xs sm:text-sm space-y-1">
+                  <div className="font-black text-blue-950 flex items-center gap-2">
+                    <span>[사전 준비] 자체 학교코드 명부 등록 (최초 1회 선택)</span>
+                    <span className="bg-blue-200/70 text-blue-900 text-[11px] px-2 py-0.5 rounded-md font-bold">브라우저 자동 영구 보관</span>
+                  </div>
+                  <p className="text-blue-800/90 leading-relaxed font-medium">
+                    지원청의 <strong>[학교명 - 실제 학교코드]</strong> 엑셀이 있다면 <strong>[자체 기준 명부 등록]</strong>에 1번만 등록해 두세요. K-에듀파인 교부서식에 실제 학교코드가 1:1로 영구 직결됩니다. <span className="text-blue-600">(미등록 시에도 임시 기관코드 <code className="bg-white/80 px-1 py-0.5 rounded text-blue-700">B1000001</code>로 안전하게 자동 부여됩니다)</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* 1단계: 엑셀 파일 일괄 드롭 */}
+              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
+                <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
                   1
                 </div>
-                <div className="space-y-1">
-                  <div className="font-black text-slate-900 text-base sm:text-lg">
-                    엑셀 파일 등록
+                <div className="space-y-1 flex-1">
+                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
+                    <span>취합할 엑셀 파일 일괄 등록</span>
+                    <span className="text-xs text-blue-600 font-bold">마우스 드래그 & 드롭</span>
                   </div>
-                  <div className="text-sm sm:text-base text-slate-600 font-medium leading-snug">
-                    취합할 파일들을 드롭존에 한 번에 끌어다 놓습니다.
-                  </div>
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                    학교들로부터 취합된 수십 개의 엑셀 파일(.xlsx)을 중앙 점선 영역에 한 번에 끌어다 놓습니다. (즉시 유효성 검사 및 실시간 목록 표시)
+                  </p>
                 </div>
               </div>
 
-              {/* 2단계 */}
-              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-4 sm:p-4.5 rounded-2xl">
-                <div className="w-11 h-11 rounded-2xl bg-indigo-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
+              {/* 2단계: 2대 모드 & 헤더 1초 확인 */}
+              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
                   2
                 </div>
-                <div className="space-y-1">
-                  <div className="font-black text-slate-900 text-base sm:text-lg">
-                    헤더 확인 (자동 감지)
+                <div className="space-y-1.5 flex-1">
+                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
+                    <span>양식 모드 선택 & 헤더 끝 행 확인</span>
+                    <span className="text-xs text-indigo-600 font-bold">1초 눈확인</span>
                   </div>
-                  <div className="text-sm sm:text-base text-slate-600 font-medium leading-snug">
-                    미리보기에서 헤더 끝 행을 확인합니다. (클릭으로 즉시 변경 가능)
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
+                      <strong className="text-indigo-950 block mb-0.5 font-black">🥞 서식 블록형</strong>
+                      <span className="text-slate-600">학교당 2줄 이상 복합 서식/수식 (급식비, 인건비, 신청서)</span>
+                    </div>
+                    <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
+                      <strong className="text-indigo-950 block mb-0.5 font-black">📄 단순 목록형</strong>
+                      <span className="text-slate-600">학교당 1줄씩 나열되는 명부 (수요조사, 비품 실태조사)</span>
+                    </div>
                   </div>
+                  <p className="text-xs text-slate-500 font-medium">
+                    🔍 <strong>헤더 끝 행</strong>은 엑셀 등록 시 자동 감지됩니다. 혹시 다를 경우 아래 뷰어에서 헤더 마지막 행을 클릭하면 1초 만에 수정됩니다.
+                  </p>
                 </div>
               </div>
 
-              {/* 3단계 */}
-              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-4 sm:p-4.5 rounded-2xl">
-                <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
+              {/* 3단계: 수합 실행 */}
+              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
                   3
                 </div>
-                <div className="space-y-1">
-                  <div className="font-black text-slate-900 text-base sm:text-lg">
-                    [수합 실행] & 다운로드
+                <div className="space-y-1 flex-1">
+                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
+                    <span>🚀 [수합 실행] 클릭</span>
+                    <span className="text-xs text-emerald-600 font-bold">0.5초 고속 연산</span>
                   </div>
-                  <div className="text-sm sm:text-base text-slate-600 font-medium leading-snug">
-                    2초 만에 완벽 서식 보존 마스터 엑셀이 생성됩니다.
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                    어떤 모드를 선택하든 <strong>[통합 마스터 서식]</strong>과 <strong>[K-에듀파인 교부서식]</strong> 2가지가 한 번에 100% 동시 자동 생성됩니다.
+                  </p>
+                  <p className="text-xs text-emerald-700 font-medium">
+                    🟢 정상 제출 및 🔴 미제출 학교가 신호등으로 즉시 집계되며, <strong>[📋 미제출 독촉 명단 1초 복사]</strong>가 가능합니다.
+                  </p>
+                </div>
+              </div>
+
+              {/* 4단계: 2-Way 맞춤 다운로드 */}
+              <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
+                <div className="w-10 h-10 rounded-2xl bg-blue-700 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                  4
+                </div>
+                <div className="space-y-1.5 flex-1">
+                  <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
+                    <span>맞춤형 2-Way 다운로드</span>
+                    <span className="text-xs text-blue-700 font-bold">원클릭 저장</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="bg-white border border-slate-200 rounded-xl p-2.5">
+                      <strong className="text-slate-900 block mb-0.5 font-black">📥 마스터 엑셀 (통합본)</strong>
+                      <span className="text-slate-600">Sheet 1(취합본) + Sheet 2(교부서식)가 합쳐진 내부 보관용</span>
+                    </div>
+                    <div className="bg-white border border-blue-200 rounded-xl p-2.5">
+                      <strong className="text-blue-900 block mb-0.5 font-black">🚀 K-에듀파인 전용 다운로드</strong>
+                      <span className="text-blue-800">에듀파인 시스템에 즉시 파일 업로드 가능한 단독 서식</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* 팁 요약 2종 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-3.5 flex items-start gap-3">
-                  <Layers size={19} className="text-blue-600 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-black text-blue-950 text-sm sm:text-base block">모드 선택</span>
-                    <span className="text-blue-800/90 text-xs sm:text-sm font-medium leading-relaxed">일반 서식은 <strong>블록 서식</strong>, 1줄 명부는 <strong>단순 목록</strong></span>
-                  </div>
-                </div>
-                <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3.5 flex items-start gap-3">
-                  <ShieldCheck size={19} className="text-emerald-600 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-black text-emerald-950 text-sm sm:text-base block">100% 로컬 보안</span>
-                    <span className="text-emerald-800/90 text-xs sm:text-sm font-medium leading-relaxed">서버 전송 없이 내 PC 메모리에서 안전 처리</span>
-                  </div>
+              {/* 하단 100% 로컬 보안 안내 */}
+              <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3.5 flex items-center gap-3">
+                <ShieldCheck size={22} className="text-emerald-600 shrink-0" />
+                <div className="text-xs sm:text-sm">
+                  <span className="font-black text-emerald-950 block">100% 로컬 브라우저 보안 (서버 유출 0%)</span>
+                  <span className="text-emerald-800 font-medium">모든 취합 연산은 담당자 PC 메모리 안에서만 처리되며, 외부 서버로 단 1바이트도 전송되지 않습니다.</span>
                 </div>
               </div>
 
