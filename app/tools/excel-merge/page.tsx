@@ -1327,7 +1327,9 @@ export default function ExcelMergePage() {
                     type="number" 
                     value={headerEndRow} 
                     onChange={e => {
-                      setHeaderEndRow(Number(e.target.value));
+                      const newEnd = Number(e.target.value);
+                      setHeaderEndRow(newEnd);
+                      setBlockStartRow(newEnd + 1);
                       setActivePreset('custom');
                     }}
                     className="w-20 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900 text-center font-black text-sm sm:text-base shadow-2xs"
@@ -1362,7 +1364,9 @@ export default function ExcelMergePage() {
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-slate-200/60">
                 <div>
-                  <span className="text-slate-700 block mb-1 text-xs sm:text-sm font-bold">시작 행</span>
+                  <span className="text-slate-700 block mb-1 text-xs sm:text-sm font-bold">
+                    시작 행 <span className="text-purple-600 font-normal text-[11px] sm:text-xs">(헤더+1)</span>
+                  </span>
                   <input 
                     type="number" 
                     value={blockStartRow} 
@@ -1370,22 +1374,42 @@ export default function ExcelMergePage() {
                       setBlockStartRow(Number(e.target.value));
                       setActivePreset('custom');
                     }}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-slate-900 font-black text-sm sm:text-base text-center shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-slate-900 font-black text-sm sm:text-base text-center shadow-2xs h-[38px]"
                   />
                 </div>
                 <div>
-                  <span className="text-slate-700 block mb-1 text-xs sm:text-sm font-bold">
-                    {isAutoDetectRows ? '기준 행수' : '블록 행수'}
-                  </span>
-                  <input 
-                    type="number" 
-                    value={blockRowCount} 
-                    onChange={e => {
-                      setBlockRowCount(Number(e.target.value));
-                      setActivePreset('custom');
-                    }}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-slate-900 font-black text-sm sm:text-base text-center shadow-2xs"
-                  />
+                  {isAutoDetectRows ? (
+                    <div>
+                      <span className="text-purple-700 block mb-1 text-xs sm:text-sm font-bold">
+                        추출 범위
+                      </span>
+                      <div 
+                        className="w-full bg-purple-100/90 border border-purple-300 text-purple-800 font-extrabold text-xs sm:text-sm rounded-lg px-2 py-1.5 text-center flex items-center justify-center gap-1 shadow-2xs h-[38px]"
+                        title="가변행 감지: 학교마다 작성한 줄 수가 달라도 빈 행 전까지의 실제 작성 데이터를 자동으로 모두 수합합니다."
+                      >
+                        <Sparkles size={14} className="text-purple-600 shrink-0" />
+                        <span className="whitespace-nowrap">끝 행까지 자동</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="text-slate-700 block mb-1 text-xs sm:text-sm font-bold">
+                        고정 블록 행수
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <input 
+                          type="number" 
+                          value={blockRowCount} 
+                          onChange={e => {
+                            setBlockRowCount(Number(e.target.value));
+                            setActivePreset('custom');
+                          }}
+                          className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-slate-900 font-black text-sm sm:text-base text-center shadow-2xs h-[38px]"
+                        />
+                        <span className="text-slate-500 text-xs font-bold shrink-0">행</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
