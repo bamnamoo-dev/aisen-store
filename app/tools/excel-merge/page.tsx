@@ -3,12 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Script from 'next/script';
 import JSZip from 'jszip';
+import Link from 'next/link';
 import ToolHeader from '@/components/ToolHeader';
 import { 
   FileSpreadsheet, Upload, Download, CheckCircle2, AlertCircle, AlertTriangle, 
   Layers, Copy, RefreshCw, Sparkles, FileText, ArrowRight, ShieldCheck, 
   HelpCircle, ChevronDown, Check, Send, DownloadCloud, FileCheck2, School,
-  FlaskConical, Archive, Eye, FileUp, Building2, SlidersHorizontal
+  FlaskConical, Archive, Eye, FileUp, Building2, SlidersHorizontal, BookOpen,
+  RotateCcw, X
 } from 'lucide-react';
 
 interface SchoolItem {
@@ -86,6 +88,7 @@ export default function ExcelMergePage() {
   const [previewSheetName, setPreviewSheetName] = useState<string>('');
   const [isPreviewOpen, setIsPreviewOpen] = useState(true);
   const [autoDetectedBadge, setAutoDetectedBadge] = useState<string>('');
+  const [isManualOpen, setIsManualOpen] = useState(false); // 실무 사용설명서 모달 열림 상태
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const rosterInputRef = useRef<HTMLInputElement>(null);
@@ -424,8 +427,12 @@ export default function ExcelMergePage() {
     setProcessedList([]);
     setMissingSchools([]);
     setMergedBlob(null);
+    setMergedFileName('');
     setProgress(0);
     setStatusMessage('');
+    setPreviewRows([]);
+    setPreviewSheetName('');
+    setAutoDetectedBadge('');
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (rosterInputRef.current) rosterInputRef.current.value = '';
   };
@@ -801,8 +808,37 @@ export default function ExcelMergePage() {
       {/* 스마트 통합 헤더 */}
       <ToolHeader 
         title="AI-SEN 엑셀수합" 
-        subtitle="관내 기관·학교별 엑셀 서식 자동 취합 & 정렬 마스터 (서버 유출 0% 로컬 결합)"
-        onReset={handleReset}
+        icon={<FileSpreadsheet size={15} className="text-blue-600" />}
+        themeColor="blue"
+        extraAction={
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              onClick={() => setIsManualOpen(true)}
+              className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 sm:px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              title="AI-SEN 엑셀수합 실무 사용설명서 열기"
+            >
+              <BookOpen size={13} className="text-amber-700" />
+              <span className="hidden sm:inline">사용설명서</span>
+            </button>
+
+            <button
+              onClick={handleReset}
+              className="inline-flex items-center gap-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2 sm:px-2.5 py-1 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              title="업로드된 파일 및 통계 초기화 (0개소 제로 상태로 복귀)"
+            >
+              <RotateCcw size={13} className="text-rose-600" />
+              <span className="hidden sm:inline">초기화</span>
+            </button>
+
+            <Link
+              href="/board"
+              className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2 sm:px-2.5 py-1 rounded-lg transition-colors shadow-2xs"
+              title="실무 소통게시판 바로가기"
+            >
+              <span className="hidden sm:inline">소통게시판</span>
+            </Link>
+          </div>
+        }
       />
 
       <main className="flex-1 max-w-[1440px] w-full mx-auto p-4 md:p-6 space-y-5">
@@ -949,13 +985,14 @@ export default function ExcelMergePage() {
               </span>
             </div>
 
-            {/* 🧪 표준 샘플 테스트 액션 바 */}
+            {/* 🧪 표준 샘플 테스트 액션 바 & 초기화 */}
             <div className="flex gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/80 rounded-2xl p-2.5 shadow-2xs">
               <button
                 type="button"
                 onClick={handleLoadSampleFiles}
                 disabled={isProcessing}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                title="136개 가상학교 엑셀 샘플 파일 일괄 로드"
               >
                 <FlaskConical size={14} />
                 <span>🧪 [테스트] 136개 가상학교 샘플 로드</span>
@@ -964,10 +1001,21 @@ export default function ExcelMergePage() {
                 href="/samples/sample_136_schools.zip"
                 download="sample_136_schools.zip"
                 className="flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs font-bold py-2 px-2.5 rounded-xl transition-colors shrink-0 shadow-2xs"
+                title="136개 가상학교 샘플 엑셀 ZIP 다운로드"
               >
                 <Archive size={13} />
                 <span>ZIP 다운</span>
               </a>
+              <button
+                type="button"
+                onClick={handleReset}
+                disabled={isProcessing || (files.length === 0 && targetSchools.length === 0)}
+                className="flex items-center justify-center gap-1 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs font-bold py-2 px-2.5 rounded-xl transition-colors shrink-0 shadow-2xs disabled:opacity-40 cursor-pointer"
+                title="모든 파일 및 통계 초기화 (0개소 제로 상태)"
+              >
+                <RotateCcw size={13} />
+                <span>초기화</span>
+              </button>
             </div>
 
             {/* 범용 수합 3원칙 설정 패널 */}
@@ -1187,6 +1235,20 @@ export default function ExcelMergePage() {
                   </>
                 )}
               </button>
+
+              {/* 하단 전체 초기화 버튼 */}
+              {(files.length > 0 || targetSchools.length > 0) && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  disabled={isProcessing}
+                  className="w-full text-center text-xs text-slate-400 hover:text-rose-600 font-semibold py-1.5 transition-colors cursor-pointer flex items-center justify-center gap-1"
+                  title="업로드된 모든 파일과 통계를 비우고 처음 상태로 돌아갑니다."
+                >
+                  <RotateCcw size={12} />
+                  <span>전체 초기화 (0개소 제로 상태)</span>
+                </button>
+              )}
             </div>
 
           </div>
@@ -1476,6 +1538,166 @@ export default function ExcelMergePage() {
         </div>
 
       </main>
+
+      {/* 📖 AI-SEN 엑셀수합 실무 사용설명서 모달 */}
+      {isManualOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          onClick={() => setIsManualOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 모달 상단 헤더 */}
+            <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-xs">
+                  <BookOpen size={20} className="text-amber-300" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base sm:text-lg tracking-tight flex items-center gap-2">
+                    AI-SEN 엑셀수합 실무 사용설명서
+                    <span className="bg-amber-400 text-slate-900 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                      가이드
+                    </span>
+                  </h3>
+                  <p className="text-blue-200 text-xs mt-0.5">
+                    수십·수백 개 학교의 엑셀 서식을 2초 만에 단 1장의 마스터로 취합하는 방법
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsManualOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-white"
+                title="사용설명서 닫기"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* 모달 내용 스크롤 영역 */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 text-slate-700 text-xs sm:text-sm leading-relaxed">
+              
+              {/* 1. 빠른 3단계 요약 */}
+              <div className="bg-blue-50/70 border border-blue-200 rounded-2xl p-4 space-y-2.5">
+                <div className="font-bold text-blue-900 text-sm flex items-center gap-1.5">
+                  <Sparkles size={16} className="text-blue-600" />
+                  <span>🎯 1분 초간단 3단계 이용 순서</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                  <div className="bg-white p-3 rounded-xl border border-blue-100 shadow-2xs">
+                    <div className="font-bold text-blue-700 mb-1">1단계. 서식 업로드</div>
+                    <p className="text-slate-600">수합할 엑셀 파일들을 드롭존에 한 번에 끌어다 놓습니다. (폴더 통째 선택 가능)</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-blue-100 shadow-2xs">
+                    <div className="font-bold text-blue-700 mb-1">2단계. 헤더 확인·지정</div>
+                    <p className="text-slate-600">우측 상단 뷰어에서 자동 감지된 헤더를 확인하거나, 원하는 행을 마우스로 1클릭합니다.</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-blue-100 shadow-2xs">
+                    <div className="font-bold text-blue-700 mb-1">3단계. [취합 실행] 클릭</div>
+                    <p className="text-slate-600">2초 만에 단일 마스터 엑셀이 완성되며 미제출교 명단도 1초 만에 복사됩니다.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. 3대 취합 모드 안내 */}
+              <div className="space-y-2">
+                <h4 className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                  <Layers size={16} className="text-indigo-600" />
+                  <span>🧩 3대 취합 모드 선택 요령</span>
+                </h4>
+                <div className="space-y-2 text-xs">
+                  <div className="border border-slate-200 p-3 rounded-xl hover:border-indigo-300 transition-colors">
+                    <div className="font-bold text-slate-800 flex items-center justify-between mb-1">
+                      <span className="text-indigo-700 font-extrabold">🍱 서식 블록형 취합 (기본 추천)</span>
+                      <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px]">급식비·식품관리비·인건비</span>
+                    </div>
+                    <p className="text-slate-600">
+                      학교별로 16줄 등 다행(Multi-Row) 복합 서식이 있는 경우 사용합니다. 1~17행 헤더는 최초 1회만 맨 위에 유지되고, 각 학교의 본문 블록(16줄)이 아래로 순서대로 온전히 이어붙습니다.
+                    </p>
+                  </div>
+
+                  <div className="border border-slate-200 p-3 rounded-xl hover:border-blue-300 transition-colors">
+                    <div className="font-bold text-slate-800 flex items-center justify-between mb-1">
+                      <span className="text-blue-700 font-extrabold">📋 단순 목록형 취합</span>
+                      <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px]">일반 명부·실태조사·시설현황</span>
+                    </div>
+                    <p className="text-slate-600">
+                      1행에 헤더 컬럼이 있고 각 학교별로 1줄씩 데이터를 제출한 일반 목록 표를 단일 엑셀 시트로 병합합니다.
+                    </p>
+                  </div>
+
+                  <div className="border border-slate-200 p-3 rounded-xl hover:border-emerald-300 transition-colors">
+                    <div className="font-bold text-slate-800 flex items-center justify-between mb-1">
+                      <span className="text-emerald-700 font-extrabold">📤 K-에듀파인 교부 변환</span>
+                      <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px]">학교 전출금 교부액 일괄 업로드</span>
+                    </div>
+                    <p className="text-slate-600">
+                      각 학교 신청서의 교부액 합계(I열 등)를 자동 추출하여, K-에듀파인 예산관리 시스템에서 바로 업로드할 수 있는 엑셀 양식으로 즉시 변환합니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. 스마트 헤더 자동 감지 & 마우스 1초 클릭 */}
+              <div className="space-y-2">
+                <h4 className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                  <Eye size={16} className="text-blue-600" />
+                  <span>✨ 엑셀 뷰어 & 스마트 헤더 1초 지정</span>
+                </h4>
+                <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl space-y-1.5 text-xs">
+                  <p className="font-semibold text-slate-800">
+                    컴퓨터에서 MS 엑셀을 따로 실행할 필요가 없습니다!
+                  </p>
+                  <p className="text-slate-600">
+                    • 엑셀 파일을 올리면 시스템이 컬럼명(학교명, 연번 등)을 스캔하여 헤더 끝 행을 0.1초 만에 자동 지정합니다.<br />
+                    • 변경을 원하시면 우측 상단 뷰어의 원하는 행을 <strong>마우스로 툭 클릭</strong>하면 즉시 헤더 끝 및 본문 시작 행으로 반영됩니다.
+                  </p>
+                </div>
+              </div>
+
+              {/* 4. 기준 명부 & 미제출 독촉 명단 1초 복사 */}
+              <div className="space-y-2">
+                <h4 className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                  <Building2 size={16} className="text-purple-600" />
+                  <span>🏛️ 기준 명부 & 미제출 독촉 명단 1초 복사</span>
+                </h4>
+                <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl space-y-1.5 text-xs">
+                  <p className="text-slate-600">
+                    • <strong>교육지원청 선택</strong> 또는 <strong>[자체 명부 엑셀 업로드]</strong>로 대상 기관을 설정할 수 있습니다.<br />
+                    • 취합 완료 후 미제출교가 있는 경우, 우측 하단의 <strong>[📋 독촉 명단 1초 복사]</strong> 버튼을 누르면 공문서나 메신저에 바로 붙여넣을 수 있는 텍스트가 클립보드에 복사됩니다.
+                  </p>
+                </div>
+              </div>
+
+              {/* 5. 100% 로컬 무부하 보안 & 오프라인 실행기 */}
+              <div className="bg-emerald-50/70 border border-emerald-200 p-3.5 rounded-xl space-y-1 text-xs">
+                <div className="font-bold text-emerald-950 flex items-center gap-1">
+                  <ShieldCheck size={15} className="text-emerald-600" />
+                  <span>100% 브라우저 로컬 보안 (서버 유출 0%)</span>
+                </div>
+                <p className="text-emerald-800">
+                  모든 엑셀 파싱 및 병합 작업은 귀하의 PC 웹브라우저 메모리 안에서만 0초 만에 완결되며 서버로 단 1바이트도 전송되지 않습니다. 인터넷이 차단된 폐쇄망 환경에서는 상단의 <strong>[오프라인 단독파일 다운]</strong>을 이용해 주십시오.
+                </p>
+              </div>
+
+            </div>
+
+            {/* 모달 하단 푸터 버튼 */}
+            <div className="bg-slate-50 border-t border-slate-200 p-4 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsManualOpen(false)}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold px-6 py-2.5 rounded-xl shadow-sm hover:shadow transition-all cursor-pointer"
+              >
+                확인 및 닫기
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
