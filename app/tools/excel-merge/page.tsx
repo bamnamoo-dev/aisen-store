@@ -153,13 +153,13 @@ export default function ExcelMergePage() {
     setMergedBlob(null);
   };
 
-  // 50개교 가상 샘플 파일 원클릭 로드
+  // 136개교 가상 샘플 파일 원클릭 로드
   const handleLoadSampleFiles = async () => {
     setIsProcessing(true);
-    setStatusMessage('가상 50개교 신청서 샘플 팩 로딩 및 압축 해제 중...');
+    setStatusMessage('관내 136개교 신청서 샘플 팩 로딩 및 압축 해제 중...');
     setProgress(30);
     try {
-      const res = await fetch('/samples/sample_50_schools.zip');
+      const res = await fetch('/samples/sample_136_schools.zip');
       if (!res.ok) throw new Error('샘플 파일을 가져올 수 없습니다.');
       const blob = await res.blob();
       setProgress(60);
@@ -174,7 +174,7 @@ export default function ExcelMergePage() {
       setProgress(100);
       setFiles(sampleFiles);
       setMergedBlob(null);
-      setStatusMessage(`가상 50개교 신청서가 성공적으로 로드되었습니다. (${sampleFiles.length}개 파일)`);
+      setStatusMessage(`관내 136개교 신청서가 성공적으로 로드되었습니다. (${sampleFiles.length}개 파일)`);
     } catch (e: any) {
       alert('샘플 파일 로드 실패: ' + e.message);
     } finally {
@@ -651,7 +651,7 @@ export default function ExcelMergePage() {
               </span>
             </div>
 
-            {/* 🧪 샘플 50개교 테스트 액션 바 */}
+            {/* 🧪 샘플 136개교 테스트 액션 바 */}
             <div className="flex flex-col sm:flex-row gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/80 rounded-2xl p-3 shadow-2xs">
               <button
                 type="button"
@@ -660,15 +660,15 @@ export default function ExcelMergePage() {
                 className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <FlaskConical size={16} />
-                <span>🧪 샘플 50개교 1초 자동 로드</span>
+                <span>🧪 관내 136개교 전원 1초 자동 로드</span>
               </button>
               <a
-                href="/samples/sample_50_schools.zip"
-                download="sample_50_schools.zip"
+                href="/samples/sample_136_schools.zip"
+                download="sample_136_schools.zip"
                 className="flex items-center justify-center gap-1.5 bg-white hover:bg-slate-100 text-purple-700 border border-purple-200 text-xs font-bold py-2.5 px-3.5 rounded-xl transition-colors shrink-0 shadow-2xs"
               >
                 <Archive size={14} />
-                <span>ZIP 다운</span>
+                <span>ZIP 다운 (136개교)</span>
               </a>
             </div>
 
