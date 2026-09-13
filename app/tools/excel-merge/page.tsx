@@ -361,6 +361,54 @@ export default function ExcelMergePage() {
     });
   };
 
+  // 🛡️ 셀 값 및 수식 안전 복사 함수 (Shared Formula 오류 100% 원천 방어)
+  const copyCellValueSafely = (cell: any, rowOffset: number) => {
+    if (!cell) return null;
+
+    // 1. 빗금 사선 셀 방어 (빗금 테두리 빈 셀은 null 처리)
+    const hasDiagonal = cell.border?.diagonal && (cell.border.diagonal.up || cell.border.diagonal.down);
+    if (hasDiagonal && !cell.formula && (!cell.value || typeof cell.value !== 'object')) {
+      return null;
+    }
+
+    // 2. 단독 수식(formula)이 명시된 셀 -> 오프셋만큼 행 번호 이동 보존
+    if (cell.formula) {
+      return {
+        formula: shiftFormula(cell.formula, rowOffset),
+        result: cell.result !== undefined ? cell.result : null
+      };
+    }
+
+    // 3. cell.value가 객체이고 formula 속성을 가진 경우
+    if (cell.value && typeof cell.value === 'object' && cell.value.formula) {
+      return {
+        formula: shiftFormula(cell.value.formula, rowOffset),
+        result: cell.value.result !== undefined ? cell.value.result : (cell.result !== undefined ? cell.result : null)
+      };
+    }
+
+    // 4. 🚨 공유 수식(sharedFormula) 클론 방어:
+    // ExcelJS에서 마스터 좌표와 클론 좌표가 어긋나면 'Shared Formula master must exist...' 크래시 발생
+    // 따라서 sharedFormula 클론 셀은 깨진 수식 대신 안전하게 이미 계산된 결과값(result)으로 변환
+    if (cell.sharedFormula || (cell.value && typeof cell.value === 'object' && cell.value.sharedFormula)) {
+      const safeResult = (cell.value && typeof cell.value === 'object' && cell.value.result !== undefined)
+        ? cell.value.result
+        : (cell.result !== undefined ? cell.result : null);
+      return safeResult;
+    }
+
+    // 5. 일반 객체형 셀 값인 경우 (RichText, Date, Hyperlink 등)
+    if (cell.value && typeof cell.value === 'object') {
+      if ('sharedFormula' in cell.value) {
+        return cell.value.result !== undefined ? cell.value.result : null;
+      }
+      return cell.value;
+    }
+
+    // 6. 기본 원시값 (숫자, 문자열, 불리언 등)
+    return cell.value;
+  };
+
   // 가변 데이터 행 감지 함수 (빈 줄 전까지의 실제 작성 행 수 스캔)
   const findLastDataRow = (ws: any, startRow: number, maxCol: number = 40): number => {
     let last = startRow;
@@ -457,10 +505,15 @@ export default function ExcelMergePage() {
     }
   };
 
-  // files 또는 sheetKeyword 변경 시 미리보기 갱신
+  // files 또는 sheetKeyword 변경 시 미리보기 갱신 (유효한 첫 번째 엑셀 파일 자동 탐색)
   useEffect(() => {
     if (files.length > 0 && typeof window !== 'undefined' && (window as any).ExcelJS) {
-      loadSheetPreview(files[0]);
+      const validExcel = files.find(f => 
+        !f.name.startsWith('~$') && (f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls'))
+      );
+      if (validExcel) {
+        loadSheetPreview(validExcel);
+      }
     } else if (files.length === 0) {
       setPreviewRows([]);
       setPreviewSheetName('');
@@ -491,14 +544,27 @@ export default function ExcelMergePage() {
   };
 
   const addFiles = (newFiles: File[]) => {
-    const valid = newFiles.filter(f => 
-      !f.name.startsWith('~$') && (f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls'))
-    );
-    if (valid.length === 0) {
-      alert('유효한 엑셀 파일(.xlsx, .xlsm)이 없습니다.');
+    // 1. 임시 락 파일(~$...)만 제외하고 모든 파일 수용 (PDF, HWP 등 오제출 파일 포함)
+    const cleaned = newFiles.filter(f => !f.name.startsWith('~$'));
+    if (cleaned.length === 0) {
+      alert('선택된 파일이 없습니다.');
       return;
     }
-    setFiles(prev => [...prev, ...valid]);
+
+    // 최소 1개 이상 취합 가능한 엑셀 파일(.xlsx, .xlsm, .xls)이 존재하는지 확인
+    const hasExcelInNew = cleaned.some(f => 
+      f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls')
+    );
+    const hasExcelInPrev = files.some(f => 
+      f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls')
+    );
+
+    if (!hasExcelInNew && !hasExcelInPrev) {
+      alert('취합 기준 템플릿이 될 유효한 엑셀 파일(.xlsx, .xlsm)이 최소 1개 이상 포함되어야 합니다.');
+      return;
+    }
+
+    setFiles(prev => [...prev, ...cleaned]);
     setMergedBlob(null);
   };
 
@@ -587,29 +653,98 @@ export default function ExcelMergePage() {
     const matchedMap = new Map<number, { file: File; school: SchoolItem; data: any }>();
 
     try {
-      // 1. 기준 템플릿 파일 로드 (첫 번째 유효 엑셀)
-      const templateFile = files[0];
-      const templateBuffer = await templateFile.arrayBuffer();
-      const templateWb = new ExcelJS.Workbook();
-      await templateWb.xlsx.load(templateBuffer);
+      // 1. 기준 템플릿 파일 로드 (첫 번째 유효한 엑셀 파일을 스마트 탐색)
+      let templateFile: File | undefined;
+      let templateWb: any;
+      let targetWs: any;
 
-      let targetWs = templateWb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
-      if (!targetWs) targetWs = templateWb.worksheets[1] || templateWb.worksheets[0];
+      for (const f of files) {
+        const isExcel = f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls');
+        if (!isExcel || f.name.startsWith('~$')) continue;
+        try {
+          const buf = await f.arrayBuffer();
+          const wb = new ExcelJS.Workbook();
+          await wb.xlsx.load(buf);
+          let ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
+          if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
+          if (ws) {
+            templateFile = f;
+            templateWb = wb;
+            targetWs = ws;
+            break;
+          }
+        } catch (e) {
+          // 해당 엑셀 파일이 손상된 경우 다음 파일 탐색
+        }
+      }
 
-      // 2. 각 파일 순회 및 연번/학교명 추출
+      if (!templateFile || !templateWb || !targetWs) {
+        alert('취합 기준 템플릿으로 사용할 수 있는 유효한 엑셀 파일이 없습니다.\n정상적인 .xlsx 서식 파일이 포함되어 있는지 확인해주세요.');
+        setIsProcessing(false);
+        return;
+      }
+
+      // 2. 각 파일 순회 및 연번/학교명 추출 (PDF, 비엑셀, 서식오류 파일 자동 감지 & 패스)
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const pct = 15 + Math.floor((i / files.length) * 45);
         setProgress(pct);
-        setStatusMessage(`파일 파싱 중 (${i + 1}/${files.length}): ${file.name}`);
+        setStatusMessage(`파일 분석 중 (${i + 1}/${files.length}): ${file.name}`);
+
+        // 학교명 사전 추출 (파일명 기반)
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+        const cleanFileName = nameWithoutExt.replace(/신청서|서식|2026/g, '').trim();
+        const matchedSchoolByName = findMatchingSchool(cleanFileName);
+        const fallbackSchoolName = matchedSchoolByName?.name || cleanFileName || file.name;
+
+        // 🚨 A. 확장자 검사: 비엑셀 파일(PDF, HWP, 이미지 등) 즉시 패스 & 오류 카운팅
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        const isExcelExt = ext === 'xlsx' || ext === 'xlsm' || ext === 'xls';
+        if (!isExcelExt) {
+          const extBadge = ext ? ext.toUpperCase() : '기타';
+          processed.push({
+            name: file.name,
+            size: file.size,
+            schoolName: fallbackSchoolName,
+            matchedSeq: matchedSchoolByName?.seq,
+            status: 'error',
+            errorMsg: `비엑셀 파일(${extBadge}) 제출`
+          });
+          continue; // 🚀 패스하고 다음 파일로 진행!
+        }
 
         try {
           const buffer = await file.arrayBuffer();
           const wb = new ExcelJS.Workbook();
           await wb.xlsx.load(buffer);
 
+          // 🚨 B. 시트 검증: 워크시트가 없는 경우 패스
+          if (!wb.worksheets || wb.worksheets.length === 0) {
+            processed.push({
+              name: file.name,
+              size: file.size,
+              schoolName: fallbackSchoolName,
+              status: 'error',
+              errorMsg: '빈 엑셀 파일 (시트 없음)'
+            });
+            continue;
+          }
+
           let ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
+
+          // 🚨 C. 서식 자체를 잘못 낸 경우 (서식 불일치/행 수 부족/엉뚱한 양식 감지)
+          const totalRows = ws.rowCount || 0;
+          if (totalRows < blockStartRow && totalRows <= 3) {
+            processed.push({
+              name: file.name,
+              size: file.size,
+              schoolName: fallbackSchoolName,
+              status: 'error',
+              errorMsg: '서식 불일치 (행 수 부족/다른 양식)'
+            });
+            continue;
+          }
 
           let rawSchoolName = '';
           const col1Val = ws.getCell(blockStartRow, 1).value;
@@ -620,18 +755,42 @@ export default function ExcelMergePage() {
             const cellVal = ws.getCell(targetRow, schoolCellCol).value;
             rawSchoolName = cellVal ? String(cellVal).trim() : '';
           } else {
-            rawSchoolName = file.name.replace(/\.[^/.]+$/, '').replace(/신청서|서식|2026/g, '').trim();
+            rawSchoolName = cleanFileName;
           }
 
           if (!rawSchoolName) {
-            rawSchoolName = file.name.replace(/\.[^/.]+$/, '').replace(/신청서|서식|2026/g, '').trim();
+            rawSchoolName = cleanFileName;
           }
 
           const matchedSchool = findMatchingSchool(rawSchoolName);
           const finalSeq = (!isNaN(parsedColSeq) && parsedColSeq > 0) 
             ? parsedColSeq 
-            : (matchedSchool?.seq || (i + 1));
-          const finalSchoolName = matchedSchool?.name || rawSchoolName || `기관_${finalSeq}`;
+            : (matchedSchool?.seq || matchedSchoolByName?.seq || (i + 1));
+          const finalSchoolName = matchedSchool?.name || matchedSchoolByName?.name || rawSchoolName || `기관_${finalSeq}`;
+
+          // 🚨 D. 본문 데이터 전무 검사 (엉뚱한 빈 서식 패스)
+          let hasContent = false;
+          for (let r = blockStartRow; r < blockStartRow + 5; r++) {
+            for (let c = 1; c <= 12; c++) {
+              const val = ws.getCell(r, c).value;
+              if (val !== null && val !== undefined && String(val).trim() !== '') {
+                hasContent = true;
+                break;
+              }
+            }
+            if (hasContent) break;
+          }
+
+          if (!hasContent) {
+            processed.push({
+              name: file.name,
+              size: file.size,
+              schoolName: finalSchoolName,
+              status: 'error',
+              errorMsg: '서식 불일치 (본문 내용 비어있음)'
+            });
+            continue; // 🚀 패스!
+          }
 
           if (matchedMap.has(finalSeq)) {
             processed.push({
@@ -647,7 +806,7 @@ export default function ExcelMergePage() {
 
           matchedMap.set(finalSeq, {
             file,
-            school: { seq: finalSeq, name: finalSchoolName, code: matchedSchool?.code },
+            school: { seq: finalSeq, name: finalSchoolName, code: matchedSchool?.code || matchedSchoolByName?.code },
             data: ws
           });
 
@@ -663,9 +822,9 @@ export default function ExcelMergePage() {
           processed.push({
             name: file.name,
             size: file.size,
-            schoolName: '(손상된 파일)',
+            schoolName: fallbackSchoolName || '(손상된 파일)',
             status: 'error',
-            errorMsg: err.message || '파일 열기 실패'
+            errorMsg: err.message?.includes('password') ? '암호 걸린 파일' : (err.message || '파일 열기 실패')
           });
         }
       }
@@ -729,23 +888,8 @@ export default function ExcelMergePage() {
             srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
               const dstCell = dstRow.getCell(colNumber);
 
-              // 빗금 사선 셀 방어 및 수식 평행이동
-              const hasDiagonal = cell.border?.diagonal && (cell.border.diagonal.up || cell.border.diagonal.down);
-              if (hasDiagonal && !cell.formula && (!cell.value || typeof cell.value !== 'object')) {
-                dstCell.value = null;
-              } else if (cell.formula) {
-                dstCell.value = {
-                  formula: shiftFormula(cell.formula, rowOffset),
-                  result: cell.result
-                };
-              } else if (cell.value && typeof cell.value === 'object' && cell.value.formula) {
-                dstCell.value = {
-                  formula: shiftFormula(cell.value.formula, rowOffset),
-                  result: cell.value.result
-                };
-              } else {
-                dstCell.value = cell.value;
-              }
+              // 🛡️ 셀 값 및 수식 안전 복사 (Shared Formula 방어)
+              dstCell.value = copyCellValueSafely(cell, rowOffset);
 
               // 스타일 100% 보존
               if (cell.font) dstCell.font = { ...cell.font };
@@ -793,13 +937,16 @@ export default function ExcelMergePage() {
           const count = Math.max(1, lastR - blockStartRow + 1);
 
           for (let r = 0; r < count; r++) {
-            const srcRow = srcWs.getRow(blockStartRow + r);
-            const dstRow = targetWs.getRow(currentDstRow + r);
+            const srcRowNum = blockStartRow + r;
+            const dstRowNum = currentDstRow + r;
+            const rowOffset = dstRowNum - srcRowNum;
+            const srcRow = srcWs.getRow(srcRowNum);
+            const dstRow = targetWs.getRow(dstRowNum);
             if (srcRow.height) dstRow.height = srcRow.height;
 
             srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
               const dstCell = dstRow.getCell(colNumber);
-              dstCell.value = cell.value;
+              dstCell.value = copyCellValueSafely(cell, rowOffset);
               if (cell.font) dstCell.font = { ...cell.font };
               if (cell.fill) dstCell.fill = { ...cell.fill };
               if (cell.border) dstCell.border = { ...cell.border };
@@ -893,6 +1040,21 @@ export default function ExcelMergePage() {
         r2.getCell(5).numFmt = '#,##0';
       });
 
+      // 5. 최종 파일 빌드 전 워크시트 내 잔존 공유 수식(Shared Formula) 전수 안전 살균
+      // (원본 템플릿에 남아있던 고아 sharedFormula 셀로 인한 빌드 크래시 100% 원천 차단)
+      templateWb.eachSheet((ws: any) => {
+        ws.eachRow({ includeEmpty: false }, (row: any) => {
+          row.eachCell({ includeEmpty: false }, (cell: any) => {
+            if (cell.sharedFormula || (cell.value && typeof cell.value === 'object' && cell.value.sharedFormula)) {
+              const safeVal = (cell.value && typeof cell.value === 'object' && cell.value.result !== undefined)
+                ? cell.value.result
+                : (cell.result !== undefined ? cell.result : (typeof cell.value === 'object' ? null : cell.value));
+              cell.value = safeVal;
+            }
+          });
+        });
+      });
+
       // 5. 최종 파일 빌드 (통합 마스터 엑셀 및 K-에듀파인 단독 엑셀)
       setProgress(95);
       setStatusMessage('통합 마스터 및 에듀파인 교부 파일 최종 렌더링 중...');
@@ -950,11 +1112,23 @@ export default function ExcelMergePage() {
   // 기존 호환용 다운로드 핸들러
   const handleDownload = handleDownloadMaster;
 
-  // 미제출 학교 명단 클립보드 복사
+  // 미제출 및 오류(PDF/서식불일치) 학교 명단 클립보드 복사
   const copyMissingList = () => {
-    if (missingSchools.length === 0) return;
-    const text = missingSchools.map(s => `${s.seq}. ${s.name}`).join('\n');
-    navigator.clipboard.writeText(`[미제출 기관·학교 독촉 명단]\n` + text);
+    const errorItems = processedList.filter(p => p.status === 'error');
+    if (missingSchools.length === 0 && errorItems.length === 0) return;
+
+    let text = '';
+    if (missingSchools.length > 0) {
+      text += `[미제출 기관·학교 독촉 명단 (${missingSchools.length}개소)]\n` + 
+              missingSchools.map(s => `${s.seq}. ${s.name}`).join('\n');
+    }
+    if (errorItems.length > 0) {
+      if (text) text += '\n\n';
+      text += `[서식오류·비엑셀(PDF) 재제출 요청 명단 (${errorItems.length}건)]\n` + 
+              errorItems.map((item, idx) => `${idx + 1}. ${item.schoolName} (${item.name}) - ${item.errorMsg || '서식 오류'}`).join('\n');
+    }
+
+    navigator.clipboard.writeText(text);
     setCopiedNotification(true);
     setTimeout(() => setCopiedNotification(false), 2000);
   };
@@ -1213,7 +1387,7 @@ export default function ExcelMergePage() {
               ref={fileInputRef}
               type="file" 
               multiple 
-              accept=".xlsx,.xlsm,.xls" 
+              accept=".xlsx,.xlsm,.xls,.pdf,.hwp,.hwpx,*" 
               className="hidden" 
               onChange={handleFileInputChange}
             />
@@ -1721,12 +1895,28 @@ export default function ExcelMergePage() {
               </div>
               <div className="text-2xl sm:text-4xl font-black text-rose-700 mt-0.5 sm:mt-1">{missingSchools.length}개소</div>
             </div>
-            <div className="bg-white border border-amber-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-2xs">
-              <div className="text-xs sm:text-base text-amber-600 font-bold">중복/확인필요</div>
-              <div className="text-2xl sm:text-4xl font-black text-amber-700 mt-0.5 sm:mt-1">
-                {processedList.filter(p => p.status === 'duplicate' || p.status === 'unmatched').length}건
-              </div>
-            </div>
+            {/* 4번째 카드: 오류/확인필요 (PDF, 서식 불일치, 손상 파일 명확 카운트) */}
+            {(() => {
+              const errCount = processedList.filter(p => p.status === 'error').length;
+              const dupCount = processedList.filter(p => p.status === 'duplicate').length;
+              const unmatchCount = processedList.filter(p => p.status === 'unmatched').length;
+              const totalIssues = errCount + dupCount + unmatchCount;
+              return (
+                <div className={`bg-white border ${errCount > 0 ? 'border-rose-300 ring-1 ring-rose-200' : 'border-amber-200'} rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-2xs`}>
+                  <div className="text-xs sm:text-base font-bold flex items-center justify-between">
+                    <span className={errCount > 0 ? 'text-rose-600' : 'text-amber-600'}>오류/확인필요</span>
+                    {errCount > 0 && (
+                      <span className="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded font-black">
+                        오류 {errCount}
+                      </span>
+                    )}
+                  </div>
+                  <div className={`text-2xl sm:text-4xl font-black ${errCount > 0 ? 'text-rose-700' : 'text-amber-700'} mt-0.5 sm:mt-1`}>
+                    {totalIssues}건
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* 결과 다운로드 카드 (마스터 통합본 + K-에듀파인 전용 2-Way 완비 / 모바일 꽉찬 터치) */}
@@ -1830,7 +2020,7 @@ export default function ExcelMergePage() {
                       <span className="font-medium text-slate-800 truncate">{item.schoolName}</span>
                       <span className="text-slate-400 text-[10px] truncate hidden sm:inline">({item.name})</span>
                     </div>
-                    <div className="shrink-0">
+                    <div className="shrink-0 flex items-center gap-1">
                       {item.status === 'matched' && (
                         <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">정상</span>
                       )}
@@ -1839,6 +2029,11 @@ export default function ExcelMergePage() {
                       )}
                       {item.status === 'unmatched' && (
                         <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-[10px] font-bold">불일치</span>
+                      )}
+                      {item.status === 'error' && (
+                        <span className="bg-rose-100 text-rose-800 border border-rose-200 px-2 py-0.5 rounded text-[10px] font-bold" title={item.errorMsg || '서식/파일 오류'}>
+                          {item.errorMsg || '오류(제외)'}
+                        </span>
                       )}
                     </div>
                   </div>
