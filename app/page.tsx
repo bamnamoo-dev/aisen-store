@@ -22,7 +22,8 @@ import {
   ShieldCheck,
   Compass,
   BookOpen,
-  Sparkles
+  Sparkles,
+  Layers
 } from 'lucide-react';
 import IntegratedManualModal from '@/components/IntegratedManualModal';
 
@@ -40,7 +41,7 @@ const CATEGORIES: CategoryTab[] = [
   { 
     id: 'all', 
     label: '전체', 
-    count: 15, 
+    count: 16, 
     colorClass: 'text-slate-600 bg-slate-100 border-slate-200 hover:bg-slate-200', 
     activeClass: 'bg-slate-900 text-white border-slate-900 shadow-xs' 
   },
@@ -60,17 +61,17 @@ const CATEGORIES: CategoryTab[] = [
   },
   { 
     id: 'admin', 
-    label: '행정·서고', 
+    label: '행정·실무', 
     count: 4, 
     colorClass: 'text-purple-700 bg-purple-50/80 border-purple-200 hover:bg-purple-100', 
     activeClass: 'bg-purple-600 text-white border-purple-600 shadow-xs' 
   },
   { 
     id: 'facility', 
-    label: '시설·힐링', 
-    count: 3, 
+    label: '공간·힐링', 
+    count: 4, 
     colorClass: 'text-rose-700 bg-rose-50/80 border-rose-200 hover:bg-rose-100', 
-    activeClass: 'bg-rose-600 text-white border-rose-600 shadow-xs' 
+    activeClass: 'bg-rose-500 text-white border-rose-500 shadow-xs' 
   },
 ];
 
@@ -408,6 +409,27 @@ const SERVICE_CARDS: ServiceCardItem[] = [
     }
   },
   {
+    id: 'sen-excel-merge',
+    category: 'facility',
+    title: 'AI-SEN 엑셀수합',
+    description: '관내 학교 서식 일괄 취합 & 에듀파인 교부 마스터 (로컬 0초)',
+    badge: '취합·교부',
+    actionText: '엑셀 수합',
+    href: '/tools/excel-merge',
+    isExternal: false,
+    icon: <Layers size={18} />,
+    theme: {
+      stripe: 'bg-rose-500',
+      iconBg: 'bg-rose-50 text-rose-600 border-rose-100',
+      iconColor: 'text-rose-600',
+      badgeBg: 'bg-rose-50',
+      badgeText: 'text-rose-700',
+      badgeBorder: 'border-rose-200',
+      actionColor: 'text-rose-600',
+      hoverBorder: 'hover:border-rose-400',
+    }
+  },
+  {
     id: 'sen-watermelon',
     category: 'facility',
     title: 'AI-SEN 힐링게임',
@@ -426,8 +448,7 @@ const SERVICE_CARDS: ServiceCardItem[] = [
       badgeBorder: 'border-rose-200',
       actionColor: 'text-rose-600',
       hoverBorder: 'hover:border-rose-400',
-    },
-    colSpan: 'col-span-2 sm:col-span-1 lg:col-span-2'
+    }
   }
 ];
 
