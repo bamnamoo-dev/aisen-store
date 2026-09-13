@@ -3615,11 +3615,11 @@ export default function ExcelMergePage() {
                 <span className="text-xl shrink-0 mt-0.5">💡</span>
                 <div className="text-xs sm:text-sm space-y-1">
                   <div className="font-black text-blue-950 flex items-center gap-2">
-                    <span>[사전 준비] 자체 학교코드 명부 등록 (최초 1회 선택)</span>
+                    <span>[사전 준비] 자체 학교 기준 명부 등록 (선택 사항)</span>
                     <span className="bg-blue-200/70 text-blue-900 text-[11px] px-2 py-0.5 rounded-md font-bold">브라우저 자동 영구 보관</span>
                   </div>
                   <p className="text-blue-800/90 leading-relaxed font-medium">
-                    지원청의 <strong>[학교명 - 실제 학교코드]</strong> 엑셀이 있다면 <strong>[자체 기준 명부 등록]</strong>에 1번만 등록해 두세요. K-에듀파인 교부서식에 실제 학교코드가 1:1로 영구 직결됩니다. <span className="text-blue-600">(미등록 시에도 임시 기관코드 <code className="bg-white/80 px-1 py-0.5 rounded text-blue-700">B1000001</code>로 안전하게 자동 부여됩니다)</span>
+                    지원청의 <strong>[학교명 - 연번]</strong> 엑셀이 있다면 <strong>[자체 기준 명부 등록]</strong>에 1회 등록해 두세요. 등록된 학교 순서대로 깔끔하게 자동 정렬되고, 미제출 학교도 1초 만에 자동 파악됩니다. <span className="text-blue-600">(명부가 없어도 제출된 파일 순서대로 자유롭게 자동 수합됩니다)</span>
                   </p>
                 </div>
               </div>
@@ -3640,29 +3640,41 @@ export default function ExcelMergePage() {
                 </div>
               </div>
 
-              {/* 2단계: 2대 모드 & 헤더 1초 확인 */}
+              {/* 2단계: 양식 모드 & 헤더 끝 행 지정 */}
               <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
                 <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
                   2
                 </div>
-                <div className="space-y-1.5 flex-1">
+                <div className="space-y-2 flex-1">
                   <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
-                    <span>양식 모드 선택 & 헤더 끝 행 확인</span>
-                    <span className="text-xs text-indigo-600 font-bold">1초 눈확인</span>
+                    <span>양식 모드 선택 & 헤더 끝 행 확인 (★ 핵심)</span>
+                    <span className="text-xs text-indigo-600 font-bold">1초 확인</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                     <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
                       <strong className="text-indigo-950 block mb-0.5 font-black">🥞 서식 블록형</strong>
-                      <span className="text-slate-600">학교당 2줄 이상 복합 서식/수식 (급식비, 인건비, 신청서)</span>
+                      <span className="text-slate-600">학교당 여러 줄 복합 서식/수식 (급식비, 인건비, 목적사업비)</span>
                     </div>
                     <div className="bg-white border border-indigo-100 rounded-xl p-2.5">
                       <strong className="text-indigo-950 block mb-0.5 font-black">📄 단순 목록형</strong>
                       <span className="text-slate-600">학교당 1줄씩 나열되는 명부 (수요조사, 비품 실태조사)</span>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-500 font-medium">
-                    🔍 <strong>헤더 끝 행</strong>은 엑셀 등록 시 자동 감지됩니다. 혹시 다를 경우 아래 뷰어에서 헤더 마지막 행을 클릭하면 1초 만에 수정됩니다.
-                  </p>
+                  {/* 헤더 끝 행 지정 방법 상세 안내 */}
+                  <div className="bg-indigo-50/80 border border-indigo-200/90 rounded-xl p-3 text-xs space-y-1.5">
+                    <div className="font-black text-indigo-950 flex items-center gap-1.5">
+                      <span className="text-indigo-600">🎯</span>
+                      <span>[헤더 끝 행]이란 무엇이고 어떻게 지정하나요?</span>
+                    </div>
+                    <ul className="list-disc list-inside space-y-1 text-indigo-900/90 leading-relaxed font-medium">
+                      <li>
+                        <strong>역할:</strong> 표의 제목/항목명(연번, 학교명, 신청금액 등)이 끝나는 <strong>마지막 행 번호</strong>입니다. 이 행 바로 다음 줄부터 실제 각 학교의 데이터(본문)가 합쳐집니다.
+                      </li>
+                      <li>
+                        <strong>지정 방법:</strong> 파일 등록 시 프로그램이 <strong>파란색 음영으로 자동 감지</strong>합니다. 만약 실제 표 제목과 다를 경우, 아래 <strong>[시트 뷰어 표]에서 표 제목의 마지막 행을 마우스로 &lsquo;콕&rsquo; 클릭</strong>하시면 1초 만에 즉시 수정됩니다.
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
@@ -3677,32 +3689,32 @@ export default function ExcelMergePage() {
                     <span className="text-xs text-emerald-600 font-bold">0.5초 고속 연산</span>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                    어떤 모드를 선택하든 <strong>[통합 마스터 서식]</strong>과 <strong>[K-에듀파인 교부서식]</strong> 2가지가 한 번에 100% 동시 자동 생성됩니다.
+                    클릭 즉시 모든 학교 파일의 서식과 수식을 100% 온전하게 보존한 <strong>[취합 마스터 엑셀]</strong>이 고속 생성됩니다.
                   </p>
                   <p className="text-xs text-emerald-700 font-medium">
-                    🟢 정상 제출 및 🔴 미제출 학교가 신호등으로 즉시 집계되며, <strong>[📋 미제출 독촉 명단 1초 복사]</strong>가 가능합니다.
+                    🟢 정상 제출 및 🔴 미제출 학교가 5대 신호등으로 즉시 자동 분류되며, <strong>[📋 미제출 독촉 명단 1초 복사]</strong>가 가능합니다.
                   </p>
                 </div>
               </div>
 
-              {/* 4단계: 2-Way 맞춤 다운로드 */}
+              {/* 4단계: 결과 확인 및 엑셀 다운로드 */}
               <div className="flex items-start gap-3.5 bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
                 <div className="w-10 h-10 rounded-2xl bg-blue-700 text-white font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs mt-0.5">
                   4
                 </div>
                 <div className="space-y-1.5 flex-1">
                   <div className="font-black text-slate-900 text-base sm:text-lg flex items-center justify-between">
-                    <span>맞춤형 2-Way 다운로드</span>
+                    <span>결과 확인 및 엑셀 다운로드</span>
                     <span className="text-xs text-blue-700 font-bold">원클릭 저장</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                     <div className="bg-white border border-slate-200 rounded-xl p-2.5">
-                      <strong className="text-slate-900 block mb-0.5 font-black">📥 마스터 엑셀 (통합본)</strong>
-                      <span className="text-slate-600">Sheet 1(취합본) + Sheet 2(교부서식)가 합쳐진 내부 보관용</span>
+                      <strong className="text-slate-900 block mb-0.5 font-black">📥 마스터 엑셀 다운로드</strong>
+                      <span className="text-slate-600">모든 학교의 서식·수식·셀병합이 100% 보존된 최종 취합본</span>
                     </div>
                     <div className="bg-white border border-blue-200 rounded-xl p-2.5">
-                      <strong className="text-blue-900 block mb-0.5 font-black">🚀 K-에듀파인 전용 다운로드</strong>
-                      <span className="text-blue-800">에듀파인 시스템에 즉시 파일 업로드 가능한 단독 서식</span>
+                      <strong className="text-blue-900 block mb-0.5 font-black">📊 종합보고서 / 현재 목록 엑셀</strong>
+                      <span className="text-blue-800">정상, 미제출, 오류, 중복 현황이 엑셀 필터와 함께 정리된 보고서</span>
                     </div>
                   </div>
                 </div>
