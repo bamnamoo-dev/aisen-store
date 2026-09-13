@@ -10,7 +10,7 @@ import {
   Layers, Copy, RefreshCw, Sparkles, FileText, ArrowRight, ShieldCheck, 
   HelpCircle, ChevronDown, Check, Send, DownloadCloud, FileCheck2, School,
   FlaskConical, Archive, Eye, FileUp, Building2, SlidersHorizontal, BookOpen,
-  RotateCcw, X, ClipboardList
+  RotateCcw, X, ClipboardList, Search, ArrowUpDown, ArrowUp, ArrowDown, Filter
 } from 'lucide-react';
 
 interface SchoolItem {
@@ -29,6 +29,7 @@ interface ProcessedFile {
   errorMsg?: string;
   dataBlock?: any;
   rowCount?: number;
+  fitness?: number;
 }
 
 // 기준 명부 옵션 (실무 최적화: '명부 없음' 기본 + '자체 기준 명부')
@@ -79,6 +80,11 @@ export default function ExcelMergePage() {
   const [copiedNotification, setCopiedNotification] = useState(false);
   const [activeReportTab, setActiveReportTab] = useState<'all' | 'missing' | 'error' | 'duplicate' | 'matched'>('missing');
   const [copiedReportType, setCopiedReportType] = useState<string | null>(null);
+
+  // 🌟 제출 현황 및 서식 검증 리스트 실시간 필터 & 다각도 정렬 상태
+  const [reportSearchKeyword, setReportSearchKeyword] = useState<string>('');
+  const [reportSortField, setReportSortField] = useState<'seq' | 'name' | 'filename'>('seq');
+  const [reportSortOrder, setReportSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // 엑셀 시트 상단 미리보기 & 스마트 헤더 선택기 상태
   const [previewRows, setPreviewRows] = useState<Array<{ rowNum: number; cells: string[] }>>([]);
@@ -797,6 +803,9 @@ export default function ExcelMergePage() {
     setAutoDetectedBadge('');
     setActiveReportTab('missing');
     setCopiedReportType(null);
+    setReportSearchKeyword('');
+    setReportSortField('seq');
+    setReportSortOrder('asc');
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (rosterInputRef.current) rosterInputRef.current.value = '';
   };
@@ -818,7 +827,7 @@ export default function ExcelMergePage() {
 
     const ExcelJS = (window as any).ExcelJS;
     const processed: ProcessedFile[] = [];
-    const matchedMap = new Map<number, { file: File; school: SchoolItem; data: any }>();
+    const matchedMap = new Map<number, { file: File; school: SchoolItem; data: any; fitness?: number }>();
 
     try {
       // 1. 기준 템플릿 파일 로드 (첫 번째 유효한 엑셀 파일을 스마트 탐색)
@@ -931,27 +940,65 @@ export default function ExcelMergePage() {
             continue;
           }
 
+          // 🌟 1. 전체 시트 중 기준 템플릿과 가장 적합한 최적 시트 탐색 & 지문 적합도(Fitness Score) 산출
           let ws: any = null;
-          // 1. 시트명 직접 일치 우선 (예: '신청서식')
-          if (previewSheetName) {
-            ws = wb.worksheets.find((s: any) => s.name === previewSheetName);
-          }
-          // 2. 키워드 일치 (예: '신청' or '급식' or '인건비')
-          if (!ws && sheetKeyword) {
-            ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
-          }
-          // 3. 사용자가 지정한 탭 순번
-          if (!ws && selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
+          let bestFitness = -1;
+          let bestMatchedWords = 0;
+
+          // 1-1. 사용자가 상단 미리보기에서 특정 시트 순번을 직접 클릭한 경우 우선 반영
+          if (selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
             ws = wb.worksheets[selectedSheetIndex];
           }
-          // 4. 2번째 또는 1번째 시트
+
+          // 1-2. 각 시트의 헤더 지문(Fingerprint) 정밀 스캔하여 기준 템플릿과 일치도가 가장 높은 최적 시트 자동 선택
+          for (const s of wb.worksheets) {
+            let score = 0;
+            // 시트명 매칭 가산점 (미리보기 시트명 일치 +50, 키워드 일치 +25)
+            if (previewSheetName && s.name === previewSheetName) score += 50;
+            else if (sheetKeyword && s.name.includes(sheetKeyword)) score += 25;
+
+            // 시트 헤더 단어 일치도 측정 (1~20행)
+            let matchCount = 0;
+            const scannedWords = new Set<string>();
+            const scanMaxRow = Math.min(s.rowCount || 0, Math.max(headerEndRow + 3, 20));
+
+            for (let r = 1; r <= scanMaxRow; r++) {
+              const row = s.getRow(r);
+              row.eachCell({ includeEmpty: false }, (c: any) => {
+                const val = c.value;
+                const txt = String(val && typeof val === 'object' ? (val.result || val.formula || '') : (val || '')).trim();
+                if (txt.length >= 2) {
+                  const clean = txt.replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g, ' ');
+                  clean.split(/\s+/).forEach(w => {
+                    const lower = w.toLowerCase();
+                    if (lower.length >= 2 && !scannedWords.has(lower)) {
+                      scannedWords.add(lower);
+                      if (templateCoreWords.has(lower)) {
+                        matchCount++;
+                      }
+                    }
+                  });
+                }
+              });
+            }
+
+            score += matchCount * 5;
+            if (score > bestFitness) {
+              bestFitness = score;
+              if (selectedSheetIndex < 0) {
+                ws = s;
+              }
+              bestMatchedWords = matchCount;
+            }
+          }
+
           if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
 
           // 🌟 스마트 시트 자동 보정: 선택된 ws의 행 수가 blockStartRow보다 작다면 유효 데이터 시트 자동 탐색!
           if (ws && (ws.rowCount || 0) < blockStartRow) {
             const candidate = wb.worksheets.find((s: any) => 
               (s.rowCount || 0) >= blockStartRow && 
-              (s.name.includes('신청') || s.name.includes('서식') || s.name.includes('급식') || (s.rowCount || 0) > 10)
+              ((previewSheetName && s.name === previewSheetName) || (sheetKeyword && s.name.includes(sheetKeyword)) || (s.rowCount || 0) > 10)
             );
             if (candidate) {
               ws = candidate;
@@ -971,50 +1018,16 @@ export default function ExcelMergePage() {
             continue;
           }
 
-          // 🚨 C-2. 서식 지문(Fingerprint) 정밀 대조: 다른 업무 양식(석면/공사/인사 등) 자동 감지 및 100% 취합 제외
-          if (templateHeaderWords.size >= 2) {
-            let matchedCoreWords = 0;
-            let matchedTotalWords = 0;
-            const scannedWords = new Set<string>();
-            const scanMaxRow = Math.min(ws.rowCount || 0, Math.max(headerEndRow + 3, 20));
-
-            for (let r = 1; r <= scanMaxRow; r++) {
-              const row = ws.getRow(r);
-              row.eachCell({ includeEmpty: false }, (c: any) => {
-                const val = c.value;
-                const txt = String(val && typeof val === 'object' ? (val.result || val.formula || '') : (val || '')).trim();
-                if (txt.length >= 2) {
-                  const clean = txt.replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g, ' ');
-                  clean.split(/\s+/).forEach(w => {
-                    const lower = w.toLowerCase();
-                    if (lower.length >= 2 && !scannedWords.has(lower)) {
-                      scannedWords.add(lower);
-                      if (templateHeaderWords.has(lower)) {
-                        matchedTotalWords++;
-                        if (templateCoreWords.has(lower)) {
-                          matchedCoreWords++;
-                        }
-                      }
-                    }
-                  });
-                }
-              });
-            }
-
-            // 핵심 업무 단어가 2개 이상 정의되어 있는데 매칭이 0개이거나, 총 헤더 단어 일치가 1개 이하인 경우 완벽 차단!
-            const isDifferentForm = (templateCoreWords.size >= 2 && matchedCoreWords === 0) ||
-              (templateHeaderWords.size >= 4 && matchedTotalWords <= 1);
-
-            if (isDifferentForm) {
-              processed.push({
-                name: file.name,
-                size: file.size,
-                schoolName: fallbackSchoolName,
-                status: 'error',
-                errorMsg: '서식 불일치 (다른 업무 양식 제출 - 자동 제외)'
-              });
-              continue; // 🚀 취합 데이터(matchedMap)에 절대 결합하지 않고 즉시 패스!
-            }
+          // 🚨 C-2. 서식 지문(Fingerprint) 정밀 대조: 기준 템플릿의 핵심 단어가 5개 이상인데 일치 단어가 0개이면 완전 다른 업무 양식 자동 제외!
+          if (templateCoreWords.size >= 5 && bestMatchedWords === 0 && (!previewSheetName || ws.name !== previewSheetName)) {
+            processed.push({
+              name: file.name,
+              size: file.size,
+              schoolName: fallbackSchoolName,
+              status: 'error',
+              errorMsg: '서식 불일치 (다른 업무 양식 제출 - 자동 제외)'
+            });
+            continue; // 🚀 취합 데이터에 절대 결합하지 않고 즉시 패스!
           }
 
           // 🚨 C-3. 단일 학교 서식 아님 감지 (수십 개 시설이 나열된 총괄 대장 파일 침범 원천 차단)
@@ -1086,31 +1099,51 @@ export default function ExcelMergePage() {
             continue; // 🚀 패스!
           }
 
+          const candidateRecord: ProcessedFile = {
+            name: file.name,
+            size: file.size,
+            schoolName: finalSchoolName,
+            matchedSeq: finalSeq,
+            status: 'matched',
+            fitness: bestFitness
+          };
+
           if (matchedMap.has(finalSeq)) {
-            processed.push({
-              name: file.name,
-              size: file.size,
-              schoolName: finalSchoolName,
-              matchedSeq: finalSeq,
-              status: 'duplicate',
-              errorMsg: `중복 제출 기관 (연번 ${finalSeq})`
-            });
+            const existing = matchedMap.get(finalSeq)!;
+            const existingFitness = existing.fitness ?? 0;
+
+            if (bestFitness > existingFitness) {
+              // 🏆 새 파일이 템플릿과 더 잘 맞음! (예: 앞서 들어온 파일이 엉뚱한 파일이거나 구버전이고 지금 파일이 진짜 서식)
+              const oldIdx = processed.findIndex(p => p.name === existing.file.name && p.matchedSeq === finalSeq);
+              if (oldIdx >= 0) {
+                processed[oldIdx].status = 'duplicate';
+                processed[oldIdx].errorMsg = `중복 제출 기관 (연번 ${finalSeq}) - 더 적합한 서식으로 대체됨`;
+              }
+              matchedMap.set(finalSeq, {
+                file,
+                school: { seq: finalSeq, name: finalSchoolName, code: matchedSchool?.code || matchedSchoolByName?.code },
+                data: ws,
+                fitness: bestFitness
+              });
+              candidateRecord.status = 'matched';
+              processed.push(candidateRecord);
+            } else {
+              // 기존에 먼저 등록된 파일이 더 적합하거나 동일함 -> 새 파일은 중복으로 처리
+              candidateRecord.status = 'duplicate';
+              candidateRecord.errorMsg = `중복 제출 기관 (연번 ${finalSeq})`;
+              processed.push(candidateRecord);
+            }
             continue;
           }
 
           matchedMap.set(finalSeq, {
             file,
             school: { seq: finalSeq, name: finalSchoolName, code: matchedSchool?.code || matchedSchoolByName?.code },
-            data: ws
+            data: ws,
+            fitness: bestFitness
           });
 
-          processed.push({
-            name: file.name,
-            size: file.size,
-            schoolName: finalSchoolName,
-            matchedSeq: finalSeq,
-            status: 'matched'
-          });
+          processed.push(candidateRecord);
 
         } catch (err: any) {
           processed.push({
@@ -1492,7 +1525,7 @@ export default function ExcelMergePage() {
     URL.revokeObjectURL(url);
   };
 
-  // 3. 📊 종합 취합 결과 보고서 엑셀 파일(.xlsx) 생성 및 다운로드
+  // 3. 📊 종합 취합 결과 보고서 엑셀 파일(.xlsx) 생성 및 다운로드 (정렬 & 자동 필터 완비)
   const handleDownloadReportExcel = async () => {
     try {
       const ExcelJS = (window as any).ExcelJS;
@@ -1505,9 +1538,31 @@ export default function ExcelMergePage() {
       wb.creator = 'AI-SEN 엑셀수합';
       wb.created = new Date();
 
-      const matchedItems = processedList.filter(p => p.status === 'matched');
-      const errorItems = processedList.filter(p => p.status === 'error');
-      const duplicateItems = processedList.filter(p => p.status === 'duplicate');
+      // 사용자 선택 정렬 기준 반영 헬퍼
+      const sortList = <T extends { seq?: any; name?: string; schoolName?: string; matchedSeq?: any }>(list: T[]): T[] => {
+        return [...list].sort((a: any, b: any) => {
+          let cmp = 0;
+          if (reportSortField === 'seq') {
+            const seqA = a.matchedSeq !== undefined ? a.matchedSeq : (a.seq !== undefined ? a.seq : 999999);
+            const seqB = b.matchedSeq !== undefined ? b.matchedSeq : (b.seq !== undefined ? b.seq : 999999);
+            cmp = seqA - seqB;
+          } else if (reportSortField === 'name') {
+            const nameA = a.schoolName || a.name || '';
+            const nameB = b.schoolName || b.name || '';
+            cmp = nameA.localeCompare(nameB, 'ko');
+          } else if (reportSortField === 'filename') {
+            const fileA = a.name || '';
+            const fileB = b.name || '';
+            cmp = fileA.localeCompare(fileB, 'ko');
+          }
+          return reportSortOrder === 'asc' ? cmp : -cmp;
+        });
+      };
+
+      const matchedItems = sortList(processedList.filter(p => p.status === 'matched'));
+      const errorItems = sortList(processedList.filter(p => p.status === 'error'));
+      const duplicateItems = sortList(processedList.filter(p => p.status === 'duplicate'));
+      const sortedMissingSchools = sortList(missingSchools);
       const totalCount = targetSchools.length > 0 ? targetSchools.length : (matchedItems.length + missingSchools.length);
 
       // --- [시트 1: 📊 취합 총괄 보고서] ---
@@ -1533,7 +1588,9 @@ export default function ExcelMergePage() {
       const subCell = ws1.getCell('A3');
       const now = new Date();
       const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      subCell.value = `작성일시: ${dateStr} · 총 관리 대상 ${totalCount}개소 기준`;
+      const sortLabel = reportSortField === 'seq' ? '연번순' : (reportSortField === 'name' ? '학교명순' : '파일명순');
+      const orderLabel = reportSortOrder === 'asc' ? '오름차순' : '내림차순';
+      subCell.value = `작성일시: ${dateStr} · 총 관리 대상 ${totalCount}개소 기준 · 적용 정렬: ${sortLabel}(${orderLabel})`;
       subCell.font = { name: '맑은 고딕', size: 10, color: { argb: 'FF64748B' } };
 
       // 5대 통계 요약 카드 표 (5행~6행)
@@ -1563,7 +1620,7 @@ export default function ExcelMergePage() {
 
       // 섹션 1: 미제출 기관 목록
       let startRow = 9;
-      ws1.getCell(startRow, 1).value = `🔴 미제출 기관 명단 (${missingSchools.length}개소)`;
+      ws1.getCell(startRow, 1).value = `🔴 미제출 기관 명단 (${sortedMissingSchools.length}개소)`;
       ws1.getCell(startRow, 1).font = { name: '맑은 고딕', size: 13, bold: true, color: { argb: 'FFBE123C' } };
       startRow++;
 
@@ -1576,11 +1633,11 @@ export default function ExcelMergePage() {
       }
       startRow++;
 
-      if (missingSchools.length === 0) {
+      if (sortedMissingSchools.length === 0) {
         ws1.getCell(startRow, 2).value = '미제출 기관이 없습니다. (전원 제출 완료)';
         startRow++;
       } else {
-        missingSchools.forEach((s) => {
+        sortedMissingSchools.forEach((s) => {
           const r = ws1.getRow(startRow);
           r.values = [s.seq, s.name, s.code || '-', s.type || '초·중·고', '미제출 (독촉 대상)'];
           r.font = { name: '맑은 고딕', size: 10 };
@@ -1595,7 +1652,7 @@ export default function ExcelMergePage() {
 
       // 섹션 2: 서식 오류 및 다른 양식 제출 목록
       startRow += 2;
-      ws1.getCell(startRow, 1).value = `⚠️ 서식 오류 및 다른 양식 제출 목록 (${errorItems.length}건 - 취합 데이터에서 제외됨)`;
+      ws1.getCell(startRow, 1).value = `⚠️ 서식 오류 및 다른 양식 제출 목록 (${errorItems.length}건 - 취합 제외)`;
       ws1.getCell(startRow, 1).font = { name: '맑은 고딕', size: 13, bold: true, color: { argb: 'FFB45309' } };
       startRow++;
 
@@ -1624,6 +1681,33 @@ export default function ExcelMergePage() {
         });
       }
 
+      // 섹션 3: 중복 제출 목록
+      if (duplicateItems.length > 0) {
+        startRow += 2;
+        ws1.getCell(startRow, 1).value = `🟡 중복 제출 목록 (${duplicateItems.length}건 - 최초 유효본 외 제외)`;
+        ws1.getCell(startRow, 1).font = { name: '맑은 고딕', size: 13, bold: true, color: { argb: 'FFB45309' } };
+        startRow++;
+
+        const dupHeaderRow = ws1.getRow(startRow);
+        dupHeaderRow.values = ['순번', '기관·학교명', '중복 제출 파일명', '기존 등록 연번', '조치 사항'];
+        dupHeaderRow.font = { name: '맑은 고딕', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+        for (let c = 1; c <= 5; c++) {
+          ws1.getCell(startRow, c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD97706' } };
+          ws1.getCell(startRow, c).alignment = { horizontal: 'center', vertical: 'middle' };
+        }
+        startRow++;
+
+        duplicateItems.forEach((item, idx) => {
+          const r = ws1.getRow(startRow);
+          r.values = [idx + 1, item.schoolName, item.name, item.matchedSeq || '-', '최초 유효본 반영 후 중복 제외'];
+          r.font = { name: '맑은 고딕', size: 10 };
+          r.getCell(1).alignment = { horizontal: 'center' };
+          r.getCell(4).alignment = { horizontal: 'center' };
+          r.getCell(5).alignment = { horizontal: 'center' };
+          startRow++;
+        });
+      }
+
       // --- [시트 2: 🔴 미제출 기관] ---
       const ws2 = wb.addWorksheet('미제출 기관');
       ws2.columns = [{ width: 10 }, { width: 30 }, { width: 18 }, { width: 20 }];
@@ -1631,11 +1715,16 @@ export default function ExcelMergePage() {
       ws2.getRow(1).font = { name: '맑은 고딕', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
       for (let c = 1; c <= 4; c++) {
         ws2.getCell(1, c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE11D48' } };
-        ws2.getCell(1, c).alignment = { horizontal: 'center' };
+        ws2.getCell(1, c).alignment = { horizontal: 'center', vertical: 'middle' };
       }
-      missingSchools.forEach(s => {
-        ws2.addRow([s.seq, s.name, s.code || '', '독촉 대상']);
+      sortedMissingSchools.forEach(s => {
+        const r = ws2.addRow([s.seq, s.name, s.code || '', '독촉 대상']);
+        r.font = { name: '맑은 고딕', size: 10 };
+        r.getCell(1).alignment = { horizontal: 'center' };
+        r.getCell(3).alignment = { horizontal: 'center' };
+        r.getCell(4).alignment = { horizontal: 'center' };
       });
+      ws2.autoFilter = { from: 'A1', to: `D${Math.max(2, sortedMissingSchools.length + 1)}` };
 
       // --- [시트 3: ⚠️ 서식오류(재제출요청)] ---
       const ws3 = wb.addWorksheet('서식오류(재제출)');
@@ -1644,11 +1733,16 @@ export default function ExcelMergePage() {
       ws3.getRow(1).font = { name: '맑은 고딕', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
       for (let c = 1; c <= 5; c++) {
         ws3.getCell(1, c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD97706' } };
-        ws3.getCell(1, c).alignment = { horizontal: 'center' };
+        ws3.getCell(1, c).alignment = { horizontal: 'center', vertical: 'middle' };
       }
       errorItems.forEach((item, idx) => {
-        ws3.addRow([idx + 1, item.schoolName, item.name, item.errorMsg || '서식 불일치', '재제출 요청']);
+        const r = ws3.addRow([idx + 1, item.schoolName, item.name, item.errorMsg || '서식 불일치', '재제출 요청']);
+        r.font = { name: '맑은 고딕', size: 10 };
+        r.getCell(1).alignment = { horizontal: 'center' };
+        r.getCell(4).font = { name: '맑은 고딕', size: 10, bold: true, color: { argb: 'FFDC2626' } };
+        r.getCell(5).alignment = { horizontal: 'center' };
       });
+      ws3.autoFilter = { from: 'A1', to: `E${Math.max(2, errorItems.length + 1)}` };
 
       // --- [시트 4: 🟢 정상 수합 완료] ---
       const ws4 = wb.addWorksheet('정상 수합 완료');
@@ -1657,24 +1751,226 @@ export default function ExcelMergePage() {
       ws4.getRow(1).font = { name: '맑은 고딕', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
       for (let c = 1; c <= 4; c++) {
         ws4.getCell(1, c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } };
-        ws4.getCell(1, c).alignment = { horizontal: 'center' };
+        ws4.getCell(1, c).alignment = { horizontal: 'center', vertical: 'middle' };
       }
       matchedItems.forEach((item, idx) => {
-        ws4.addRow([item.matchedSeq || idx + 1, item.schoolName, item.name, '정상 수합']);
+        const r = ws4.addRow([item.matchedSeq || idx + 1, item.schoolName, item.name, '정상 수합']);
+        r.font = { name: '맑은 고딕', size: 10 };
+        r.getCell(1).alignment = { horizontal: 'center' };
+        r.getCell(4).alignment = { horizontal: 'center' };
       });
+      ws4.autoFilter = { from: 'A1', to: `D${Math.max(2, matchedItems.length + 1)}` };
+
+      // --- [시트 5: 🟡 중복 제출] ---
+      const ws5 = wb.addWorksheet('중복 제출');
+      ws5.columns = [{ width: 8 }, { width: 28 }, { width: 45 }, { width: 16 }, { width: 25 }];
+      ws5.addRow(['순번', '학교명', '제출 파일명', '기존 연번', '비고']);
+      ws5.getRow(1).font = { name: '맑은 고딕', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+      for (let c = 1; c <= 5; c++) {
+        ws5.getCell(1, c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD97706' } };
+        ws5.getCell(1, c).alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+      duplicateItems.forEach((item, idx) => {
+        const r = ws5.addRow([idx + 1, item.schoolName, item.name, item.matchedSeq || '-', '최초 유효본 외 중복 제외']);
+        r.font = { name: '맑은 고딕', size: 10 };
+        r.getCell(1).alignment = { horizontal: 'center' };
+        r.getCell(4).alignment = { horizontal: 'center' };
+        r.getCell(5).alignment = { horizontal: 'center' };
+      });
+      ws5.autoFilter = { from: 'A1', to: `E${Math.max(2, duplicateItems.length + 1)}` };
 
       const reportBuffer = await wb.xlsx.writeBuffer();
       const reportBlob = new Blob([reportBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url = URL.createObjectURL(reportBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `취합결과_종합보고서_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.download = `취합결과_종합보고서_${sortLabel}_${new Date().toISOString().slice(0, 10)}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (e: any) {
       alert('종합 보고서 엑셀 생성 실패: ' + e.message);
+    }
+  };
+
+  // 🌟 실시간 검색 필터 및 다각도 정렬 연산
+  const kw = reportSearchKeyword.trim().toLowerCase();
+  const filterAndSort = <T extends { seq?: any; name?: string; schoolName?: string; matchedSeq?: any; errorMsg?: string }>(
+    list: T[]
+  ): T[] => {
+    let result = list;
+    if (kw) {
+      result = result.filter(item => {
+        const name = (item.schoolName || item.name || '').toLowerCase();
+        const file = (item.name || '').toLowerCase();
+        const err = (item.errorMsg || '').toLowerCase();
+        const seqStr = String(item.matchedSeq !== undefined ? item.matchedSeq : (item.seq !== undefined ? item.seq : ''));
+        return name.includes(kw) || file.includes(kw) || err.includes(kw) || seqStr.includes(kw);
+      });
+    }
+    return [...result].sort((a: any, b: any) => {
+      let cmp = 0;
+      if (reportSortField === 'seq') {
+        const seqA = a.matchedSeq !== undefined ? a.matchedSeq : (a.seq !== undefined ? a.seq : 999999);
+        const seqB = b.matchedSeq !== undefined ? b.matchedSeq : (b.seq !== undefined ? b.seq : 999999);
+        cmp = seqA - seqB;
+      } else if (reportSortField === 'name') {
+        const nameA = a.schoolName || a.name || '';
+        const nameB = b.schoolName || b.name || '';
+        cmp = nameA.localeCompare(nameB, 'ko');
+      } else if (reportSortField === 'filename') {
+        const fileA = a.name || '';
+        const fileB = b.name || '';
+        cmp = fileA.localeCompare(fileB, 'ko');
+      }
+      return reportSortOrder === 'asc' ? cmp : -cmp;
+    });
+  };
+
+  const filteredMissing = filterAndSort(missingSchools);
+  const filteredError = filterAndSort(processedList.filter(p => p.status === 'error'));
+  const filteredDuplicate = filterAndSort(processedList.filter(p => p.status === 'duplicate'));
+  const filteredMatched = filterAndSort(processedList.filter(p => p.status === 'matched'));
+  const filteredAll = filterAndSort(processedList);
+
+  // 4. 📥 현재 화면에 필터링 및 정렬된 목록 그대로 엑셀 다운로드 (자동 필터 탑재)
+  const handleDownloadCurrentViewExcel = async () => {
+    try {
+      const ExcelJS = (window as any).ExcelJS;
+      if (!ExcelJS) {
+        alert('ExcelJS 엔진을 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      const wb = new ExcelJS.Workbook();
+      wb.creator = 'AI-SEN 엑셀수합';
+      wb.created = new Date();
+
+      let tabTitle = '전체 현황';
+      let itemsToExport: Array<{ seq: any; name: string; file: string; status: string; note: string }> = [];
+
+      if (activeReportTab === 'missing') {
+        tabTitle = '미제출 기관';
+        itemsToExport = filteredMissing.map(s => ({
+          seq: s.seq,
+          name: s.name,
+          file: '-',
+          status: '미제출',
+          note: s.code ? `기관코드: ${s.code}` : '독촉 대상'
+        }));
+      } else if (activeReportTab === 'error') {
+        tabTitle = '서식오류 (취합제외)';
+        itemsToExport = filteredError.map((item, idx) => ({
+          seq: item.matchedSeq || (idx + 1),
+          name: item.schoolName,
+          file: item.name,
+          status: '서식오류',
+          note: item.errorMsg || '서식 불일치'
+        }));
+      } else if (activeReportTab === 'duplicate') {
+        tabTitle = '중복 제출';
+        itemsToExport = filteredDuplicate.map((item, idx) => ({
+          seq: item.matchedSeq || (idx + 1),
+          name: item.schoolName,
+          file: item.name,
+          status: '중복제출',
+          note: item.errorMsg || `중복 (연번 ${item.matchedSeq || '-'})`
+        }));
+      } else if (activeReportTab === 'matched') {
+        tabTitle = '정상 수합 완료';
+        itemsToExport = filteredMatched.map((item, idx) => ({
+          seq: item.matchedSeq || (idx + 1),
+          name: item.schoolName,
+          file: item.name,
+          status: '정상수합',
+          note: '정상 결합'
+        }));
+      } else {
+        tabTitle = '전체 파일 처리현황';
+        itemsToExport = filteredAll.map((item, idx) => ({
+          seq: item.matchedSeq || (idx + 1),
+          name: item.schoolName,
+          file: item.name,
+          status: item.status === 'matched' ? '정상' : (item.status === 'error' ? '서식오류' : (item.status === 'duplicate' ? '중복' : '미매칭')),
+          note: item.errorMsg || (item.status === 'matched' ? '정상 결합' : '-')
+        }));
+      }
+
+      const ws = wb.addWorksheet(tabTitle);
+      ws.columns = [
+        { width: 10 }, // A: 연번
+        { width: 32 }, // B: 기관·학교명
+        { width: 50 }, // C: 파일명
+        { width: 16 }, // D: 처리 상태
+        { width: 36 }  // E: 사유/비고
+      ];
+
+      // 대형 제목행
+      ws.addRow([`AI-SEN 검증 목록 - ${tabTitle}`]);
+      ws.mergeCells('A1:E1');
+      ws.getRow(1).height = 32;
+      ws.getCell('A1').font = { name: '맑은 고딕', size: 15, bold: true, color: { argb: 'FF1E3A8A' } };
+      ws.getCell('A1').alignment = { vertical: 'middle' };
+
+      // 부제행
+      const sortDesc = `${reportSortField === 'seq' ? '연번순' : (reportSortField === 'name' ? '학교명순' : '파일명순')} (${reportSortOrder === 'asc' ? '오름차순' : '내림차순'})`;
+      const filterDesc = reportSearchKeyword ? ` · 검색어: "${reportSearchKeyword}"` : '';
+      ws.addRow([`정렬: ${sortDesc}${filterDesc} · 추출건수: ${itemsToExport.length}건 · 일시: ${new Date().toLocaleString('ko-KR')}`]);
+      ws.mergeCells('A2:E2');
+      ws.getRow(2).height = 20;
+      ws.getCell('A2').font = { name: '맑은 고딕', size: 9, color: { argb: 'FF64748B' } };
+      ws.getCell('A2').alignment = { vertical: 'middle' };
+
+      // 빈 행
+      ws.addRow([]);
+
+      // 헤더행 (4행)
+      const headerRow = ws.addRow(['연번', '기관·학교명', '제출 파일명', '처리 상태', '사유 / 비고']);
+      headerRow.height = 25;
+      headerRow.font = { name: '맑은 고딕', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+      
+      const headerColor = activeReportTab === 'missing' ? 'FFE11D48' 
+                        : (activeReportTab === 'error' ? 'FFD97706' 
+                        : (activeReportTab === 'duplicate' ? 'FFD97706' 
+                        : (activeReportTab === 'matched' ? 'FF16A34A' : 'FF2563EB')));
+
+      for (let c = 1; c <= 5; c++) {
+        const cell = ws.getCell(4, c);
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: headerColor } };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+
+      // 데이터 채우기
+      itemsToExport.forEach(item => {
+        const r = ws.addRow([item.seq, item.name, item.file, item.status, item.note]);
+        r.font = { name: '맑은 고딕', size: 10 };
+        r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+        r.getCell(2).alignment = { vertical: 'middle' };
+        r.getCell(3).alignment = { vertical: 'middle' };
+        r.getCell(4).alignment = { horizontal: 'center', vertical: 'middle' };
+        r.getCell(5).alignment = { vertical: 'middle' };
+      });
+
+      // 🌟 자동 필터 (AutoFilter) 활성화: 엑셀을 열었을 때 상단 화살표 드롭다운으로 즉시 필터·정렬 가능!
+      ws.autoFilter = {
+        from: { row: 4, column: 1 },
+        to: { row: Math.max(5, 4 + itemsToExport.length), column: 5 }
+      };
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeTabName = tabTitle.replace(/[\s\(\)\/]/g, '_');
+      a.download = `검증리스트_${safeTabName}_${reportSortField}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert('현재 목록 엑셀 파일 생성 실패: ' + err.message);
     }
   };
 
@@ -2686,10 +2982,20 @@ export default function ExcelMergePage() {
                   <button
                     onClick={handleDownloadReportExcel}
                     className="text-xs sm:text-sm bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 border border-emerald-300 px-3.5 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
-                    title="미제출·서식오류·정상취합 4개 시트 종합 보고서 엑셀(.xlsx)을 다운로드합니다."
+                    title="미제출·서식오류·정상취합·중복제출 종합 보고서 엑셀(.xlsx)을 다운로드합니다."
                   >
                     <FileSpreadsheet size={15} className="text-emerald-700" />
                     <span>종합보고서 엑셀 다운로드</span>
+                  </button>
+
+                  {/* 현재 화면 목록 엑셀 다운로드 (활성화된 탭 + 검색 필터 + 정렬 반영) */}
+                  <button
+                    onClick={handleDownloadCurrentViewExcel}
+                    className="text-xs sm:text-sm bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-800 border border-blue-300 px-3.5 py-2 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    title="현재 보고 계신 탭의 필터·정렬된 목록을 엑셀(.xlsx)로 다운로드합니다 (엑셀 내 자동 필터 화살표 포함)."
+                  >
+                    <Download size={14} className="text-blue-700" />
+                    <span>현재 목록 엑셀</span>
                   </button>
 
                   {activeReportTab === 'missing' && missingSchools.length > 0 && (
@@ -2866,6 +3172,121 @@ export default function ExcelMergePage() {
                 );
               })()}
 
+              {/* 🔍 실시간 검색 필터 & 정렬 컨트롤 바 */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 sm:p-3 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
+                {/* 실시간 옴니 검색창 */}
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={reportSearchKeyword}
+                    onChange={(e) => setReportSearchKeyword(e.target.value)}
+                    placeholder="학교명, 파일명, 연번, 오류 사유 등으로 실시간 검색..."
+                    className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-8 py-1.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium"
+                  />
+                  {reportSearchKeyword && (
+                    <button
+                      onClick={() => setReportSearchKeyword('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full cursor-pointer"
+                      title="검색어 지우기"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                {/* 정렬 옵션 & 차순 선택 버튼 그룹 */}
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0">
+                  <div className="flex items-center gap-1 text-xs text-slate-500 font-bold mr-1">
+                    <Filter size={13} className="text-slate-400" />
+                    <span>정렬:</span>
+                  </div>
+
+                  {/* 연번순 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (reportSortField === 'seq') {
+                        setReportSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setReportSortField('seq');
+                        setReportSortOrder('asc');
+                      }
+                    }}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      reportSortField === 'seq'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
+                    }`}
+                    title="연번(기준명부 순번) 기준으로 정렬"
+                  >
+                    <span>연번순</span>
+                    {reportSortField === 'seq' && (
+                      reportSortOrder === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />
+                    )}
+                  </button>
+
+                  {/* 학교명순 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (reportSortField === 'name') {
+                        setReportSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setReportSortField('name');
+                        setReportSortOrder('asc');
+                      }
+                    }}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      reportSortField === 'name'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
+                    }`}
+                    title="학교/기관명 가나다순 정렬"
+                  >
+                    <span>학교명순</span>
+                    {reportSortField === 'name' && (
+                      reportSortOrder === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />
+                    )}
+                  </button>
+
+                  {/* 파일명순 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (reportSortField === 'filename') {
+                        setReportSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setReportSortField('filename');
+                        setReportSortOrder('asc');
+                      }
+                    }}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      reportSortField === 'filename'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
+                    }`}
+                    title="제출된 원본 파일명 가나다순 정렬"
+                  >
+                    <span>파일명순</span>
+                    {reportSortField === 'filename' && (
+                      reportSortOrder === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />
+                    )}
+                  </button>
+
+                  {/* 오름차순/내림차순 토글 */}
+                  <button
+                    type="button"
+                    onClick={() => setReportSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition-all flex items-center gap-1 cursor-pointer ml-0.5"
+                    title={reportSortOrder === 'asc' ? '현재: 오름차순 (클릭 시 내림차순 전환)' : '현재: 내림차순 (클릭 시 오름차순 전환)'}
+                  >
+                    <ArrowUpDown size={12} className="text-slate-500" />
+                    <span>{reportSortOrder === 'asc' ? '오름차순' : '내림차순'}</span>
+                  </button>
+                </div>
+              </div>
+
               {/* 탭별 본문 내용: 스크롤바 없이 전체 내용이 시원하게 다 펼쳐짐 (Full Expand) */}
               <div className="min-h-[160px] space-y-3">
                 {/* 1. 미제출 탭 */}
@@ -2876,14 +3297,30 @@ export default function ExcelMergePage() {
                       <span className="text-emerald-700 font-bold block text-base sm:text-lg">모든 대상 학교가 정상 제출되었습니다!</span>
                       <span className="text-xs sm:text-sm text-slate-500">미제출 기관이 0개소입니다.</span>
                     </div>
+                  ) : filteredMissing.length === 0 ? (
+                    <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                      <Search size={28} className="mx-auto text-slate-400 mb-2 opacity-60" />
+                      <p className="text-sm font-bold text-slate-600">
+                        &ldquo;{reportSearchKeyword}&rdquo; 검색어와 일치하는 미제출 기관이 없습니다.
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">다른 검색어를 입력하시거나 검색어를 지워보세요.</p>
+                      <button
+                        onClick={() => setReportSearchKeyword('')}
+                        className="mt-3 text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-bold hover:bg-slate-100 transition-all cursor-pointer"
+                      >
+                        검색어 초기화
+                      </button>
+                    </div>
                   ) : (
                     <div className="space-y-2">
                       <div className="p-3 sm:p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs sm:text-sm text-rose-900 font-semibold flex items-center justify-between">
-                        <span>⚠️ 아래 {missingSchools.length}개 기관은 아직 서류를 제출하지 않았습니다. 독촉 공문 또는 메신저 쪽지를 발송하세요.</span>
-                        <span className="text-xs sm:text-sm text-rose-700 font-black">총 {missingSchools.length}개소</span>
+                        <span>⚠️ 아래 {filteredMissing.length}개 기관은 아직 서류를 제출하지 않았습니다. 독촉 공문 또는 메신저 쪽지를 발송하세요.</span>
+                        <span className="text-xs sm:text-sm text-rose-700 font-black">
+                          {reportSearchKeyword ? `검색 ${filteredMissing.length}개소 (전체 ${missingSchools.length}개소)` : `총 ${missingSchools.length}개소`}
+                        </span>
                       </div>
                       <div className="divide-y divide-rose-100 bg-rose-50/30 rounded-xl p-2 sm:p-3 border border-rose-100">
-                        {missingSchools.map((s, idx) => (
+                        {filteredMissing.map((s, idx) => (
                           <div key={idx} className="py-3 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-rose-100/50 rounded-lg transition-colors">
                             <div className="flex items-center gap-3 min-w-0">
                               <span className="font-black text-rose-800 text-sm sm:text-base w-8 text-right shrink-0">{s.seq}.</span>
@@ -2913,13 +3350,30 @@ export default function ExcelMergePage() {
                         </div>
                       );
                     }
+                    if (filteredError.length === 0) {
+                      return (
+                        <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                          <Search size={28} className="mx-auto text-slate-400 mb-2 opacity-60" />
+                          <p className="text-sm font-bold text-slate-600">
+                            &ldquo;{reportSearchKeyword}&rdquo; 검색어와 일치하는 서식 오류 파일이 없습니다.
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">다른 검색어를 입력하시거나 검색어를 지워보세요.</p>
+                          <button
+                            onClick={() => setReportSearchKeyword('')}
+                            className="mt-3 text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-bold hover:bg-slate-100 transition-all cursor-pointer"
+                          >
+                            검색어 초기화
+                          </button>
+                        </div>
+                      );
+                    }
                     return (
                       <div className="space-y-2">
                         <div className="p-3.5 sm:p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-950 font-medium leading-relaxed">
-                          ⚠️ 아래 <strong>{errorFiles.length}개 파일</strong>은 <strong>아예 다른 양식을 제출했거나 비엑셀(PDF) 등 오류</strong>가 발생하여 <span className="text-rose-700 font-bold underline">취합 데이터에서 자동으로 안전하게 제외</span>되었습니다. 올바른 서식으로 재제출을 요청하세요.
+                          ⚠️ 아래 <strong>{filteredError.length}개 파일</strong>은 <strong>아예 다른 양식을 제출했거나 비엑셀(PDF) 등 오류</strong>가 발생하여 <span className="text-rose-700 font-bold underline">취합 데이터에서 자동으로 안전하게 제외</span>되었습니다. 올바른 서식으로 재제출을 요청하세요.
                         </div>
                         <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white p-1">
-                          {errorFiles.map((item, idx) => (
+                          {filteredError.map((item, idx) => (
                             <div key={idx} className="py-3.5 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-rose-50/50 rounded-lg transition-colors">
                               <div className="min-w-0 space-y-1">
                                 <div className="flex flex-wrap items-center gap-2">
@@ -2956,13 +3410,30 @@ export default function ExcelMergePage() {
                         </div>
                       );
                     }
+                    if (filteredDuplicate.length === 0) {
+                      return (
+                        <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                          <Search size={28} className="mx-auto text-slate-400 mb-2 opacity-60" />
+                          <p className="text-sm font-bold text-slate-600">
+                            &ldquo;{reportSearchKeyword}&rdquo; 검색어와 일치하는 중복 제출 파일이 없습니다.
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">다른 검색어를 입력하시거나 검색어를 지워보세요.</p>
+                          <button
+                            onClick={() => setReportSearchKeyword('')}
+                            className="mt-3 text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-bold hover:bg-slate-100 transition-all cursor-pointer"
+                          >
+                            검색어 초기화
+                          </button>
+                        </div>
+                      );
+                    }
                     return (
                       <div className="space-y-2">
                         <div className="p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-950 font-medium leading-relaxed">
-                          동일 기관에서 중복 제출된 파일 {dupFiles.length}건입니다. 최초로 유효하게 처리된 파일이 취합에 반영되었습니다.
+                          동일 기관에서 중복 제출된 파일 {filteredDuplicate.length}건입니다. 최초로 유효하게 처리된 파일이 취합에 반영되었습니다.
                         </div>
                         <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white p-1">
-                          {dupFiles.map((item, idx) => (
+                          {filteredDuplicate.map((item, idx) => (
                             <div key={idx} className="py-3 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-amber-50/50 rounded-lg">
                               <div className="min-w-0 space-y-0.5">
                                 <span className="font-black text-slate-900 text-sm sm:text-base">{item.schoolName}</span>
@@ -2990,9 +3461,26 @@ export default function ExcelMergePage() {
                         </div>
                       );
                     }
+                    if (filteredMatched.length === 0) {
+                      return (
+                        <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                          <Search size={28} className="mx-auto text-slate-400 mb-2 opacity-60" />
+                          <p className="text-sm font-bold text-slate-600">
+                            &ldquo;{reportSearchKeyword}&rdquo; 검색어와 일치하는 정상 수합 내역이 없습니다.
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">다른 검색어를 입력하시거나 검색어를 지워보세요.</p>
+                          <button
+                            onClick={() => setReportSearchKeyword('')}
+                            className="mt-3 text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-bold hover:bg-slate-100 transition-all cursor-pointer"
+                          >
+                            검색어 초기화
+                          </button>
+                        </div>
+                      );
+                    }
                     return (
                       <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white p-1">
-                        {matchedFiles.map((item, idx) => (
+                        {filteredMatched.map((item, idx) => (
                           <div key={idx} className="py-3 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-emerald-50/40 rounded-lg">
                             <div className="flex items-center gap-3 min-w-0">
                               <span className="font-black text-emerald-800 text-sm sm:text-base w-8 text-right shrink-0">{item.matchedSeq || idx + 1}.</span>
@@ -3011,24 +3499,52 @@ export default function ExcelMergePage() {
 
                 {/* 5. 전체 보기 탭 */}
                 {activeReportTab === 'all' && (
-                  <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white p-1">
-                    {processedList.map((item, idx) => (
-                      <div key={idx} className="py-3 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50 rounded-lg">
-                        <div className="flex items-center gap-3 min-w-0">
-                          {item.status === 'matched' && <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />}
-                          {item.status === 'error' && <AlertCircle size={16} className="text-rose-600 shrink-0" />}
-                          {item.status === 'duplicate' && <AlertTriangle size={16} className="text-amber-500 shrink-0" />}
-                          <span className="font-bold text-slate-900 text-sm sm:text-base truncate">{item.schoolName}</span>
-                          <span className="text-slate-500 text-xs sm:text-sm truncate hidden sm:inline font-medium">({item.name})</span>
+                  (() => {
+                    if (processedList.length === 0) {
+                      return (
+                        <div className="text-center py-12 text-slate-400 text-sm font-medium">
+                          처리된 내역이 아직 없습니다.
                         </div>
-                        <div className="shrink-0">
-                          {item.status === 'matched' && <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold">정상</span>}
-                          {item.status === 'error' && <span className="bg-rose-100 text-rose-800 border border-rose-200 px-3 py-1 rounded-lg text-xs sm:text-sm font-black">{item.errorMsg || '오류'}</span>}
-                          {item.status === 'duplicate' && <span className="bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold">중복</span>}
+                      );
+                    }
+                    if (filteredAll.length === 0) {
+                      return (
+                        <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                          <Search size={28} className="mx-auto text-slate-400 mb-2 opacity-60" />
+                          <p className="text-sm font-bold text-slate-600">
+                            &ldquo;{reportSearchKeyword}&rdquo; 검색어와 일치하는 항목이 없습니다.
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">다른 검색어를 입력하시거나 검색어를 지워보세요.</p>
+                          <button
+                            onClick={() => setReportSearchKeyword('')}
+                            className="mt-3 text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-bold hover:bg-slate-100 transition-all cursor-pointer"
+                          >
+                            검색어 초기화
+                          </button>
                         </div>
+                      );
+                    }
+                    return (
+                      <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white p-1">
+                        {filteredAll.map((item, idx) => (
+                          <div key={idx} className="py-3 px-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50 rounded-lg">
+                            <div className="flex items-center gap-3 min-w-0">
+                              {item.status === 'matched' && <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />}
+                              {item.status === 'error' && <AlertCircle size={16} className="text-rose-600 shrink-0" />}
+                              {item.status === 'duplicate' && <AlertTriangle size={16} className="text-amber-500 shrink-0" />}
+                              <span className="font-bold text-slate-900 text-sm sm:text-base truncate">{item.schoolName}</span>
+                              <span className="text-slate-500 text-xs sm:text-sm truncate hidden sm:inline font-medium">({item.name})</span>
+                            </div>
+                            <div className="shrink-0">
+                              {item.status === 'matched' && <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold">정상</span>}
+                              {item.status === 'error' && <span className="bg-rose-100 text-rose-800 border border-rose-200 px-3 py-1 rounded-lg text-xs sm:text-sm font-black">{item.errorMsg || '오류'}</span>}
+                              {item.status === 'duplicate' && <span className="bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1 rounded-lg text-xs sm:text-sm font-bold">중복</span>}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })()
                 )}
               </div>
             </div>
