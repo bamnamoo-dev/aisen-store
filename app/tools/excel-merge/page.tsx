@@ -73,6 +73,10 @@ export default function ExcelMergePage() {
   const [selectedRegion, setSelectedRegion] = useState<string>('none');
   const [targetSchools, setTargetSchools] = useState<SchoolItem[]>([]);
   const [customRosterName, setCustomRosterName] = useState<string>('');
+  const [savedCustomRoster, setSavedCustomRoster] = useState<{
+    name: string;
+    schools: SchoolItem[];
+  } | null>(null);
 
   // 처리 상태 관리
   const [files, setFiles] = useState<File[]>([]);
@@ -94,6 +98,21 @@ export default function ExcelMergePage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const rosterInputRef = useRef<HTMLInputElement>(null);
+
+  // 로컬에 영구 저장된 자체 명부 자동 로드 (100% 브라우저 로컬 보안, 서버 유출 0%)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('aisen_custom_roster_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed.schools) && parsed.schools.length > 0) {
+          setSavedCustomRoster(parsed);
+        }
+      }
+    } catch (e) {
+      console.error('로컬 자체 명부 로드 실패:', e);
+    }
+  }, []);
 
   // 업무별 1초 원클릭 프리셋
   const applyPreset = (presetType: 'food' | 'labor' | 'general') => {
@@ -125,28 +144,48 @@ export default function ExcelMergePage() {
     }
   };
 
-  // 기준 명부 로드 (기본 지원청 JSON)
+  // 기준 명부 로드 (기본 지원청 JSON 또는 로컬 영구 저장된 자체 명부)
   useEffect(() => {
     if (selectedRegion === 'none') {
       setTargetSchools([]);
       setCustomRosterName('');
       return;
     }
-    if (selectedRegion !== 'custom') {
-      const office = REGIONAL_OFFICES.find(o => o.id === selectedRegion);
-      if (office && office.file) {
-        fetch(office.file)
-          .then(res => res.json())
-          .then((data: SchoolItem[]) => {
-            setTargetSchools(data);
-            setCustomRosterName('');
-          })
-          .catch(err => {
-            console.error('명부 로드 실패:', err);
-          });
+    if (selectedRegion === 'custom') {
+      if (savedCustomRoster && savedCustomRoster.schools.length > 0) {
+        setTargetSchools(savedCustomRoster.schools);
+        setCustomRosterName(savedCustomRoster.name);
+      }
+      return;
+    }
+    const office = REGIONAL_OFFICES.find(o => o.id === selectedRegion);
+    if (office && office.file) {
+      fetch(office.file)
+        .then(res => res.json())
+        .then((data: SchoolItem[]) => {
+          setTargetSchools(data);
+          setCustomRosterName('');
+        })
+        .catch(err => {
+          console.error('명부 로드 실패:', err);
+        });
+    }
+  }, [selectedRegion, savedCustomRoster]);
+
+  // 로컬에 저장된 자체 명부 삭제
+  const handleDeleteCustomRoster = () => {
+    if (confirm('브라우저에 저장된 자체 기준 명부를 삭제하시겠습니까?')) {
+      try {
+        localStorage.removeItem('aisen_custom_roster_v1');
+      } catch (e) {}
+      setSavedCustomRoster(null);
+      setCustomRosterName('');
+      if (selectedRegion === 'custom') {
+        setSelectedRegion('none');
+        setTargetSchools([]);
       }
     }
-  }, [selectedRegion]);
+  };
 
   // 자체 기준 명부 엑셀(.xlsx) 업로드 파싱
   // 자체 명부 표준 양식(.xlsx) 0초 즉시 다운로드
@@ -272,10 +311,20 @@ export default function ExcelMergePage() {
         return;
       }
 
+      const displayName = `${file.name} (${customList.length}개소)`;
+      const rosterData = { name: displayName, schools: customList };
+      
+      try {
+        localStorage.setItem('aisen_custom_roster_v1', JSON.stringify(rosterData));
+        setSavedCustomRoster(rosterData);
+      } catch (e) {
+        console.error('로컬 스토리지 저장 실패:', e);
+      }
+
       setTargetSchools(customList);
       setSelectedRegion('custom');
-      setCustomRosterName(`${file.name} (${customList.length}개소 등록됨)`);
-      alert(`자체 기준 명부가 성공적으로 등록되었습니다!\n총 ${customList.length}개 기관/학교를 기준으로 수합 및 미제출 검증이 진행됩니다.`);
+      setCustomRosterName(displayName);
+      alert(`자체 기준 명부가 담당자 PC 브라우저에 안전하게 영구 저장되었습니다!\n총 ${customList.length}개 기관/학교를 기준으로 수합 및 미제출 검증이 진행됩니다.\n(서버 전송 0% · 다음 방문 시에도 그대로 자동 복원됩니다)`);
     } catch (err: any) {
       alert('명부 엑셀 파싱 실패: ' + err.message);
     }
@@ -992,11 +1041,23 @@ export default function ExcelMergePage() {
               onChange={e => setSelectedRegion(e.target.value)}
               className="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
             >
-              {REGIONAL_OFFICES.map(office => (
-                <option key={office.id} value={office.id}>
-                  {office.name}
-                </option>
-              ))}
+              {REGIONAL_OFFICES.map(office => {
+                if (office.id === 'custom') {
+                  const label = savedCustomRoster 
+                    ? `💾 [내 PC 저장] ${savedCustomRoster.name}`
+                    : '📂 자체 기준 명부 직접 등록 (.xlsx)';
+                  return (
+                    <option key={office.id} value={office.id}>
+                      {label}
+                    </option>
+                  );
+                }
+                return (
+                  <option key={office.id} value={office.id}>
+                    {office.name}
+                  </option>
+                );
+              })}
             </select>
 
             <input 
@@ -1026,9 +1087,19 @@ export default function ExcelMergePage() {
             </button>
 
             {customRosterName && (
-              <span className="text-xs sm:text-sm bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-md border border-blue-200 truncate max-w-[140px]">
-                {customRosterName}
-              </span>
+              <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-md border border-blue-200 text-xs sm:text-sm shadow-2xs">
+                <span className="truncate max-w-[140px] sm:max-w-[200px]" title={customRosterName}>
+                  {customRosterName}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleDeleteCustomRoster}
+                  className="text-rose-500 hover:text-rose-700 hover:bg-rose-100 p-0.5 rounded-md cursor-pointer transition-colors shrink-0"
+                  title="브라우저에 저장된 자체 명부 삭제"
+                >
+                  <X size={13} />
+                </button>
+              </div>
             )}
           </div>
         </div>
