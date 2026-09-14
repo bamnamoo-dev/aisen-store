@@ -24,6 +24,7 @@ import {
   BookOpen,
   Sparkles,
   Layers
+} from 'lucide-react';
 import IntegratedManualModal from '@/components/IntegratedManualModal';
 import VisitorCounter from '@/components/VisitorCounter';
 
