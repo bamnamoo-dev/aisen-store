@@ -121,7 +121,7 @@ export default function Sidebar() {
               if (isMobile) setMobileMenuOpen(false); 
               if (!item.isExternal) setIsCollapsed(true);
             }}
-            className={`flex items-center justify-between px-3 py-2 rounded-xl text-[13.5px] font-bold transition-all ${
+            className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] font-bold transition-all ${
               isActive
                 ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/90 active:bg-slate-200/70'
@@ -136,7 +136,7 @@ export default function Sidebar() {
 
             <div className="flex items-center gap-1.5 shrink-0">
               {item.badge && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
+                <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md border ${
                   isActive
                     ? 'bg-white/20 text-white border-white/30'
                     : 'bg-white text-slate-500 border-slate-200/90 shadow-2xs'
@@ -145,7 +145,7 @@ export default function Sidebar() {
                 </span>
               )}
               {item.isExternal && (
-                <ExternalLink size={12} className={isActive ? 'text-white' : 'text-slate-400'} />
+                <ExternalLink size={12.5} className={isActive ? 'text-white' : 'text-slate-400'} />
               )}
             </div>
           </Link>
@@ -209,32 +209,36 @@ export default function Sidebar() {
 
               {/* Group 1: 🔵 AI & 지침 허브 */}
               <div>
-                <p className="text-[11.5px] font-extrabold text-blue-600 px-3 uppercase tracking-wider mb-1">
-                  🔵 AI &amp; 지침 허브
+                <p className="text-[12.5px] font-extrabold text-blue-600 px-3 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <span>🔵</span>
+                  <span>AI &amp; 지침 허브</span>
                 </p>
                 {renderNavList(AI_HUB_ITEMS, true)}
               </div>
 
               {/* Group 2: 🟢 회계 & 계약 & 예산 */}
-              <div className="pt-2 border-t border-slate-100">
-                <p className="text-[11.5px] font-extrabold text-emerald-600 px-3 uppercase tracking-wider mb-1">
-                  🟢 회계 &amp; 계약 &amp; 예산
+              <div className="pt-2.5 border-t border-slate-100">
+                <p className="text-[12.5px] font-extrabold text-emerald-600 px-3 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <span>🟢</span>
+                  <span>회계 &amp; 계약 &amp; 예산</span>
                 </p>
                 {renderNavList(FINANCE_CONTRACT_ITEMS, true)}
               </div>
 
               {/* Group 3: 🟣 행정 실무 & 엑셀 */}
-              <div className="pt-2 border-t border-slate-100">
-                <p className="text-[11.5px] font-extrabold text-purple-600 px-3 uppercase tracking-wider mb-1">
-                  🟣 행정 실무 &amp; 엑셀
+              <div className="pt-2.5 border-t border-slate-100">
+                <p className="text-[12.5px] font-extrabold text-purple-600 px-3 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <span>🟣</span>
+                  <span>행정 실무 &amp; 엑셀</span>
                 </p>
                 {renderNavList(ADMIN_DOC_ITEMS, true)}
               </div>
 
               {/* Group 4: 🔴 서식 & 시설 & 힐링 */}
-              <div className="pt-2 border-t border-slate-100">
-                <p className="text-[11.5px] font-extrabold text-rose-600 px-3 uppercase tracking-wider mb-1">
-                  🔴 서식 &amp; 시설 &amp; 힐링
+              <div className="pt-2.5 border-t border-slate-100">
+                <p className="text-[12.5px] font-extrabold text-rose-600 px-3 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <span>🔴</span>
+                  <span>서식 &amp; 시설 &amp; 힐링</span>
                 </p>
                 {renderNavList(SPACE_HEALING_ITEMS, true)}
               </div>
@@ -337,39 +341,39 @@ export default function Sidebar() {
             </div>
           </div>
 
-          {/* Navigation List (시원한 13.5px 폰트, 여유로운 여백, 자연스러운 슬림 스크롤) */}
-          <div className="flex-1 overflow-y-auto p-2.5 px-3 flex flex-col gap-2.5">
+          {/* Navigation List (시원한 14px 폰트, 여유로운 여백, 자연스러운 슬림 스크롤) */}
+          <div className="flex-1 overflow-y-auto p-3 px-3.5 flex flex-col gap-3">
             {/* 1. 🔵 AI & 지침 허브 */}
             <div className="flex flex-col gap-1">
-              <p className="text-[12px] font-extrabold text-blue-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
-                <span>🔵</span>
+              <p className="text-[12.5px] font-extrabold text-blue-600 px-2.5 py-0.5 uppercase tracking-tight flex items-center gap-1.5">
+                <span className="text-[13px]">🔵</span>
                 <span>AI &amp; 지침 허브</span>
               </p>
               {renderNavList(AI_HUB_ITEMS)}
             </div>
 
             {/* 2. 🟢 회계 & 계약 & 예산 */}
-            <div className="flex flex-col gap-1 pt-2 border-t border-slate-100">
-              <p className="text-[12px] font-extrabold text-emerald-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
-                <span>🟢</span>
+            <div className="flex flex-col gap-1 pt-2.5 border-t border-slate-100">
+              <p className="text-[12.5px] font-extrabold text-emerald-600 px-2.5 py-0.5 uppercase tracking-tight flex items-center gap-1.5">
+                <span className="text-[13px]">🟢</span>
                 <span>회계 &amp; 계약 &amp; 예산</span>
               </p>
               {renderNavList(FINANCE_CONTRACT_ITEMS)}
             </div>
 
             {/* 3. 🟣 행정 실무 & 엑셀 */}
-            <div className="flex flex-col gap-1 pt-2 border-t border-slate-100">
-              <p className="text-[12px] font-extrabold text-purple-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
-                <span>🟣</span>
+            <div className="flex flex-col gap-1 pt-2.5 border-t border-slate-100">
+              <p className="text-[12.5px] font-extrabold text-purple-600 px-2.5 py-0.5 uppercase tracking-tight flex items-center gap-1.5">
+                <span className="text-[13px]">🟣</span>
                 <span>행정 실무 &amp; 엑셀</span>
               </p>
               {renderNavList(ADMIN_DOC_ITEMS)}
             </div>
 
             {/* 4. 🔴 서식 & 시설 & 힐링 */}
-            <div className="flex flex-col gap-1 pt-2 border-t border-slate-100">
-              <p className="text-[12px] font-extrabold text-rose-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
-                <span>🔴</span>
+            <div className="flex flex-col gap-1 pt-2.5 border-t border-slate-100">
+              <p className="text-[12.5px] font-extrabold text-rose-600 px-2.5 py-0.5 uppercase tracking-tight flex items-center gap-1.5">
+                <span className="text-[13px]">🔴</span>
                 <span>서식 &amp; 시설 &amp; 힐링</span>
               </p>
               {renderNavList(SPACE_HEALING_ITEMS)}
