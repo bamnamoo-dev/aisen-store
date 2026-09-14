@@ -11,20 +11,29 @@ export default function VisitorCounter({ isMobile = false }: VisitorCounterProps
   const [stats, setStats] = useState<{ today: number; total: number } | null>(null);
 
   useEffect(() => {
-    // 세션 동안 중복 호출 방지 및 데이터 패치
     const fetchVisitors = async () => {
       try {
-        // 클라이언트에서 1회 조회 (세션스토리지에 캐시가 있어도 카운트는 서버가 일별로 중복 필터링)
-        const res = await fetch('/api/visitors', { cache: 'no-store' });
+        // 브라우저 탭 세션 동안 1회만 카운트 증가 요청 (새로고침 시에는 조회만 수행)
+        const hasVisited = typeof window !== 'undefined' && sessionStorage.getItem('aisen_visited_session');
+        const recordParam = hasVisited ? '0' : '1';
+        
+        const res = await fetch(`https://chatbot.aisen.store/api/visitors?record=${recordParam}`, { 
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+
         if (res.ok) {
           const data = await res.json();
           if (data.today !== undefined && data.total !== undefined) {
             setStats({ today: data.today, total: data.total });
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('aisen_visited_session', '1');
+            }
           }
         }
       } catch (err) {
         // 네트워크 장애 시 기본값
-        setStats({ today: 1, total: 1580 });
+        setStats({ today: 2, total: 1582 });
       }
     };
 
