@@ -108,7 +108,7 @@ export default function Sidebar() {
   };
 
   const renderNavList = (items: NavItem[], isMobile = false) => (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-0.5">
       {items.map((item) => {
         const isActive = !item.isExternal && pathname === item.href;
         return (
@@ -121,22 +121,22 @@ export default function Sidebar() {
               if (isMobile) setMobileMenuOpen(false); 
               if (!item.isExternal) setIsCollapsed(true);
             }}
-            className={`flex items-center justify-between px-3 py-2 sm:py-2.5 rounded-xl text-[13px] font-bold transition-all ${
+            className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[12.5px] font-bold transition-all ${
               isActive
                 ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
-                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 active:bg-slate-200/70'
+                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/90 active:bg-slate-200/70'
             }`}
           >
-            <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
               <span className={`shrink-0 flex items-center justify-center transition-transform ${isActive ? 'text-white scale-105' : ''}`}>
                 {item.icon}
               </span>
               <span className="truncate tracking-tight">{item.name}</span>
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               {item.badge && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
+                <span className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded border ${
                   isActive
                     ? 'bg-white/20 text-white border-white/30'
                     : 'bg-white text-slate-500 border-slate-200 shadow-2xs'
@@ -145,7 +145,7 @@ export default function Sidebar() {
                 </span>
               )}
               {item.isExternal && (
-                <ExternalLink size={12} className={isActive ? 'text-white' : 'text-slate-400'} />
+                <ExternalLink size={11} className={isActive ? 'text-white' : 'text-slate-400'} />
               )}
             </div>
           </Link>
@@ -336,9 +336,9 @@ export default function Sidebar() {
           </div>
 
           {/* Navigation List (시원한 크기, 편안한 여백, 4대 카테고리 칼정렬) */}
-          <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3.5 scrollbar-thin scrollbar-thumb-slate-200">
+          <div className="flex-1 overflow-y-auto p-2.5 px-3 flex flex-col gap-2 scrollbar-none">
             {/* 1. 🔵 AI & 지침 허브 */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5">
               <p className="text-[11.5px] font-extrabold text-blue-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🔵</span>
                 <span>AI &amp; 지침 허브</span>
@@ -347,7 +347,7 @@ export default function Sidebar() {
             </div>
 
             {/* 2. 🟢 회계 & 계약 & 예산 */}
-            <div className="flex flex-col gap-1 pt-2.5 border-t border-slate-100">
+            <div className="flex flex-col gap-0.5 pt-1.5 border-t border-slate-100">
               <p className="text-[11.5px] font-extrabold text-emerald-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🟢</span>
                 <span>회계 &amp; 계약 &amp; 예산</span>
@@ -356,7 +356,7 @@ export default function Sidebar() {
             </div>
 
             {/* 3. 🟣 행정 실무 & 엑셀 */}
-            <div className="flex flex-col gap-1 pt-2.5 border-t border-slate-100">
+            <div className="flex flex-col gap-0.5 pt-1.5 border-t border-slate-100">
               <p className="text-[11.5px] font-extrabold text-purple-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🟣</span>
                 <span>행정 실무 &amp; 엑셀</span>
@@ -365,7 +365,7 @@ export default function Sidebar() {
             </div>
 
             {/* 4. 🔴 서식 & 시설 & 힐링 */}
-            <div className="flex flex-col gap-1 pt-2.5 border-t border-slate-100">
+            <div className="flex flex-col gap-0.5 pt-1.5 border-t border-slate-100">
               <p className="text-[11.5px] font-extrabold text-rose-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🔴</span>
                 <span>서식 &amp; 시설 &amp; 힐링</span>
