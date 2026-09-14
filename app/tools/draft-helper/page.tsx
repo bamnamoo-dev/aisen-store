@@ -475,6 +475,7 @@ export default function DraftHelperPage() {
                       서식 번호 #{String(activeTemplate.number).padStart(3, '0')}
                     </span>
                   </div>
+                </div>
 
                 <h2 className="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">
                   {activeTemplate.title}
