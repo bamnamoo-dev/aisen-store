@@ -16,7 +16,7 @@ export default function GuidePage() {
       />
 
       {/* 메인 본문 콘텐츠 */}
-      <main className="flex-1 w-full max-w-[1000px] mx-auto p-4 sm:p-6 md:p-8">
+      <main className="flex-1 w-full max-w-[1360px] mx-auto p-4 sm:p-6 md:p-8">
         <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-5 sm:p-7">
           <ManualContent isModal={false} />
         </div>

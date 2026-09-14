@@ -92,15 +92,15 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
               <div className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
                 <div>
                   <div className="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold mb-3.5 shadow-2xs">
-                    <Search size={22} />
+                    <LayoutDashboard size={22} />
                   </div>
-                  <h4 className="text-base sm:text-lg font-black text-slate-900 mb-1.5">스마트 검색창</h4>
+                  <h4 className="text-base sm:text-lg font-black text-slate-900 mb-1.5">16대 원스톱 실무 허브</h4>
                   <p className="text-sm text-slate-600 leading-relaxed">
-                    메인 상단 검색창에 수의계약, 복무, 강사료 등 궁금한 실무 키워드를 입력하면 AI 챗봇이 102권 지침서 쪽수를 즉시 찾아줍니다.
+                    지침서 RAG 챗봇부터 계약, 공사원가, 엑셀수합, 기안문까지 교육행정의 모든 기준과 계산을 설치 없이 원클릭으로 해결합니다.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-blue-600">
-                  <span>질의 즉시 답변 연동</span>
+                  <span>원스크린 직관 연결</span>
                   <ArrowRight size={15} />
                 </div>
               </div>
@@ -148,19 +148,19 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
 
         {/* ─── TAB 2: 🔵 AI & 포털 허브 ─── */}
         {activeTab === 'ai' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
             {/* 1. AI-SEN 행정챗봇 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Bot size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정챗봇</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 행정챗봇</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 shrink-0 whitespace-nowrap">
                     3-Tier RAG
                   </span>
                 </div>
@@ -191,14 +191,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 2. AI-SEN 행정서고 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <FolderOpen size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 행정서고</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 행정서고</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 shrink-0 whitespace-nowrap">
                     102권 공식
                   </span>
                 </div>
@@ -227,14 +227,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 3. AI-SEN 출장여비 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Navigation size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 출장여비</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 출장여비</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 shrink-0 whitespace-nowrap">
                     v4.9.2
                   </span>
                 </div>
@@ -265,14 +265,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 4. AI-SEN 소통게시판 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <MessageSquareShare size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 소통게시판</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 소통게시판</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 shrink-0 whitespace-nowrap">
                     익명 Q&A
                   </span>
                 </div>
@@ -303,19 +303,19 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
 
         {/* ─── TAB 3: 🟢 회계 · 계약 · 예산 ─── */}
         {activeTab === 'finance' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
             {/* 1. AI-SEN 계약 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Compass size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 계약</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 계약</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 whitespace-nowrap">
                     2026 지침
                   </span>
                 </div>
@@ -344,14 +344,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 2. AI-SEN 공사원가 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Calculator size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 공사원가</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 공사원가</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 whitespace-nowrap">
                     간접비 감사
                   </span>
                 </div>
@@ -380,14 +380,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 3. AI-SEN 학교회계 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <ChartPie size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 학교회계</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 학교회계</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 whitespace-nowrap">
                     SFD 대시보드
                   </span>
                 </div>
@@ -416,14 +416,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 4. AI-SEN 예산정산 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <LayoutDashboard size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 예산정산</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 예산정산</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 whitespace-nowrap">
                     목적사업비
                   </span>
                 </div>
@@ -459,14 +459,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 1. AI-SEN 엑셀수합 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <FileSpreadsheet size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 엑셀수합</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 엑셀수합</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 shrink-0 whitespace-nowrap">
                     100% 범용
                   </span>
                 </div>
@@ -495,14 +495,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 2. AI-SEN 엑셀분리 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Layers size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 엑셀분리</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 엑셀분리</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 shrink-0 whitespace-nowrap">
                     초고속 분리
                   </span>
                 </div>
@@ -531,14 +531,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 3. AI-SEN 급여식대 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <UtensilsCrossed size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 급여식대</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 급여식대</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 shrink-0 whitespace-nowrap">
                     0초 추출
                   </span>
                 </div>
@@ -567,14 +567,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 4. AI-SEN 지출바인더 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Tag size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 지출바인더</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 지출바인더</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 shrink-0 whitespace-nowrap">
                     A4 실측 인쇄
                   </span>
                 </div>
@@ -610,14 +610,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 1. AI-SEN 기안 & 서식 (308종) */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <FileText size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 기안 & 서식</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 기안 &amp; 서식</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 shrink-0 whitespace-nowrap">
                     308종 완비
                   </span>
                 </div>
@@ -654,14 +654,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 2. AI-SEN 시설대관 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Calculator size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 시설대관</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 시설대관</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 shrink-0 whitespace-nowrap">
                     조례 기준
                   </span>
                 </div>
@@ -690,14 +690,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 3. AI-SEN 교실배치 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <LayoutGrid size={20} />
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 교실배치</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 교실배치</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 shrink-0 whitespace-nowrap">
                     평면도 시각화
                   </span>
                 </div>
@@ -726,14 +726,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
             {/* 4. AI-SEN 힐링게임 */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 hover:shadow-md transition-all flex flex-col justify-between shadow-xs">
               <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl shadow-2xs">
+                <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl shrink-0 shadow-2xs">
                       🍉
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">AI-SEN 힐링게임</h4>
+                    <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 힐링게임</h4>
                   </div>
-                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 shrink-0 whitespace-nowrap">
                     수박게임
                   </span>
                 </div>
