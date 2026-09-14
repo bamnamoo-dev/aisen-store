@@ -293,44 +293,46 @@ export default function Sidebar() {
         <div className="flex flex-col h-full overflow-hidden">
           
           {/* Header */}
-          <div className="p-3.5 px-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
-            <Link href="/" className="flex items-center gap-2.5 group" title="메인 포털 홈으로 이동">
-              <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-base shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform">
+          <div className="py-3 px-3.5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/60 gap-2">
+            <Link href="/" className="flex items-center gap-2.5 group min-w-0 shrink" title="메인 포털 홈으로 이동">
+              <div className="w-8.5 h-8.5 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-xs shadow-blue-500/20 group-hover:scale-105 transition-transform shrink-0">
                 i
               </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight">
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="text-[13.5px] font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight whitespace-nowrap">
                     AI-SEN 포털
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded-md border border-emerald-200">
+                  <span className="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200 shrink-0 whitespace-nowrap">
                     Live
                   </span>
                 </div>
-                <span className="text-[11px] font-semibold text-slate-400">교육행정 올인원 허브</span>
+                <span className="text-[10.5px] font-semibold text-slate-400 whitespace-nowrap tracking-tight">
+                  교육행정 올인원 허브
+                </span>
               </div>
             </Link>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 shrink-0">
               <Link
                 href="/guide"
-                className={`p-1 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
+                className={`py-1 px-2 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-colors whitespace-nowrap shrink-0 ${
                   pathname === '/guide'
                     ? 'bg-blue-600 text-white shadow-2xs'
                     : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/70'
                 }`}
                 title="AI-SEN 종합 이용안내서 열기"
               >
-                <BookOpen size={12} />
-                <span>가이드</span>
+                <BookOpen size={11} className="shrink-0" />
+                <span className="whitespace-nowrap">가이드</span>
               </Link>
 
               <button
                 onClick={toggleSidebar}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer shrink-0"
                 title="사이드바 접기 (<<)"
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={16} />
               </button>
             </div>
           </div>
