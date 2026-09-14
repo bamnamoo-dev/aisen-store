@@ -520,12 +520,9 @@ export default function HomePage() {
         <h1 className="hidden sm:block text-3xl sm:text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-tight">
           교육행정의 모든 기준과 계산, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">AI-SEN 포털</span>
         </h1>
-        <p className="hidden sm:block text-[14.5px] sm:text-[15.5px] text-slate-500 mt-2 font-medium max-w-[720px]">
-          102권 공식 지침서 1:1 쪽수 앵커링 RAG 챗봇과 카카오·오피넷 실시간 연동 스마트 여비정산기
-        </p>
 
         {/* Unified Search Omnibar Box */}
-        <div className="w-full max-w-[800px] mt-1 sm:mt-3">
+        <div className="w-full max-w-[800px] mt-1.5 sm:mt-3.5">
           <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-2xl border border-slate-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-3 focus-within:ring-blue-100/80 transition-all shadow-2xs hover:shadow-md">
             <Search className="absolute left-3.5 sm:left-4 text-blue-500 pointer-events-none" size={17} />
             <input 
