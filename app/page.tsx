@@ -24,8 +24,8 @@ import {
   BookOpen,
   Sparkles,
   Layers
-} from 'lucide-react';
 import IntegratedManualModal from '@/components/IntegratedManualModal';
+import VisitorCounter from '@/components/VisitorCounter';
 
 type CategoryId = 'all' | 'ai' | 'finance' | 'admin' | 'facility';
 
@@ -483,17 +483,23 @@ export default function HomePage() {
               AI-SEN <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">포털</span>
             </span>
           </div>
-          <button
-            onClick={() => setManualOpen(true)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[11px] font-bold shadow-2xs active:scale-95 transition-transform"
-          >
-            <BookOpen size={11} className="text-blue-200" />
-            <span>이용안내</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <VisitorCounter isMobile={true} />
+            <button
+              onClick={() => setManualOpen(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[11px] font-bold shadow-2xs active:scale-95 transition-transform"
+            >
+              <BookOpen size={11} className="text-blue-200" />
+              <span>이용안내</span>
+            </button>
+          </div>
         </div>
 
         {/* [데스크톱 전용 탑 배지 & 런처 (>= sm)] */}
         <div className="hidden sm:flex items-center justify-center gap-2 mb-2 flex-wrap">
+          {/* 메인타이틀 상단 좌측: 실시간 방문자 카운터 */}
+          <VisitorCounter />
+
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[12px] font-bold text-blue-700 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
             <span>서울특별시교육청 올인원 통합 포털</span>
