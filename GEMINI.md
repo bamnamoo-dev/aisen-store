@@ -34,7 +34,7 @@
 | **메인 허브** | **아이센스토어 메인** | `\asisen-store\` | `https://aisen.store` (Vercel) | Next.js, Supabase, 포털 관제 |
 | **기안 도우미** | **AI-SEN 기안문 (237종)** | `\asisen-store\app\tools\draft-helper\` (내장) | `/tools/draft-helper` | Next.js, K-에듀파인 237종 공식 표준 서식 서울 최적화, 1초 스마트 인라인 치환, 무오차 클린 복사, 237종 마스터 엑셀 다운로드 |
 | **AI 챗봇** | **AI-SEN 행정챗봇 (v5.0.0, 3-Tier)** | `\sen-chatbot\`<br/>`\sen-chatbot-v2\`<br/>`\(0610)sen-chatbot\` | `https://chatbot.aisen.store` | FastMCP, LangChain/RAG, 102권 서고 쪽수 1:1 앵커링, 국가법령정보센터 연동 |
-| **에이전트 확장** | **AI-SEN 올인원 MCP (`aisen-mcp` v2.0)** | `\sen-chatbot-v2\aisen_mcp\` | `FastMCP/MCPServer 표준 stdio / Dual-Use` | 4대 도구(지침서 RAG, 관내/관외 2박3일/연수 여비 마크다운 표, 카카오 경로 유류비, 75종 HWPX 서식 2단계 스마트 폴백), 네이티브 1:1 벤치마크 100% 일치 |
+| **에이전트 확장** | **AI-SEN 올인원 MCP (`aisen-mcp` v2.0)** | `\sen-chatbot-v2\aisen_mcp\` | `FastMCP/MCPServer 표준 stdio / Dual-Use` | 5대 도구(지침서 RAG, 관내/관외 2박3일/연수 여비 마크다운 표, 카카오 경로 유류비, 75종 HWPX 서식, 237종 서울 K-에듀파인 기안문 표준 서식 인출), 네이티브 1:1 벤치마크 100% 일치 |
 | **특화 정산** | **AI-SEN 출장여비 (v4.9.2)** | `\sen-chatbot\travel\` (내장) | `https://chatbot.aisen.store/travel` | 카카오 3개 경유지 길찾기, 오피넷 실시간 유가 1일 6회 자동 고시, 19종 법정 감액, A4 1p 인쇄 |
 | **서식 포털** | **AI-SEN 행정서식 (68종)** | `\sen-chatbot\` (내장) | `https://chatbot.aisen.store?forms=1` | 인사/복무/계약 서식 실시간 미리보기 및 HWP 다운로드 |
 | **소통 포털** | **AI-SEN 소통게시판** | `\asisen-store\app\board\` | `/board` | 회원가입 없는 4자리 비밀번호 실무 Q&A 익명 소통 게시판 |
