@@ -5,9 +5,7 @@ import { useState } from 'react';
 import { 
   Bot, 
   Navigation, 
-  Search, 
   ChevronRight, 
-  ArrowRight,
   ArrowUpRight,
   MessageSquareShare,
   FolderOpen,
@@ -454,15 +452,8 @@ const SERVICE_CARDS: ServiceCardItem[] = [
 ];
 
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('');
   const [manualOpen, setManualOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<CategoryId>('all');
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    window.open(`https://chatbot.aisen.store?q=${encodeURIComponent(searchQuery.trim())}`, '_blank');
-  };
 
   const filteredCards = activeCategory === 'all' 
     ? SERVICE_CARDS 
@@ -521,33 +512,12 @@ export default function HomePage() {
           교육행정의 모든 기준과 계산, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">AI-SEN 포털</span>
         </h1>
 
-        {/* Unified Search Omnibar Box */}
-        <div className="w-full max-w-[800px] mt-1.5 sm:mt-3.5">
-          <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-2xl border border-slate-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-3 focus-within:ring-blue-100/80 transition-all shadow-2xs hover:shadow-md">
-            <Search className="absolute left-3.5 sm:left-4 text-blue-500 pointer-events-none" size={17} />
-            <input 
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="궁금한 지침(수의계약, 출장비, 강사료 등)이나 기안문·서식 검색..."
-              className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 pl-10 sm:pl-11 pr-24 sm:pr-28 py-2 sm:py-2.5 text-xs sm:text-[14px] focus:outline-none font-medium"
-            />
-            <button 
-              type="submit" 
-              className="absolute right-1 sm:right-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-1 sm:py-1.5 px-3 sm:px-4 text-xs sm:text-[13px] font-bold shadow-xs hover:shadow-sm rounded-xl flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer"
-            >
-              <span>질의하기</span>
-              <ArrowRight size={12} className="hidden sm:inline" />
-            </button>
-          </form>
-        </div>
-
       </section>
 
       {/* ========================================================
           2. CATEGORY FILTER CHIPS (모바일 스크롤 피로도 70% 감소 칩 바)
       ======================================================== */}
-      <section className="w-full max-w-[1400px] mx-auto pt-0.5 pb-1">
+      <section className="w-full max-w-[1400px] mx-auto pt-1 sm:pt-2.5 pb-1">
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 px-0.5">
           {CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat.id;
