@@ -39,36 +39,36 @@ import { useSidebar } from './SidebarContext';
 
 // 1. 🔵 AI & 지침 허브
 const AI_HUB_ITEMS = [
-  { name: 'AI-SEN 행정챗봇', href: 'https://chatbot.aisen.store', icon: <Bot size={18} className="text-blue-600" />, isExternal: true, badge: '3-Tier' },
-  { name: 'AI-SEN 행정서고', href: '/archive', icon: <FolderOpen size={18} className="text-blue-600" />, isExternal: false, badge: '102권' },
-  { name: 'AI-SEN 출장여비', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={18} className="text-blue-600" />, isExternal: true, badge: 'v4.9.2' },
-  { name: 'AI-SEN 소통게시판', href: '/board', icon: <MessageSquareShare size={18} className="text-blue-600" />, isExternal: false, badge: '소통' },
+  { name: '행정챗봇', href: 'https://chatbot.aisen.store', icon: <Bot size={18} className="text-blue-600" />, isExternal: true, badge: '3-Tier' },
+  { name: '행정서고', href: '/archive', icon: <FolderOpen size={18} className="text-blue-600" />, isExternal: false, badge: '102권' },
+  { name: '출장여비', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={18} className="text-blue-600" />, isExternal: true, badge: 'v4.9.2' },
+  { name: '소통게시판', href: '/board', icon: <MessageSquareShare size={18} className="text-blue-600" />, isExternal: false, badge: '소통' },
   { name: '구글 맞춤챗봇', href: '/chatbot', icon: <MessageSquare size={18} className="text-blue-600" />, isExternal: false, badge: 'Gemini' },
 ];
 
 // 2. 🟢 회계 & 계약 & 예산
 const FINANCE_CONTRACT_ITEMS = [
-  { name: 'AI-SEN 계약', href: '/tools/contract', icon: <Compass size={18} className="text-emerald-600" />, isExternal: false, badge: '2026' },
-  { name: 'AI-SEN 공사원가', href: '/tools/cost-audit', icon: <Calculator size={18} className="text-emerald-600" />, isExternal: false, badge: '원가' },
-  { name: 'AI-SEN 학교회계', href: '/tools/sfd', icon: <ChartPie size={18} className="text-emerald-600" />, isExternal: false, badge: 'SFD' },
-  { name: 'AI-SEN 예산정산', href: '/tools/budget-settle', icon: <LayoutDashboard size={18} className="text-emerald-600" />, isExternal: false, badge: '정산' },
+  { name: '계약', href: '/tools/contract', icon: <Compass size={18} className="text-emerald-600" />, isExternal: false, badge: '2026' },
+  { name: '공사원가', href: '/tools/cost-audit', icon: <Calculator size={18} className="text-emerald-600" />, isExternal: false, badge: '원가' },
+  { name: '학교회계', href: '/tools/sfd', icon: <ChartPie size={18} className="text-emerald-600" />, isExternal: false, badge: 'SFD' },
+  { name: '예산정산', href: '/tools/budget-settle', icon: <LayoutDashboard size={18} className="text-emerald-600" />, isExternal: false, badge: '정산' },
 ];
 
 // 3. 🟣 행정 실무 & 엑셀
 const ADMIN_DOC_ITEMS = [
-  { name: 'AI-SEN 엑셀수합', href: '/tools/excel-merge', icon: <Layers size={18} className="text-purple-600" />, isExternal: false, badge: '수합' },
-  { name: 'AI-SEN 엑셀분리', href: '/tools/sheet-splitter', icon: <FileSpreadsheet size={18} className="text-purple-600" />, isExternal: false, badge: '분리' },
-  { name: 'AI-SEN 급여식대', href: '/tools/sikdae', icon: <UtensilsCrossed size={18} className="text-purple-600" />, isExternal: false, badge: '식대' },
-  { name: 'AI-SEN 지출바인더', href: '/tools/label-maker', icon: <Tag size={18} className="text-purple-600" />, isExternal: false, badge: '라벨' },
+  { name: '엑셀수합', href: '/tools/excel-merge', icon: <Layers size={18} className="text-purple-600" />, isExternal: false, badge: '수합' },
+  { name: '엑셀분리', href: '/tools/sheet-splitter', icon: <FileSpreadsheet size={18} className="text-purple-600" />, isExternal: false, badge: '분리' },
+  { name: '급여식대', href: '/tools/sikdae', icon: <UtensilsCrossed size={18} className="text-purple-600" />, isExternal: false, badge: '식대' },
+  { name: '지출바인더', href: '/tools/label-maker', icon: <Tag size={18} className="text-purple-600" />, isExternal: false, badge: '라벨' },
 ];
 
 // 4. 🔴 서식 & 시설 & 힐링
 const SPACE_HEALING_ITEMS = [
-  { name: 'AI-SEN 기안문', href: '/tools/draft-helper', icon: <FileText size={18} className="text-rose-600" />, isExternal: false, badge: '237종' },
-  { name: 'AI-SEN 행정서식', href: '/forms', icon: <FileCheck size={18} className="text-rose-600" />, isExternal: false, badge: '71종' },
-  { name: 'AI-SEN 시설대관', href: '/tools/gym-calc', icon: <Calculator size={18} className="text-rose-600" />, isExternal: false, badge: '조례' },
-  { name: 'AI-SEN 교실배치', href: '/tools/classmap', icon: <LayoutGrid size={18} className="text-rose-600" />, isExternal: false, badge: '도면' },
-  { name: 'AI-SEN 힐링게임', href: '/tools/watermelon', icon: <span className="text-base leading-none">🍉</span>, isExternal: false, badge: '게임' },
+  { name: '기안문', href: '/tools/draft-helper', icon: <FileText size={18} className="text-rose-600" />, isExternal: false, badge: '237종' },
+  { name: '행정서식', href: '/forms', icon: <FileCheck size={18} className="text-rose-600" />, isExternal: false, badge: '71종' },
+  { name: '시설대관', href: '/tools/gym-calc', icon: <Calculator size={18} className="text-rose-600" />, isExternal: false, badge: '조례' },
+  { name: '교실배치', href: '/tools/classmap', icon: <LayoutGrid size={18} className="text-rose-600" />, isExternal: false, badge: '도면' },
+  { name: '힐링게임', href: '/tools/watermelon', icon: <span className="text-base leading-none">🍉</span>, isExternal: false, badge: '게임' },
 ];
 
 type NavItem = {
@@ -108,7 +108,7 @@ export default function Sidebar() {
   };
 
   const renderNavList = (items: NavItem[], isMobile = false) => (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col gap-1">
       {items.map((item) => {
         const isActive = !item.isExternal && pathname === item.href;
         return (
@@ -121,31 +121,31 @@ export default function Sidebar() {
               if (isMobile) setMobileMenuOpen(false); 
               if (!item.isExternal) setIsCollapsed(true);
             }}
-            className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[12.5px] font-bold transition-all ${
+            className={`flex items-center justify-between px-3 py-2 rounded-xl text-[13.5px] font-bold transition-all ${
               isActive
-                ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
+                ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/90 active:bg-slate-200/70'
             }`}
           >
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0">
               <span className={`shrink-0 flex items-center justify-center transition-transform ${isActive ? 'text-white scale-105' : ''}`}>
                 {item.icon}
               </span>
               <span className="truncate tracking-tight">{item.name}</span>
             </div>
 
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               {item.badge && (
-                <span className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded border ${
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
                   isActive
                     ? 'bg-white/20 text-white border-white/30'
-                    : 'bg-white text-slate-500 border-slate-200 shadow-2xs'
+                    : 'bg-white text-slate-500 border-slate-200/90 shadow-2xs'
                 }`}>
                   {item.badge}
                 </span>
               )}
               {item.isExternal && (
-                <ExternalLink size={11} className={isActive ? 'text-white' : 'text-slate-400'} />
+                <ExternalLink size={12} className={isActive ? 'text-white' : 'text-slate-400'} />
               )}
             </div>
           </Link>
@@ -337,11 +337,11 @@ export default function Sidebar() {
             </div>
           </div>
 
-          {/* Navigation List (시원한 크기, 편안한 여백, 4대 카테고리 칼정렬) */}
-          <div className="flex-1 overflow-y-auto p-2.5 px-3 flex flex-col gap-2 scrollbar-none">
+          {/* Navigation List (시원한 13.5px 폰트, 여유로운 여백, 자연스러운 슬림 스크롤) */}
+          <div className="flex-1 overflow-y-auto p-2.5 px-3 flex flex-col gap-2.5">
             {/* 1. 🔵 AI & 지침 허브 */}
-            <div className="flex flex-col gap-0.5">
-              <p className="text-[11.5px] font-extrabold text-blue-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
+            <div className="flex flex-col gap-1">
+              <p className="text-[12px] font-extrabold text-blue-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🔵</span>
                 <span>AI &amp; 지침 허브</span>
               </p>
@@ -349,8 +349,8 @@ export default function Sidebar() {
             </div>
 
             {/* 2. 🟢 회계 & 계약 & 예산 */}
-            <div className="flex flex-col gap-0.5 pt-1.5 border-t border-slate-100">
-              <p className="text-[11.5px] font-extrabold text-emerald-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
+            <div className="flex flex-col gap-1 pt-2 border-t border-slate-100">
+              <p className="text-[12px] font-extrabold text-emerald-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🟢</span>
                 <span>회계 &amp; 계약 &amp; 예산</span>
               </p>
@@ -358,8 +358,8 @@ export default function Sidebar() {
             </div>
 
             {/* 3. 🟣 행정 실무 & 엑셀 */}
-            <div className="flex flex-col gap-0.5 pt-1.5 border-t border-slate-100">
-              <p className="text-[11.5px] font-extrabold text-purple-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
+            <div className="flex flex-col gap-1 pt-2 border-t border-slate-100">
+              <p className="text-[12px] font-extrabold text-purple-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🟣</span>
                 <span>행정 실무 &amp; 엑셀</span>
               </p>
@@ -367,8 +367,8 @@ export default function Sidebar() {
             </div>
 
             {/* 4. 🔴 서식 & 시설 & 힐링 */}
-            <div className="flex flex-col gap-0.5 pt-1.5 border-t border-slate-100">
-              <p className="text-[11.5px] font-extrabold text-rose-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
+            <div className="flex flex-col gap-1 pt-2 border-t border-slate-100">
+              <p className="text-[12px] font-extrabold text-rose-600 px-2 py-0.5 uppercase tracking-tight flex items-center gap-1">
                 <span>🔴</span>
                 <span>서식 &amp; 시설 &amp; 힐링</span>
               </p>
