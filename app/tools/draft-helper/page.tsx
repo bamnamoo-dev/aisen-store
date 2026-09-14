@@ -476,20 +476,6 @@ export default function DraftHelperPage() {
                     </span>
                   </div>
 
-                  {/* 챗봇 연계 버튼 */}
-                  <a
-                    href={`https://chatbot.aisen.store?q=${encodeURIComponent(
-                      `${activeTemplate.title} 기안문 작성해줘`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Sparkles size={12} />
-                    챗봇에서 살붙이기
-                  </a>
-                </div>
-
                 <h2 className="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">
                   {activeTemplate.title}
                 </h2>
