@@ -6,6 +6,7 @@ import {
   Bot, 
   Navigation, 
   ChevronRight, 
+  ArrowRight,
   ArrowUpRight,
   MessageSquareShare,
   FolderOpen,
