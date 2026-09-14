@@ -22,7 +22,8 @@ import {
   ExternalLink,
   Info,
   Sparkles,
-  FileText
+  FileText,
+  Layers
 } from 'lucide-react';
 
 interface ManualContentProps {
