@@ -27,7 +27,8 @@ import {
   BookOpen,
   FileText,
   Layers,
-  ShieldCheck
+  ShieldCheck,
+  Cpu
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -40,6 +41,7 @@ import { useSidebar } from './SidebarContext';
 // 1. 🔵 AI & 지침 허브
 const AI_HUB_ITEMS = [
   { name: 'AI-SEN 행정챗봇', href: 'https://chatbot.aisen.store', icon: <Bot size={18} className="text-blue-600" />, isExternal: true, badge: '3-Tier' },
+  { name: 'AI-SEN MCP 테스터', href: 'https://chatbot.aisen.store/mcp', icon: <Cpu size={18} className="text-blue-600" />, isExternal: true, badge: 'Web' },
   { name: 'AI-SEN 행정서고', href: '/archive', icon: <FolderOpen size={18} className="text-blue-600" />, isExternal: false, badge: '102권' },
   { name: 'AI-SEN 출장여비', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={18} className="text-blue-600" />, isExternal: true, badge: 'v4.9.2' },
   { name: 'AI-SEN 소통게시판', href: '/board', icon: <MessageSquareShare size={18} className="text-blue-600" />, isExternal: false, badge: '소통' },
