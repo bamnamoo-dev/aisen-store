@@ -3798,7 +3798,7 @@ export default function ExcelMergePage() {
                   </div>
                 </div>
 
-                {/* 2단계 카드 */}
+                {/* 2단계 카드: 시트 선택 & 양식 모드 & 헤더 끝 행 확인 */}
                 <div className="bg-slate-50/90 border border-slate-200 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-indigo-400 hover:shadow-md transition-all">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
@@ -3808,7 +3808,7 @@ export default function ExcelMergePage() {
                         </div>
                         <div>
                           <h4 className="font-black text-slate-900 text-base sm:text-lg">
-                            양식 모드 & 헤더 끝 행 1초 확인
+                            시트 선택 & 양식 모드 · 헤더 1초 확인
                           </h4>
                           <span className="text-xs text-indigo-600 font-medium">단 1초 확인으로 수합 정확도 100% 종결</span>
                         </div>
@@ -3818,29 +3818,43 @@ export default function ExcelMergePage() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2.5 text-xs sm:text-sm">
-                      <div className="bg-white border border-indigo-100 rounded-xl p-3">
-                        <strong className="text-indigo-950 block mb-1 font-black text-sm sm:text-base">🥞 서식 블록형</strong>
-                        <span className="text-slate-600 text-xs sm:text-[13px] leading-snug block">
+                    {/* 📑 취합할 시트(탭) 선택 안내 블록 */}
+                    <div className="bg-white border border-indigo-100 rounded-xl p-3 text-xs sm:text-[13px] space-y-1">
+                      <div className="flex items-center gap-1.5 text-indigo-950 font-black">
+                        <Layers size={14} className="text-indigo-600" />
+                        <span>📑 취합할 시트(탭) 선택</span>
+                        <span className="text-[10.5px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 ml-auto">다중 시트 지원</span>
+                      </div>
+                      <p className="text-slate-600 leading-relaxed font-medium">
+                        제출 파일에 시트가 여러 개 있는 경우(예: <code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-700 font-bold">[안내문]</code>, <code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-700 font-bold">[취합서식]</code>), 화면 상단의 <strong>[1번째 시트], [2번째 시트]...</strong> 탭 버튼을 클릭하여 취합할 대상 시트를 즉시 지정할 수 있습니다. (기본값: 서식 자동 감지)
+                      </p>
+                    </div>
+
+                    {/* 2대 양식 모드 */}
+                    <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                      <div className="bg-white border border-indigo-100 rounded-xl p-2.5 sm:p-3">
+                        <strong className="text-indigo-950 block mb-0.5 font-black text-xs sm:text-sm">🥞 서식 블록형</strong>
+                        <span className="text-slate-600 text-[11px] sm:text-xs leading-snug block">
                           학교당 여러 줄(다행) 복합 서식 및 수식 보존 (급식비, 인건비, 사업비 등)
                         </span>
                       </div>
-                      <div className="bg-white border border-indigo-100 rounded-xl p-3">
-                        <strong className="text-indigo-950 block mb-1 font-black text-sm sm:text-base">📄 단순 목록형</strong>
-                        <span className="text-slate-600 text-xs sm:text-[13px] leading-snug block">
-                          학교당 1줄씩 아래로 쭉 나열되는 명부/대장 (수요조사, 실태조사 등)
+                      <div className="bg-white border border-indigo-100 rounded-xl p-2.5 sm:p-3">
+                        <strong className="text-indigo-950 block mb-0.5 font-black text-xs sm:text-sm">📄 단순 목록형</strong>
+                        <span className="text-slate-600 text-[11px] sm:text-xs leading-snug block">
+                          학교당 1줄씩 아래로 나열되는 명부/대장 (수요조사, 실태조사 등)
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-4 bg-indigo-50 border border-indigo-200/90 rounded-xl p-3.5 text-xs sm:text-sm space-y-1">
+                  {/* 🎯 헤더 끝 행이란? */}
+                  <div className="mt-3.5 bg-indigo-50 border border-indigo-200/90 rounded-xl p-3 text-xs sm:text-[13px] space-y-1">
                     <div className="font-black text-indigo-950 flex items-center gap-1.5">
                       <span>🎯</span>
                       <span>[헤더 끝 행]이란?</span>
                     </div>
                     <p className="text-indigo-900/90 leading-relaxed font-medium">
-                      표의 항목 제목(연번, 학교명, 신청금액 등)이 끝나는 <strong>마지막 행 번호</strong>입니다. 프로그램이 <strong>파란 음영으로 자동 감지</strong>하며, 표 뷰어에서 마지막 제목 행을 마우스로 클릭하면 즉시 수정됩니다.
+                      표 항목 제목(연번, 학교명, 신청금액 등)이 끝나는 <strong>마지막 행 번호</strong>입니다. 프로그램이 <strong>파란 음영으로 자동 감지</strong>하며, 표 뷰어에서 마지막 제목 행을 마우스로 클릭하면 즉시 수정됩니다.
                     </p>
                   </div>
                 </div>
