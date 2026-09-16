@@ -239,14 +239,14 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  관내·관외뿐 아니라 국외(해외)출장 4대 등급, 기내박 감액, 하나은행 매매기준율 연동, 카카오 유류비 산출 및 A4 1장 정산서 인쇄를 지원합니다.
+                  관내·관외뿐 아니라 국외(해외)출장 4대 등급(USD), 기내1박 $0, 식비 1/3 감액, 하나은행 매매기준율, 고정값·변동값 자동 대조 및 A4 1장 무오차 정산서 인쇄를 지원합니다.
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">해외출장(가·나·다·라)</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">기내박·조식 법정감액</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">하나은행 매매기준율</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">카카오 실시간 거리</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">오피넷 1일 6회 유가</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">A4 1p 정산서</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">카카오 거리·유가</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">A4 1p 완결 인쇄</span>
                 </div>
               </div>
 
