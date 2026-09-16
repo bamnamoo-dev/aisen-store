@@ -41,7 +41,7 @@ import { useSidebar } from './SidebarContext';
 const AI_HUB_ITEMS = [
   { name: '행정챗봇', href: 'https://chatbot.aisen.store', icon: <Bot size={18} className="text-blue-600" />, isExternal: true, badge: '3-Tier' },
   { name: '행정서고', href: '/archive', icon: <FolderOpen size={18} className="text-blue-600" />, isExternal: false, badge: '102권' },
-  { name: '출장여비', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={18} className="text-blue-600" />, isExternal: true, badge: 'v4.9.2' },
+  { name: '출장여비', href: 'https://chatbot.aisen.store/travel', icon: <Navigation size={18} className="text-blue-600" />, isExternal: true, badge: 'v5.0.0' },
   { name: '소통게시판', href: '/board', icon: <MessageSquareShare size={18} className="text-blue-600" />, isExternal: false, badge: '소통' },
   { name: '구글 맞춤챗봇', href: '/chatbot', icon: <MessageSquare size={18} className="text-blue-600" />, isExternal: false, badge: 'Gemini' },
 ];

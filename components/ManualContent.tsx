@@ -235,13 +235,15 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                     <h4 className="text-[15px] sm:text-base font-black text-slate-900 leading-snug tracking-tight">AI-SEN 출장여비</h4>
                   </div>
                   <span className="text-xs font-black px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 shrink-0 whitespace-nowrap">
-                    v4.9.2
+                    v5.0.0
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                  카카오 길찾기 API(최대 3개 경유지)와 오피넷 실시간 유가를 연동하고, 19종 법정 감액을 자동 계산하여 A4 1장 인쇄를 지원합니다.
+                  관내·관외뿐 아니라 국외(해외)출장 4대 등급, 기내박 감액, 하나은행 매매기준율 연동, 카카오 유류비 산출 및 A4 1장 정산서 인쇄를 지원합니다.
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">해외출장(가·나·다·라)</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">하나은행 매매기준율</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">카카오 실시간 거리</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">오피넷 1일 6회 유가</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">A4 1p 정산서</span>
