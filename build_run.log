@@ -1,0 +1,5 @@
+2026-09-14 10:35:06,982 - sen-chatbot-db - INFO - ⚙️ [Migration] feedbacks 테이블에 client_ip 컬럼 및 인덱스 추가 완료.
+2026-09-14 10:35:06,990 - sen-chatbot-db - INFO - ⚙️ [Migration] login_attempts 테이블 생성 완료.
+2026-09-14 10:35:07,044 - sen-chatbot-split-cache - INFO - ⚙️ [QuerySplitCache] SQLite DB 테이블 및 인덱스 초기화 완료.
+2026-09-14 10:35:07,091 - sen-chatbot-backend - INFO - [CORS] 허용 오리진: ['https://aisen.store', 'https://www.aisen.store', 'https://chatbot.aisen.store', 'http://49.247.137.249', 'http://localhost:8000', 'http://localhost:3000', 'http://127.0.0.1:8000', 'http://127.0.0.1:3000']
+2026-09-14 10:35:08,731 - sen-chatbot-backend - INFO - 🚀 [MCP SSE] /api/mcp SSE 서버 마운트 완료 (https://chatbot.aisen.store/api/mcp/sse)
