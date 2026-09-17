@@ -1673,27 +1673,31 @@ export default function ExcelMergePage() {
           const currentDstRow = currentDstRowMap.get(cfg.sheetIndex) || cfg.blockStartRow;
           const rowOffset = currentDstRow - cfg.blockStartRow;
 
-          // 🌟 [예시 및 미작성 시트 자동 필터링 헬퍼]
-          // 행 내에 '예시' 텍스트가 포함되어 있거나, 기본 템플릿 샘플 데이터(은성중, 세화여고 등)인지 검사
+          // 🌟 [100% 범용 예시 및 미작성 행 자동 필터링 헬퍼]
+          // 연번, 비고, 사유, 학교명 등 행 전체의 어떤 셀이든 '예시' 텍스트가 포함되어 있는지 전수 검사
           const checkIsExampleOrSampleRow = (row: any): boolean => {
             let isEx = false;
             row.eachCell({ includeEmpty: false }, (cell: any) => {
               const val = cell.value;
               const txt = String(val && typeof val === 'object' ? (val.result || val.formula || '') : (val || '')).trim();
-              if (txt.includes('예시')) {
+              if (txt.includes('예시') || txt.includes('샘플') || txt.includes('sample')) {
                 isEx = true;
               }
             });
             if (isEx) return true;
 
-            // 현재 학교가 아닌 타 학교(기본 템플릿 샘플 은성중/세화여고 등)의 예시 행인지 검사
+            // 현재 학교 파일이 아닌 타 학교(기본 템플릿 견본 샘플 교명)의 예시 행인지 검사
             const sNameCol = cfg.schoolCellCol || 6;
             const rowSchool = String(row.getCell(sNameCol).value || '').trim();
             if (rowSchool && !info.school.name.includes(rowSchool) && !rowSchool.includes(info.school.name)) {
-              if (rowSchool.includes('은성중') || rowSchool.includes('세화여고') || rowSchool.includes('세화여자고')) {
+              if (
+                rowSchool.includes('은성중') || rowSchool.includes('세화여고') || rowSchool.includes('세화여자고') ||
+                rowSchool.includes('경희여중') || rowSchool.includes('경희여자중') || rowSchool.includes('대성고')
+              ) {
                 return true;
               }
             }
+
             return false;
           };
 
@@ -1713,7 +1717,7 @@ export default function ExcelMergePage() {
               srcRow.eachCell({ includeEmpty: false }, (c: any) => {
                 const v = c.value;
                 const t = String(v && typeof v === 'object' ? (v.result || v.formula || '') : (v || '')).trim();
-                if (t.length > 0 && t !== '0') hasMeaningfulVal = true;
+                if (t.length > 0 && t !== '0' && t !== '-') hasMeaningfulVal = true;
               });
               if (hasMeaningfulVal) {
                 hasRealSchoolData = true;
@@ -1726,7 +1730,7 @@ export default function ExcelMergePage() {
               continue;
             }
 
-            // 🌟 2. 실제 데이터 복사: 예시 행은 건너뛰고 실제 데이터 행만 복사
+            // 🌟 2. 실제 데이터 복사: 예시 행 및 안내표 행은 건너뛰고 실제 데이터 행만 복사
             const validSrcRows: any[] = [];
             for (let r = 0; r < detectedRows; r++) {
               const srcRowNum = cfg.blockStartRow + r;
