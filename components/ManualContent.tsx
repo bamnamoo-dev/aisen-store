@@ -477,7 +477,8 @@ export default function ManualContent({ onToolClick, isModal = false }: ManualCo
                 </p>
                 <div className="flex flex-wrap gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">서식/수식 100% 보존</span>
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">에듀파인 교부 동시생성</span>
+                  <span className="bg-purple-50 text-purple-700 px-2.5 py-1 rounded-md border border-purple-200/60 font-semibold">예시 데이터 자동 제외</span>
+                  <span className="bg-slate-100 px-2.5 py-1 rounded-md">다중 시트 동시 수합</span>
                   <span className="bg-slate-100 px-2.5 py-1 rounded-md">자체 명부 학교코드 연동</span>
                 </div>
               </div>
