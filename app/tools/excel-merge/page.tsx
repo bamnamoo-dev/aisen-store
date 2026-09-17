@@ -10,7 +10,8 @@ import {
   Layers, Copy, RefreshCw, Sparkles, FileText, ArrowRight, ShieldCheck, 
   HelpCircle, ChevronDown, Check, Send, DownloadCloud, FileCheck2, School,
   FlaskConical, Archive, Eye, FileUp, Building2, SlidersHorizontal, BookOpen,
-  RotateCcw, X, ClipboardList, Search, ArrowUpDown, ArrowUp, ArrowDown, Filter
+  RotateCcw, X, ClipboardList, Search, ArrowUpDown, ArrowUp, ArrowDown, Filter,
+  Trash2, Edit2, Plus, CheckSquare, Square, FolderPlus, ListOrdered
 } from 'lucide-react';
 
 interface SchoolItem {
@@ -18,6 +19,27 @@ interface SchoolItem {
   name: string;
   type?: string;
   code?: string;
+}
+
+// 🏛️ 다중 자체 기준 명부 데이터 구조
+interface CustomRoster {
+  id: string;
+  name: string;
+  createdAt: string;
+  schools: SchoolItem[];
+}
+
+// 📑 시트별 독립 설정 구조체 (다중 시트 취합용)
+interface SheetConfig {
+  sheetIndex: number;          // 시트 순번 (0, 1, 2...)
+  sheetName: string;           // 시트 이름
+  enabled: boolean;            // 이번 취합 포함 여부 (체크박스)
+  mode: 'block' | 'simple';    // 서식 블록형 vs 단순 목록형
+  headerEndRow: number;        // 헤더 끝 행
+  blockStartRow: number;       // 본문 시작 행 (headerEndRow + 1)
+  blockRowCount: number;       // 학교당 블록 행 수 (블록형)
+  isAutoDetectRows: boolean;   // 가변행 자동 감지 여부
+  schoolCellCol: number;       // 학교명 셀 열 위치
 }
 
 interface ProcessedFile {
@@ -32,10 +54,9 @@ interface ProcessedFile {
   fitness?: number;
 }
 
-// 기준 명부 옵션 (실무 최적화: '명부 없음' 기본 + '자체 기준 명부')
+// 기준 명부 옵션
 const ROSTER_OPTIONS = [
-  { id: 'none', name: '명부 없음 (자유 수합 / 미제출 검증 생략)' },
-  { id: 'custom', name: '📂 자체 기준 명부 직접 등록 (.xlsx)' }
+  { id: 'none', name: '명부 없음 (자유 수합 / 미제출 검증 생략)' }
 ];
 
 export default function ExcelMergePage() {
@@ -57,14 +78,19 @@ export default function ExcelMergePage() {
   const [edufineBizName, setEdufineBizName] = useState('학교 전출금 교부액');
   const [edufineAmountCol, setEdufineAmountCol] = useState(9); // I열 = 합계액
 
-  // 기준 명부 관리 상태 (전국 대응 - 초기값은 선택 안 함(0개소))
+  // 🏛️ 다중 기준 명부 관리 상태 (복수 명부 무제한 영구 보관)
   const [selectedRegion, setSelectedRegion] = useState<string>('none');
   const [targetSchools, setTargetSchools] = useState<SchoolItem[]>([]);
   const [customRosterName, setCustomRosterName] = useState<string>('');
-  const [savedCustomRoster, setSavedCustomRoster] = useState<{
-    name: string;
-    schools: SchoolItem[];
-  } | null>(null);
+  const [savedRosters, setSavedRosters] = useState<CustomRoster[]>([]);
+  const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
+  const [editingRosterId, setEditingRosterId] = useState<string | null>(null);
+  const [editingRosterName, setEditingRosterName] = useState('');
+  const [previewRosterModal, setPreviewRosterModal] = useState<CustomRoster | null>(null);
+
+  // 📑 다중 시트 독립 설정 상태 (sheetIndex -> SheetConfig)
+  const [sheetConfigs, setSheetConfigs] = useState<Record<number, SheetConfig>>({});
+  const [activePreviewSheetIndex, setActivePreviewSheetIndex] = useState<number>(0);
 
   // 처리 상태 관리
   const [files, setFiles] = useState<File[]>([]);
@@ -98,18 +124,47 @@ export default function ExcelMergePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const rosterInputRef = useRef<HTMLInputElement>(null);
 
-  // 로컬에 영구 저장된 자체 명부 자동 로드 (100% 브라우저 로컬 보안, 서버 유출 0%)
+  // 로컬에 영구 저장된 다중 명부 목록 자동 로드 (v1 -> v2 자동 마이그레이션 포함)
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('aisen_custom_roster_v1');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && Array.isArray(parsed.schools) && parsed.schools.length > 0) {
-          setSavedCustomRoster(parsed);
+      let rosters: CustomRoster[] = [];
+      const savedV2 = localStorage.getItem('aisen_custom_rosters_v2');
+      if (savedV2) {
+        const parsed = JSON.parse(savedV2);
+        if (Array.isArray(parsed)) {
+          rosters = parsed;
         }
       }
+
+      // 이전 v1 데이터가 남아있는 경우 v2로 안전하게 흡수 보존
+      const savedV1 = localStorage.getItem('aisen_custom_roster_v1');
+      if (savedV1) {
+        try {
+          const parsedV1 = JSON.parse(savedV1);
+          if (parsedV1 && Array.isArray(parsedV1.schools) && parsedV1.schools.length > 0) {
+            const exists = rosters.some(r => r.name === parsedV1.name);
+            if (!exists) {
+              const migrated: CustomRoster = {
+                id: `roster_migrated_${Date.now()}`,
+                name: parsedV1.name || '자체 기준 명부 (이전 저장본)',
+                createdAt: new Date().toISOString(),
+                schools: parsedV1.schools
+              };
+              rosters.unshift(migrated);
+              localStorage.setItem('aisen_custom_rosters_v2', JSON.stringify(rosters));
+            }
+          }
+        } catch (v1Err) {}
+      }
+
+      setSavedRosters(rosters);
+      if (rosters.length > 0 && (selectedRegion === 'none' || selectedRegion === 'custom')) {
+        setSelectedRegion(rosters[0].id);
+        setTargetSchools(rosters[0].schools);
+        setCustomRosterName(rosters[0].name);
+      }
     } catch (e) {
-      console.error('로컬 자체 명부 로드 실패:', e);
+      console.error('로컬 명부 목록 로드 실패:', e);
     }
   }, []);
 
@@ -143,38 +198,66 @@ export default function ExcelMergePage() {
     }
   };
 
-  // 기준 명부 로드 (자체 기준 명부 또는 선택 안 함)
+  // 기준 명부 로드 (선택된 ID에 따라 타겟 학교 목록 즉시 전환)
   useEffect(() => {
     if (selectedRegion === 'none') {
       setTargetSchools([]);
       setCustomRosterName('');
       return;
     }
-    if (selectedRegion === 'custom') {
-      if (savedCustomRoster && savedCustomRoster.schools.length > 0) {
-        setTargetSchools(savedCustomRoster.schools);
-        setCustomRosterName(savedCustomRoster.name);
-      }
-      return;
-    }
     if (selectedRegion === 'virtual_sample') {
       return; // handleLoadSampleFiles에서 직접 세팅
     }
-  }, [selectedRegion, savedCustomRoster]);
-
-  // 로컬에 저장된 자체 명부 삭제
-  const handleDeleteCustomRoster = () => {
-    if (confirm('브라우저에 저장된 자체 기준 명부를 삭제하시겠습니까?')) {
-      try {
-        localStorage.removeItem('aisen_custom_roster_v1');
-      } catch (e) {}
-      setSavedCustomRoster(null);
+    const found = savedRosters.find(r => r.id === selectedRegion);
+    if (found) {
+      setTargetSchools(found.schools);
+      setCustomRosterName(found.name);
+    } else if (savedRosters.length > 0) {
+      setSelectedRegion(savedRosters[0].id);
+      setTargetSchools(savedRosters[0].schools);
+      setCustomRosterName(savedRosters[0].name);
+    } else {
+      setTargetSchools([]);
       setCustomRosterName('');
-      if (selectedRegion === 'custom') {
+    }
+  }, [selectedRegion, savedRosters]);
+
+  // 로컬 명부 개별 삭제
+  const handleDeleteRoster = (id: string) => {
+    const target = savedRosters.find(r => r.id === id);
+    if (!confirm(`'${target?.name || '기준 명부'}'를 삭제하시겠습니까?`)) return;
+    const updated = savedRosters.filter(r => r.id !== id);
+    setSavedRosters(updated);
+    try {
+      localStorage.setItem('aisen_custom_rosters_v2', JSON.stringify(updated));
+    } catch (e) {}
+
+    if (selectedRegion === id) {
+      if (updated.length > 0) {
+        setSelectedRegion(updated[0].id);
+        setTargetSchools(updated[0].schools);
+        setCustomRosterName(updated[0].name);
+      } else {
         setSelectedRegion('none');
         setTargetSchools([]);
+        setCustomRosterName('');
       }
     }
+  };
+
+  // 로컬 명부 이름 변경
+  const handleRenameRoster = (id: string, newName: string) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    const updated = savedRosters.map(r => r.id === id ? { ...r, name: trimmed } : r);
+    setSavedRosters(updated);
+    try {
+      localStorage.setItem('aisen_custom_rosters_v2', JSON.stringify(updated));
+    } catch (e) {}
+    if (selectedRegion === id) {
+      setCustomRosterName(trimmed);
+    }
+    setEditingRosterId(null);
   };
 
   // 자체 기준 명부 엑셀(.xlsx) 업로드 파싱
@@ -329,20 +412,27 @@ export default function ExcelMergePage() {
         return;
       }
 
-      const displayName = `${file.name} (${customList.length}개소)`;
-      const rosterData = { name: displayName, schools: customList };
-      
+      const cleanBaseName = file.name.replace(/\.[^/.]+$/, '');
+      const displayName = `${cleanBaseName} (${customList.length}개소)`;
+      const newRoster: CustomRoster = {
+        id: `roster_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        name: displayName,
+        createdAt: new Date().toISOString(),
+        schools: customList
+      };
+
+      const updatedRosters = [newRoster, ...savedRosters.filter(r => r.name !== displayName)];
+      setSavedRosters(updatedRosters);
       try {
-        localStorage.setItem('aisen_custom_roster_v1', JSON.stringify(rosterData));
-        setSavedCustomRoster(rosterData);
+        localStorage.setItem('aisen_custom_rosters_v2', JSON.stringify(updatedRosters));
       } catch (e) {
         console.error('로컬 스토리지 저장 실패:', e);
       }
 
       setTargetSchools(customList);
-      setSelectedRegion('custom');
+      setSelectedRegion(newRoster.id);
       setCustomRosterName(displayName);
-      alert(`자체 기준 명부가 담당자 PC 브라우저에 안전하게 영구 저장되었습니다!\n총 ${customList.length}개 기관/학교를 기준으로 수합 및 미제출 검증이 진행됩니다.\n(서버 전송 0% · 다음 방문 시에도 그대로 자동 복원됩니다)`);
+      alert(`자체 기준 명부 ['${displayName}'] 가 내 PC 브라우저에 안전하게 저장되었습니다!\n총 ${customList.length}개 기관/학교를 기준으로 수합 및 미제출 검증이 진행됩니다.\n(서버 전송 0% · 복수 명부 목록에서 언제든 전환 가능합니다)`);
     } catch (err: any) {
       alert('명부 엑셀 파싱 실패: ' + err.message);
     }
@@ -617,7 +707,7 @@ export default function ExcelMergePage() {
     }
   };
 
-  // 첫 번째 파일의 특정 시트를 읽어 시각적 미리보기 구성 & 스마트 헤더 추천
+  // 첫 번째 파일의 모든 시트를 분석하여 독립 설정(SheetConfig) 자동 빌드 및 미리보기 렌더링
   const loadSheetPreview = async (file: File, forceSheetIndex?: number) => {
     try {
       const ExcelJS = (window as any).ExcelJS;
@@ -628,28 +718,69 @@ export default function ExcelMergePage() {
       const sheets = wb.worksheets.map((s: any, idx: number) => ({ index: idx, name: s.name }));
       setAvailableSheets(sheets);
 
-      // 대상 시트 결정 (강제 지정 인덱스 > 현재 선택 인덱스 > 시트명 일치 > 키워드 > 2번째/1번째)
-      const targetIdx = forceSheetIndex !== undefined ? forceSheetIndex : selectedSheetIndex;
-      let ws: any = null;
+      // 🌟 모든 시트 전수 분석하여 시트별 스마트 초기 설정(SheetConfig) 맵 자동 구축
+      setSheetConfigs(prev => {
+        const nextConfigs: Record<number, SheetConfig> = { ...prev };
 
-      if (targetIdx >= 0 && wb.worksheets[targetIdx]) {
-        ws = wb.worksheets[targetIdx];
-      } else if (previewSheetName) {
-        ws = wb.worksheets.find((s: any) => s.name === previewSheetName);
-      } else if (sheetKeyword) {
-        ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
-      }
+        wb.worksheets.forEach((s: any, idx: number) => {
+          // 이미 사용자가 커스텀 조정한 설정이 존재하고 시트명이 같다면 유지
+          if (nextConfigs[idx] && nextConfigs[idx].sheetName === s.name) {
+            return;
+          }
 
-      if (!ws) {
-        ws = wb.worksheets[1] || wb.worksheets[0];
-      }
+          // 해당 시트의 상위 25행 스캔하여 스마트 헤더 감지
+          const sampleRows: Array<{ rowNum: number; cells: string[] }> = [];
+          const maxScan = Math.min(25, s.rowCount || 25);
+          for (let r = 1; r <= maxScan; r++) {
+            const row = s.getRow(r);
+            const cellVals: string[] = [];
+            for (let c = 1; c <= 12; c++) {
+              const val = row.getCell(c).value;
+              let text = '';
+              if (val === null || val === undefined) text = '';
+              else if (typeof val === 'object') {
+                if (val.result !== undefined) text = String(val.result);
+                else if (val.formula) text = `=${val.formula}`;
+                else text = String(val);
+              } else {
+                text = String(val);
+              }
+              cellVals.push(text.trim());
+            }
+            sampleRows.push({ rowNum: r, cells: cellVals });
+          }
+
+          const detected = detectSmartHeaderRow(sampleRows);
+          const hRow = (detected && detected > 0) ? detected : (idx === 0 ? 17 : 1);
+          const isGuide = /안내|참고|요령|작성|지침|Q&A|faq|목차/i.test(s.name);
+
+          nextConfigs[idx] = {
+            sheetIndex: idx,
+            sheetName: s.name,
+            enabled: !isGuide, // 안내/작성요령 시트는 자동 제외 기본값
+            mode: hRow <= 2 ? 'simple' : 'block',
+            headerEndRow: hRow,
+            blockStartRow: hRow + 1,
+            blockRowCount: 16,
+            isAutoDetectRows: true,
+            schoolCellCol: 5
+          };
+        });
+
+        return nextConfigs;
+      });
+
+      // 대상 미리보기 시트 결정 (강제 지정 인덱스 > 현재 선택 인덱스 > 0번 시트)
+      const targetIdx = forceSheetIndex !== undefined 
+        ? forceSheetIndex 
+        : (activePreviewSheetIndex >= 0 && wb.worksheets[activePreviewSheetIndex] ? activePreviewSheetIndex : 0);
+      let ws: any = wb.worksheets[targetIdx] || wb.worksheets[0];
       if (!ws) return;
 
       const currentIdx = wb.worksheets.indexOf(ws);
+      setActivePreviewSheetIndex(currentIdx);
+      setSelectedSheetIndex(currentIdx);
       setPreviewSheetName(ws.name);
-      if (forceSheetIndex !== undefined) {
-        setSelectedSheetIndex(forceSheetIndex);
-      }
 
       const rows: Array<{ rowNum: number; cells: string[] }> = [];
       const maxRowsToPreview = Math.min(30, ws.rowCount || 30);
@@ -674,22 +805,23 @@ export default function ExcelMergePage() {
       }
       setPreviewRows(rows);
 
-      // 스마트 헤더 자동 감지 실행
-      const detected = detectSmartHeaderRow(rows);
-      if (detected && detected > 0) {
-        setHeaderEndRow(detected);
-        setBlockStartRow(detected + 1);
-        setAutoDetectedBadge(`✨ [${ws.name}] 컬럼명 분석 결과 헤더 끝이 ${detected}행으로 자동 지정되었습니다.`);
-      } else {
-        setAutoDetectedBadge(`현재 선택된 시트: [${ws.name}] (필요 시 아래 표에서 헤더 끝 행을 클릭하세요)`);
+      // 스마트 헤더 자동 감지 실행 및 현재 시트 설정과 동기화
+      const curConfig = sheetConfigs[currentIdx];
+      const hEnd = curConfig ? curConfig.headerEndRow : (detectSmartHeaderRow(rows) || 1);
+      setHeaderEndRow(hEnd);
+      setBlockStartRow(hEnd + 1);
+      if (curConfig) {
+        setMode(curConfig.mode);
       }
+      setAutoDetectedBadge(`✨ [${ws.name}] 컬럼 분석 결과 헤더 끝이 ${hEnd}행으로 지정되었습니다. (표에서 다른 행 터치 시 즉시 변경)`);
     } catch (e) {
       console.error('시트 미리보기 파싱 실패:', e);
     }
   };
 
-  // 사용자가 시트 탭(몇 번째 시트인지)을 직접 클릭했을 때 전환
+  // 사용자가 특정 시트 탭을 클릭하여 미리보기를 전환했을 때
   const handleSheetTabClick = (sheetIdx: number) => {
+    setActivePreviewSheetIndex(sheetIdx);
     setSelectedSheetIndex(sheetIdx);
     const validExcel = files.find(f => 
       !f.name.startsWith('~$') && (f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls'))
@@ -699,7 +831,52 @@ export default function ExcelMergePage() {
     }
   };
 
-  // files 또는 sheetKeyword 변경 시 미리보기 갱신 (유효한 첫 번째 엑셀 파일 자동 탐색)
+  // 시트 체크박스 토글 (취합 포함 여부)
+  const toggleSheetEnabled = (sheetIdx: number) => {
+    setSheetConfigs(prev => {
+      const cur = prev[sheetIdx];
+      if (!cur) return prev;
+      return {
+        ...prev,
+        [sheetIdx]: {
+          ...cur,
+          enabled: !cur.enabled
+        }
+      };
+    });
+  };
+
+  // 모든 시트 일괄 선택 / 일괄 해제
+  const setAllSheetsEnabled = (enabled: boolean) => {
+    setSheetConfigs(prev => {
+      const next: Record<number, SheetConfig> = { ...prev };
+      Object.keys(next).forEach(k => {
+        const idx = Number(k);
+        if (next[idx]) {
+          next[idx] = { ...next[idx], enabled };
+        }
+      });
+      return next;
+    });
+  };
+
+  // 현재 활성화된 시트의 수합 모드(블록형 / 단순목록형) 변경
+  const handleModeChangeForActiveSheet = (newMode: 'block' | 'simple') => {
+    setMode(newMode);
+    setSheetConfigs(prev => {
+      const cur = prev[activePreviewSheetIndex];
+      if (!cur) return prev;
+      return {
+        ...prev,
+        [activePreviewSheetIndex]: {
+          ...cur,
+          mode: newMode
+        }
+      };
+    });
+  };
+
+  // files 변경 시 미리보기 갱신 (유효한 첫 번째 엑셀 파일 자동 탐색)
   useEffect(() => {
     if (files.length > 0 && typeof window !== 'undefined' && (window as any).ExcelJS) {
       const validExcel = files.find(f => 
@@ -713,16 +890,30 @@ export default function ExcelMergePage() {
       setPreviewSheetName('');
       setAvailableSheets([]);
       setSelectedSheetIndex(-1);
+      setActivePreviewSheetIndex(0);
+      setSheetConfigs({});
       setAutoDetectedBadge('');
     }
-  }, [files, sheetKeyword, excelJsLoaded]);
+  }, [files, excelJsLoaded]);
 
-  // 마우스 클릭으로 헤더 끝 행 및 본문 시작행 1초 지정
+  // 마우스 클릭으로 현재 시트의 헤더 끝 행 및 본문 시작행 1초 지정
   const handleSelectHeaderEndRow = (rowNum: number) => {
     setHeaderEndRow(rowNum);
     setBlockStartRow(rowNum + 1);
     setActivePreset('custom');
-    setAutoDetectedBadge(`마우스 클릭으로 ${rowNum}행을 헤더 끝으로 지정하였습니다.`);
+    setSheetConfigs(prev => {
+      const cur = prev[activePreviewSheetIndex];
+      if (!cur) return prev;
+      return {
+        ...prev,
+        [activePreviewSheetIndex]: {
+          ...cur,
+          headerEndRow: rowNum,
+          blockStartRow: rowNum + 1
+        }
+      };
+    });
+    setAutoDetectedBadge(`마우스 클릭으로 [${previewSheetName || '선택 시트'}] 의 헤더 끝을 ${rowNum}행으로 지정하였습니다.`);
   };
 
   // 파일 업로드 처리
@@ -873,32 +1064,35 @@ export default function ExcelMergePage() {
     const matchedMap = new Map<number, { file: File; school: SchoolItem; data: any; fitness?: number }>();
 
     try {
+      // 🌟 취합 대상 시트 설정 목록 (enabled: true)
+      let activeConfigs = Object.values(sheetConfigs).filter(c => c.enabled);
+      if (activeConfigs.length === 0) {
+        const curIdx = activePreviewSheetIndex >= 0 ? activePreviewSheetIndex : 0;
+        activeConfigs = [{
+          sheetIndex: curIdx,
+          sheetName: previewSheetName || '기본시트',
+          enabled: true,
+          mode: mode,
+          headerEndRow: headerEndRow,
+          blockStartRow: blockStartRow,
+          blockRowCount: blockRowCount,
+          isAutoDetectRows: isAutoDetectRows,
+          schoolCellCol: schoolCellCol
+        }];
+      }
+
       // 1. 기준 템플릿 파일 로드 (첫 번째 유효한 엑셀 파일을 스마트 탐색)
       let templateFile: File | undefined;
       let templateWb: any;
-      let targetWs: any;
 
       for (const f of files) {
         const isExcel = f.name.endsWith('.xlsx') || f.name.endsWith('.xlsm') || f.name.endsWith('.xls');
         if (!isExcel || f.name.startsWith('~$')) continue;
         try {
           const wb = await loadWorkbookSafely(f, ExcelJS);
-
-          // 템플릿 대상 시트 (사용자 지정 순번 > 시트명 > 키워드 > 2번째/1번째 시트)
-          let ws: any = null;
-          if (selectedSheetIndex >= 0 && wb.worksheets[selectedSheetIndex]) {
-            ws = wb.worksheets[selectedSheetIndex];
-          } else if (previewSheetName) {
-            ws = wb.worksheets.find((s: any) => s.name === previewSheetName);
-          } else if (sheetKeyword) {
-            ws = wb.worksheets.find((s: any) => s.name.includes(sheetKeyword));
-          }
-          if (!ws) ws = wb.worksheets[1] || wb.worksheets[0];
-
-          if (ws) {
+          if (wb && wb.worksheets && wb.worksheets.length > 0) {
             templateFile = f;
             templateWb = wb;
-            targetWs = ws;
             break;
           }
         } catch (e) {
@@ -906,11 +1100,29 @@ export default function ExcelMergePage() {
         }
       }
 
-      if (!templateFile || !templateWb || !targetWs) {
+      if (!templateFile || !templateWb) {
         alert('취합 기준 템플릿으로 사용할 수 있는 유효한 엑셀 파일이 없습니다.\n정상적인 .xlsx 서식 파일이 포함되어 있는지 확인해주세요.');
         setIsProcessing(false);
         return;
       }
+
+      // 템플릿 내 취합 대상 시트들 매핑 & 초기 시작행 설정
+      const targetWsMap = new Map<number, any>();
+      const currentDstRowMap = new Map<number, number>();
+
+      for (const cfg of activeConfigs) {
+        let ws = templateWb.worksheets.find((s: any) => s.name === cfg.sheetName) || templateWb.worksheets[cfg.sheetIndex];
+        if (!ws && templateWb.worksheets.length > 0) {
+          ws = templateWb.worksheets[0];
+        }
+        if (ws) {
+          targetWsMap.set(cfg.sheetIndex, ws);
+          currentDstRowMap.set(cfg.sheetIndex, cfg.blockStartRow);
+        }
+      }
+
+      const primaryCfg = activeConfigs[0];
+      const targetWs = targetWsMap.get(primaryCfg.sheetIndex) || templateWb.worksheets[0];
 
       // 🌟 기준 템플릿의 헤더 지문(Fingerprint) 수집 (1행 ~ headerEndRow 영역의 핵심 컬럼/제목 단어들)
       const COMMON_ADMIN_STOPWORDS = new Set([
@@ -1282,124 +1494,138 @@ export default function ExcelMergePage() {
         });
       }
 
-      if (mode === 'block') {
-        // [모드 1: 서식 블록형 취합 - 가변행/고정블록 겸용]
-        let currentDstRow = blockStartRow;
+      // 4. 모드별 및 시트별 병합 수행 (정렬 기준 적용)
+      for (let idx = 0; idx < sortedSeqs.length; idx++) {
+        const seq = sortedSeqs[idx];
+        const info = matchedMap.get(seq)!;
 
-        for (let idx = 0; idx < sortedSeqs.length; idx++) {
-          const seq = sortedSeqs[idx];
-          const info = matchedMap.get(seq)!;
-          const srcWs = info.data;
-          
-          const detectedRows = isAutoDetectRows 
-            ? Math.max(1, findLastDataRow(srcWs, blockStartRow) - blockStartRow + 1)
-            : blockRowCount;
-          // ✅ 캡 제거: C-3 체크(300행 임계값)에서 이미 총괄대장을 걸러냈으므로 이중 캡은 불필요
-          // 이전 Math.min(detectedRows, max(40,...)) 로직이 41~45행 데이터를 silent loss 하던 버그 수정
-          const actualRowCount = detectedRows;
+        const pct = 65 + Math.floor((idx / sortedSeqs.length) * 20);
+        setProgress(pct);
+        setStatusMessage(`기관 데이터 결합 (${idx + 1}/${sortedSeqs.length}): ${info.school.name} (${activeConfigs.length}개 시트)`);
 
-          const dstStartRow = currentDstRow;
-          const rowOffset = dstStartRow - blockStartRow;
+        // 해당 학교 파일 1회 안전 로드 (메모리 절약 & 고속 처리)
+        let srcWb: any = null;
+        try {
+          srcWb = await loadWorkbookSafely(info.file, ExcelJS);
+        } catch (schoolFileErr: any) {
+          console.error(`[${info.school.name}] 파일 파싱 실패:`, schoolFileErr);
+          const foundItem = processed.find(p => p.matchedSeq === seq || p.schoolName === info.school.name);
+          if (foundItem) {
+            foundItem.status = 'error';
+            foundItem.errorMsg = '파일 열기 실패';
+          }
+          continue;
+        }
 
-          const pct = 65 + Math.floor((idx / sortedSeqs.length) * 20);
-          setProgress(pct);
-          setStatusMessage(`기관 데이터 결합 (${idx + 1}/${sortedSeqs.length}): ${info.school.name} (${actualRowCount}행)`);
+        if (!srcWb || !srcWb.worksheets) continue;
 
-          try {
-            // 행별 셀 복사 (값, 서식, 수식)
-            for (let r = 0; r < actualRowCount; r++) {
-              const srcRowNum = blockStartRow + r;
-              const dstRowNum = dstStartRow + r;
-              const srcRow = srcWs.getRow(srcRowNum);
-              const dstRow = targetWs.getRow(dstRowNum);
+        // 선택된 모든 시트 순회 병합
+        for (const cfg of activeConfigs) {
+          const tWs = targetWsMap.get(cfg.sheetIndex);
+          if (!tWs) continue;
 
-              if (srcRow.height) dstRow.height = srcRow.height;
+          // 학교 워크북에서 해당 시트 탐색 (1. 시트명 일치 -> 2. 시트명 정규화 부분 일치 -> 3. 순번 일치)
+          let srcWs: any = srcWb.worksheets.find((s: any) => s.name === cfg.sheetName);
+          if (!srcWs) {
+            const cleanCfgName = cfg.sheetName.replace(/[\s\(\)\[\]_\-·\.]/g, '');
+            srcWs = srcWb.worksheets.find((s: any) => {
+              const cleanSName = s.name.replace(/[\s\(\)\[\]_\-·\.]/g, '');
+              return cleanSName.includes(cleanCfgName) || cleanCfgName.includes(cleanSName);
+            });
+          }
+          if (!srcWs && srcWb.worksheets[cfg.sheetIndex]) {
+            srcWs = srcWb.worksheets[cfg.sheetIndex];
+          }
 
-              srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
-                const dstCell = dstRow.getCell(colNumber);
+          if (!srcWs) {
+            // 이 학교에 해당 시트가 없는 경우 안전하게 패스
+            continue;
+          }
 
-                // 🛡️ 셀 값 및 수식 안전 복사 (Shared Formula 방어)
-                dstCell.value = copyCellValueSafely(cell, rowOffset);
+          const currentDstRow = currentDstRowMap.get(cfg.sheetIndex) || cfg.blockStartRow;
+          const rowOffset = currentDstRow - cfg.blockStartRow;
 
-                // 스타일 100% 보존
-                if (cell.font) dstCell.font = { ...cell.font };
-                if (cell.fill) dstCell.fill = { ...cell.fill };
-                if (cell.border) dstCell.border = { ...cell.border };
-                if (cell.alignment) dstCell.alignment = { ...cell.alignment };
-                if (cell.numFmt) dstCell.numFmt = cell.numFmt;
-              });
-            }
+          if (cfg.mode === 'block') {
+            const detectedRows = cfg.isAutoDetectRows 
+              ? Math.max(1, findLastDataRow(srcWs, cfg.blockStartRow) - cfg.blockStartRow + 1)
+              : cfg.blockRowCount;
+            const actualRowCount = detectedRows;
 
-            // 병합 셀 오프셋 이동 적용
-            if (idx > 0 && srcWs.model && srcWs.model.merges) {
-              srcWs.model.merges.forEach((mergeRange: string) => {
-                const parts = mergeRange.split(':');
-                if (parts.length === 2) {
-                  const match1 = parts[0].match(/([A-Z]+)(\d+)/);
-                  const match2 = parts[1].match(/([A-Z]+)(\d+)/);
-                  if (match1 && match2) {
-                    const col1 = match1[1];
-                    const row1 = parseInt(match1[2], 10);
-                    const col2 = match2[1];
-                    const row2 = parseInt(match2[2], 10);
+            try {
+              for (let r = 0; r < actualRowCount; r++) {
+                const srcRowNum = cfg.blockStartRow + r;
+                const dstRowNum = currentDstRow + r;
+                const srcRow = srcWs.getRow(srcRowNum);
+                const dstRow = tWs.getRow(dstRowNum);
 
-                    if (row1 >= blockStartRow && row2 < blockStartRow + actualRowCount) {
-                      const newMerge = `${col1}${row1 + rowOffset}:${col2}${row2 + rowOffset}`;
-                      try {
-                        targetWs.mergeCells(newMerge);
-                      } catch (e) {}
+                if (srcRow.height) dstRow.height = srcRow.height;
+
+                srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
+                  const dstCell = dstRow.getCell(colNumber);
+                  dstCell.value = copyCellValueSafely(cell, rowOffset);
+
+                  if (cell.font) dstCell.font = { ...cell.font };
+                  if (cell.fill) dstCell.fill = { ...cell.fill };
+                  if (cell.border) dstCell.border = { ...cell.border };
+                  if (cell.alignment) dstCell.alignment = { ...cell.alignment };
+                  if (cell.numFmt) dstCell.numFmt = cell.numFmt;
+                });
+              }
+
+              // 병합 셀 오프셋 이동 적용
+              if (idx > 0 && srcWs.model && srcWs.model.merges) {
+                srcWs.model.merges.forEach((mergeRange: string) => {
+                  const parts = mergeRange.split(':');
+                  if (parts.length === 2) {
+                    const match1 = parts[0].match(/([A-Z]+)(\d+)/);
+                    const match2 = parts[1].match(/([A-Z]+)(\d+)/);
+                    if (match1 && match2) {
+                      const col1 = match1[1];
+                      const r1 = parseInt(match1[2], 10);
+                      const col2 = match2[1];
+                      const r2 = parseInt(match2[2], 10);
+
+                      if (r1 >= cfg.blockStartRow && r2 < cfg.blockStartRow + actualRowCount) {
+                        try {
+                          tWs.mergeCells(`${col1}${r1 + rowOffset}:${col2}${r2 + rowOffset}`);
+                        } catch (e) {}
+                      }
                     }
                   }
-                }
-              });
-            }
+                });
+              }
 
-            currentDstRow += actualRowCount;
-          } catch (schoolMergeErr: any) {
-            console.error(`[${info.school.name}] 서식 오류로 자동 패스:`, schoolMergeErr);
-            const foundItem = processed.find(p => p.matchedSeq === seq || p.schoolName === info.school.name);
-            if (foundItem) {
-              foundItem.status = 'error';
-              foundItem.errorMsg = '서식/수식 깨짐 (자동 패스)';
+              currentDstRowMap.set(cfg.sheetIndex, currentDstRow + actualRowCount);
+            } catch (schoolMergeErr: any) {
+              console.error(`[${info.school.name}][${cfg.sheetName}] 서식 오류로 자동 패스:`, schoolMergeErr);
             }
-          }
-        }
-      } else {
-        // [모드 2: 단순 목록형 취합]
-        let currentDstRow = blockStartRow;
-        for (let idx = 0; idx < sortedSeqs.length; idx++) {
-          const seq = sortedSeqs[idx];
-          const info = matchedMap.get(seq)!;
-          const srcWs = info.data;
-          const lastR = findLastDataRow(srcWs, blockStartRow);
-          const count = Math.max(1, lastR - blockStartRow + 1);
+          } else {
+            // 단순 목록형 취합
+            const lastR = findLastDataRow(srcWs, cfg.blockStartRow);
+            const count = Math.max(1, lastR - cfg.blockStartRow + 1);
 
-          try {
-            for (let r = 0; r < count; r++) {
-              const srcRowNum = blockStartRow + r;
-              const dstRowNum = currentDstRow + r;
-              const rowOffset = dstRowNum - srcRowNum;
-              const srcRow = srcWs.getRow(srcRowNum);
-              const dstRow = targetWs.getRow(dstRowNum);
-              if (srcRow.height) dstRow.height = srcRow.height;
+            try {
+              for (let r = 0; r < count; r++) {
+                const srcRowNum = cfg.blockStartRow + r;
+                const dstRowNum = currentDstRow + r;
+                const offset = dstRowNum - srcRowNum;
+                const srcRow = srcWs.getRow(srcRowNum);
+                const dstRow = tWs.getRow(dstRowNum);
+                if (srcRow.height) dstRow.height = srcRow.height;
 
-              srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
-                const dstCell = dstRow.getCell(colNumber);
-                dstCell.value = copyCellValueSafely(cell, rowOffset);
-                if (cell.font) dstCell.font = { ...cell.font };
-                if (cell.fill) dstCell.fill = { ...cell.fill };
-                if (cell.border) dstCell.border = { ...cell.border };
-                if (cell.alignment) dstCell.alignment = { ...cell.alignment };
-                if (cell.numFmt) dstCell.numFmt = cell.numFmt;
-              });
-            }
-            currentDstRow += count;
-          } catch (listMergeErr: any) {
-            console.error(`[${info.school.name}] 목록형 서식 오류로 자동 패스:`, listMergeErr);
-            const foundItem = processed.find(p => p.matchedSeq === seq || p.schoolName === info.school.name);
-            if (foundItem) {
-              foundItem.status = 'error';
-              foundItem.errorMsg = '서식/수식 깨짐 (자동 패스)';
+                srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
+                  const dstCell = dstRow.getCell(colNumber);
+                  dstCell.value = copyCellValueSafely(cell, offset);
+                  if (cell.font) dstCell.font = { ...cell.font };
+                  if (cell.fill) dstCell.fill = { ...cell.fill };
+                  if (cell.border) dstCell.border = { ...cell.border };
+                  if (cell.alignment) dstCell.alignment = { ...cell.alignment };
+                  if (cell.numFmt) dstCell.numFmt = cell.numFmt;
+                });
+              }
+              currentDstRowMap.set(cfg.sheetIndex, currentDstRow + count);
+            } catch (listMergeErr: any) {
+              console.error(`[${info.school.name}][${cfg.sheetName}] 목록형 서식 오류:`, listMergeErr);
             }
           }
         }
@@ -1588,7 +1814,7 @@ export default function ExcelMergePage() {
       }
 
       setProgress(100);
-      setStatusMessage(`취합 성공! 마스터 서식 완성 (정상 ${matchedMap.size}건 / 미제출 ${missing.length}건)`);
+      setStatusMessage(`취합 성공! 마스터 서식 완성 (${activeConfigs.length}개 시트 동시 취합 / 정상 ${matchedMap.size}건 / 미제출 ${missing.length}건)`);
 
     } catch (error: any) {
       console.error('병합 오류:', error);
@@ -2314,25 +2540,20 @@ export default function ExcelMergePage() {
             <select
               value={selectedRegion}
               onChange={e => setSelectedRegion(e.target.value)}
-              className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer h-[38px] max-w-[260px] sm:max-w-[330px] truncate"
+              className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer h-[38px] max-w-[260px] sm:max-w-[340px] truncate shadow-2xs"
             >
-              {ROSTER_OPTIONS.map(opt => {
-                if (opt.id === 'custom') {
-                  const label = savedCustomRoster 
-                    ? `💾 [내 PC 저장] ${savedCustomRoster.name}`
-                    : '📂 자체 기준 명부 직접 등록 (.xlsx)';
-                  return (
-                    <option key={opt.id} value={opt.id}>
-                      {label}
+              <option value="none">명부 없음 (자유 수합 / 미제출 검증 생략)</option>
+              
+              {savedRosters.length > 0 && (
+                <optgroup label="💾 내 PC 저장 명부 목록">
+                  {savedRosters.map(r => (
+                    <option key={r.id} value={r.id}>
+                      📁 {r.name}
                     </option>
-                  );
-                }
-                return (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.name}
-                  </option>
-                );
-              })}
+                  ))}
+                </optgroup>
+              )}
+
               {selectedRegion === 'virtual_sample' && (
                 <option value="virtual_sample">🧪 [테스트] 가상 136개교 샘플 명부</option>
               )}
@@ -2349,32 +2570,37 @@ export default function ExcelMergePage() {
               <button
                 type="button"
                 onClick={() => rosterInputRef.current?.click()}
-                className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer h-[38px]"
-                title="A열: 연번, B열: 학교/기관명이 적힌 엑셀 파일을 업로드합니다."
+                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold py-1.5 px-3 rounded-lg shadow-2xs transition-colors cursor-pointer h-[38px]"
+                title="새로운 기준 명부 엑셀(.xlsx) 파일을 업로드하여 목록에 추가합니다."
               >
-                <FileUp size={14} className="text-blue-600" />
-                <span>자체 명부</span>
+                <Plus size={14} />
+                <span>명부 등록</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setIsRosterModalOpen(true)}
+                className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer h-[38px] shadow-2xs"
+                title="저장된 자체 명부 목록 열람, 이름 변경 및 삭제 관리"
+              >
+                <ClipboardList size={14} className="text-blue-600" />
+                <span>명부 관리</span>
+                {savedRosters.length > 0 && (
+                  <span className="bg-blue-100 text-blue-800 text-[11px] font-black px-1.5 py-0.2 rounded-full">
+                    {savedRosters.length}
+                  </span>
+                )}
+              </button>
+
               <button
                 type="button"
                 onClick={handleDownloadRosterTemplate}
-                className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-bold py-1.5 px-2.5 rounded-lg border border-blue-200 transition-colors cursor-pointer h-[38px]"
+                className="flex items-center gap-1 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold py-1.5 px-2.5 rounded-lg border border-slate-200 transition-colors cursor-pointer h-[38px] shadow-2xs"
                 title="자체 명부 표준 엑셀 양식(.xlsx)을 다운로드합니다. (A열: 연번, B열: 학교명, 선택: 학교코드)"
               >
                 <Download size={13} />
                 <span>양식</span>
               </button>
-              {customRosterName && (
-                <button
-                  type="button"
-                  onClick={handleDeleteCustomRoster}
-                  className="flex items-center gap-1 text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs sm:text-sm font-bold py-1.5 px-2 rounded-lg cursor-pointer transition-colors h-[38px]"
-                  title="브라우저에 저장된 자체 명부 삭제"
-                >
-                  <X size={13} />
-                  <span>해제</span>
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -2502,47 +2728,153 @@ export default function ExcelMergePage() {
               </div>
             </div>
 
-            {/* 📑 취합 대상 시트(몇 번째 시트인지) 원클릭 선택 바 */}
+            {/* 📑 취합 대상 시트(탭) 다중 선택 & 시트별 독립 설정 바 */}
             {availableSheets.length > 0 && (
-              <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-slate-100 border border-blue-200/80 rounded-xl p-3 shadow-2xs space-y-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                  <span className="text-xs sm:text-sm font-black text-blue-950 flex items-center gap-1.5">
-                    <Layers size={16} className="text-blue-600" />
-                    취합할 시트(탭) 선택 :
-                    <span className="text-blue-700 font-extrabold ml-1">
-                      {selectedSheetIndex >= 0 ? `${selectedSheetIndex + 1}번째 시트` : '자동 감지'}
+              <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-slate-100 border border-blue-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                {/* 상단 컨트롤 바: 선택된 시트 수 + 요약 배지 + 전체 선택/해제 */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-blue-200/60 pb-2.5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs sm:text-sm font-black text-blue-950 flex items-center gap-1.5">
+                      <Layers size={17} className="text-blue-600" />
+                      취합 대상 시트 선택 :
                     </span>
-                    <span className="text-slate-500 font-semibold text-xs">([{previewSheetName || '기본시트'}])</span>
-                  </span>
-                  <span className="text-[11px] text-blue-700 font-medium hidden sm:inline">
-                    💡 아래 탭 버튼을 클릭하면 해당 시트로 즉시 전환되어 취합됩니다.
-                  </span>
+                    <span className="bg-blue-600 text-white font-black text-xs px-2.5 py-1 rounded-full shadow-2xs">
+                      총 {Object.values(sheetConfigs).filter(c => c.enabled).length}개 시트 동시 취합
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setAllSheetsEnabled(true)}
+                      className="inline-flex items-center gap-1.5 text-xs font-black text-blue-700 bg-white hover:bg-blue-50 border border-blue-300 px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs active:scale-95"
+                      title="모든 시트를 취합 대상에 포함"
+                    >
+                      <CheckSquare size={13} className="text-blue-600" />
+                      <span>전체 선택</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAllSheetsEnabled(false)}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-white hover:bg-slate-50 border border-slate-300 px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs active:scale-95"
+                      title="모든 시트 취합 해제"
+                    >
+                      <Square size={13} className="text-slate-500" />
+                      <span>전체 해제</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                  {availableSheets.map((sh) => {
-                    const isSelected = selectedSheetIndex === sh.index || previewSheetName === sh.name;
-                    return (
-                      <button
-                        key={sh.index}
-                        type="button"
-                        onClick={() => handleSheetTabClick(sh.index)}
-                        className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-2xs ${
-                          isSelected
-                            ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-300 font-black scale-102'
-                            : 'bg-white text-slate-700 hover:bg-slate-50 hover:text-blue-600 border border-slate-200'
-                        }`}
-                        title={`${sh.index + 1}번째 시트: [${sh.name}] 로 취합`}
+
+                {/* 현재 선택된 취합 대상 시트 한눈에 보기 배지 */}
+                <div className="flex items-center gap-1.5 flex-wrap text-xs">
+                  <span className="text-slate-600 font-bold shrink-0">📌 동시 취합 예정:</span>
+                  {availableSheets.filter(sh => sheetConfigs[sh.index]?.enabled).length === 0 ? (
+                    <span className="text-rose-600 font-black bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
+                      ⚠️ 선택된 시트가 없습니다. 최소 1개 이상 시트를 체크해주세요.
+                    </span>
+                  ) : (
+                    availableSheets.filter(sh => sheetConfigs[sh.index]?.enabled).map(sh => (
+                      <span 
+                        key={sh.index} 
+                        className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-black px-2 py-0.5 rounded-md shadow-2xs"
                       >
-                        <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-black ${
-                          isSelected ? 'bg-white text-blue-600' : 'bg-slate-100 text-slate-600 border border-slate-200'
-                        }`}>
-                          {sh.index + 1}
+                        <Check size={12} className="text-emerald-600 stroke-[3]" />
+                        <span>{sh.name}</span>
+                        <span className="text-[10px] text-emerald-600 bg-emerald-100/70 px-1 rounded">
+                          {sheetConfigs[sh.index]?.headerEndRow}행
                         </span>
-                        <span className="truncate max-w-[160px] sm:max-w-[220px]">{sh.name}</span>
-                        {isSelected && <Check size={14} className="text-white shrink-0 stroke-[3]" />}
-                      </button>
+                      </span>
+                    ))
+                  )}
+                </div>
+
+                {/* 시트 탭 카드 목록 (체크박스 + 시트명 + 독립 헤더 설정 뱃지 + 미리보기 상태 표시) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                  {availableSheets.map((sh) => {
+                    const cfg = sheetConfigs[sh.index] || {
+                      sheetIndex: sh.index,
+                      sheetName: sh.name,
+                      enabled: true,
+                      mode: 'block',
+                      headerEndRow: 17
+                    };
+                    const isViewing = activePreviewSheetIndex === sh.index || previewSheetName === sh.name;
+                    const isEnabled = cfg.enabled;
+
+                    return (
+                      <div
+                        key={sh.index}
+                        onClick={() => handleSheetTabClick(sh.index)}
+                        className={`rounded-xl p-2.5 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-between gap-2 border shadow-2xs select-none relative ${
+                          isViewing
+                            ? 'ring-2 ring-blue-600 border-blue-400 bg-white shadow-md'
+                            : isEnabled
+                              ? 'bg-white text-slate-800 hover:border-blue-300 hover:bg-blue-50/40 border-slate-200'
+                              : 'bg-slate-100/80 text-slate-400 border-slate-200 opacity-60'
+                        }`}
+                        title={`[${sh.name}] 클릭 시 아래 표에서 미리보기 및 헤더 행 설정`}
+                      >
+                        {/* 좌측: 체크박스 버튼 + 시트 번호 + 시트명 */}
+                        <div className="flex items-center gap-2 min-w-0">
+                          {/* 취합 포함 체크 토글 버튼 */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSheetEnabled(sh.index);
+                            }}
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center font-black transition-all cursor-pointer shrink-0 shadow-2xs ${
+                              isEnabled
+                                ? 'bg-emerald-600 text-white hover:bg-emerald-700 ring-1 ring-emerald-600'
+                                : 'bg-slate-200 text-slate-400 hover:bg-slate-300 border border-slate-300'
+                            }`}
+                            title={isEnabled ? '취합 대상에서 제외하려면 클릭' : '취합 대상에 포함하려면 클릭'}
+                          >
+                            {isEnabled ? <Check size={14} className="stroke-[3]" /> : null}
+                          </button>
+
+                          {/* 시트 번호 */}
+                          <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-black shrink-0 ${
+                            isEnabled ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-400'
+                          }`}>
+                            {sh.index + 1}
+                          </span>
+
+                          {/* 시트명 */}
+                          <span className={`truncate font-bold text-xs sm:text-sm ${
+                            isEnabled ? 'text-slate-900' : 'line-through text-slate-400'
+                          }`}>
+                            {sh.name}
+                          </span>
+                        </div>
+
+                        {/* 우측: 시트별 헤더 뱃지 + 미리보기 인디케이터 */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {isViewing && (
+                            <span className="text-[10.5px] font-black text-blue-700 bg-blue-100 border border-blue-300 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                              <Eye size={11} className="text-blue-600" />
+                              미리보기 중
+                            </span>
+                          )}
+
+                          <span className={`text-[10px] sm:text-[11px] px-2 py-0.5 rounded-md font-bold ${
+                            isEnabled
+                              ? 'bg-slate-100 text-slate-700 border border-slate-300'
+                              : 'bg-slate-200 text-slate-400'
+                          }`}>
+                            {cfg.headerEndRow}행·{cfg.mode === 'block' ? '블록형' : '목록형'}
+                          </span>
+                        </div>
+                      </div>
                     );
                   })}
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-blue-950 bg-blue-100/70 p-2.5 rounded-xl gap-1.5 font-medium border border-blue-200">
+                  <span className="flex items-center gap-1">
+                    💡 <strong>초록색 체크(✓) 버튼</strong>으로 취합할 시트들을 여러 개 지정하고, <strong>카드를 클릭</strong>하면 아래 표에서 시트별 헤더 행을 1클릭으로 각각 다르게 지정할 수 있습니다.
+                  </span>
+                  <span className="text-blue-700 font-bold shrink-0">※ 작성안내/참고 시트는 자동 취합 제외(체크 해제)</span>
                 </div>
               </div>
             )}
@@ -2556,9 +2888,22 @@ export default function ExcelMergePage() {
 
             {isPreviewOpen && (
               <div className="space-y-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm text-slate-600 px-1 font-medium gap-1">
-                  <span>🔵 1행 ~ <strong>{headerEndRow}행</strong>: 공통 헤더로 1회 유지</span>
-                  <span>🟢 <strong>{headerEndRow + 1}행</strong>부터: 각 기관/학교별 본문 결합 시작</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm text-slate-600 px-1 font-medium gap-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span>🔵 1행 ~ <strong>{headerEndRow}행</strong>: <strong className="text-blue-700">[{previewSheetName || '선택시트'}]</strong> 공통 헤더 유지</span>
+                    <span>🟢 <strong>{headerEndRow + 1}행</strong>부터 본문 결합</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-xs text-slate-500 font-bold">시트 수합 방식:</span>
+                    <button
+                      type="button"
+                      onClick={() => handleModeChangeForActiveSheet(sheetConfigs[activePreviewSheetIndex]?.mode === 'block' ? 'simple' : 'block')}
+                      className="text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-lg transition-colors cursor-pointer shadow-2xs"
+                      title="이 시트의 취합 모드를 서식 블록형 또는 단순 목록형으로 전환"
+                    >
+                      {sheetConfigs[activePreviewSheetIndex]?.mode === 'simple' ? '📄 단순 목록형' : '🥞 서식 블록형'} (전환)
+                    </button>
+                  </div>
                 </div>
 
                 {/* 모바일 가로 스크롤 터치 힌트 */}
@@ -2922,7 +3267,7 @@ export default function ExcelMergePage() {
             ) : (
               <>
                 <Sparkles size={20} />
-                <span>{files.length > 0 ? `${files.length}개 파일 일괄 수합 실행 (100% 보존)` : '엑셀 파일을 먼저 등록해주세요'}</span>
+                <span>{files.length > 0 ? `${files.length}개 파일 (${Object.values(sheetConfigs).filter(c => c.enabled).length || 1}개 시트) 일괄 수합 실행` : '엑셀 파일을 먼저 등록해주세요'}</span>
               </>
             )}
           </button>
@@ -3968,6 +4313,309 @@ export default function ExcelMergePage() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 🏛️ [다중 자체 기준 명부 관리 모달] (복수 명부 목록, 이름 수정, 삭제, 신규 등록) */}
+      {/* ========================================================================= */}
+      {isRosterModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-[840px] max-h-[90vh] rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+            
+            {/* 모달 헤더 */}
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-4 sm:px-6 sm:py-5 flex items-center justify-between shrink-0 shadow-xs">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white shrink-0 shadow-2xs">
+                  <ClipboardList size={22} />
+                </div>
+                <div>
+                  <h3 className="font-black text-base sm:text-xl flex items-center gap-2">
+                    <span>자체 기준 명부 관리소</span>
+                    <span className="text-xs bg-emerald-400 text-slate-950 font-black px-2 py-0.5 rounded-md shadow-2xs">
+                      내 PC 영구 보관
+                    </span>
+                  </h3>
+                  <p className="text-xs text-blue-100/90 font-medium mt-0.5">
+                    초등, 중등, 고등, 목적사업 등 여러 명부를 보관하고 원클릭으로 선택·수정·삭제합니다.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRosterModalOpen(false);
+                  setEditingRosterId(null);
+                }}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                title="모달 닫기"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* 모달 본문 */}
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1 bg-slate-50/50">
+              {/* 상단 액션 바 */}
+              <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-slate-700">
+                    저장된 명부: <strong className="text-blue-600">{savedRosters.length}개</strong>
+                  </span>
+                  {selectedRegion !== 'none' && selectedRegion !== 'virtual_sample' && (
+                    <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-md font-bold truncate max-w-[240px]">
+                      현재 적용: {customRosterName}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => rosterInputRef.current?.click()}
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold py-2 px-3 rounded-lg shadow-2xs transition-all active:scale-95 cursor-pointer"
+                  >
+                    <Plus size={14} />
+                    <span>새 명부 엑셀 등록</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadRosterTemplate}
+                    className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs sm:text-sm font-bold py-2 px-3 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <Download size={13} />
+                    <span>표준 양식</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 명부 목록 */}
+              {savedRosters.length === 0 ? (
+                <div className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-8 sm:p-12 text-center space-y-3">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
+                    <FolderPlus size={28} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-base">저장된 자체 명부가 없습니다</h4>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
+                      A열(연번), B열(학교/기관명)이 적힌 엑셀 파일을 등록하시면 브라우저에 영구 보관되어 언제든 불러와 수합할 수 있습니다.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => rosterInputRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold py-2.5 px-4 rounded-xl shadow-xs transition-all cursor-pointer"
+                  >
+                    <Upload size={14} />
+                    <span>첫 명부 등록하기 (.xlsx)</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {savedRosters.map((roster, idx) => {
+                    const isSelected = selectedRegion === roster.id;
+                    const isEditing = editingRosterId === roster.id;
+
+                    return (
+                      <div
+                        key={roster.id}
+                        className={`bg-white border rounded-xl p-3.5 sm:p-4 shadow-2xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                          isSelected ? 'border-blue-400 ring-2 ring-blue-100 bg-blue-50/20' : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        {/* 좌측: 명부 정보 / 이름 수정 입력창 */}
+                        <div className="flex-1 min-w-0">
+                          {isEditing ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={editingRosterName}
+                                onChange={(e) => setEditingRosterName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleRenameRoster(roster.id, editingRosterName);
+                                  if (e.key === 'Escape') setEditingRosterId(null);
+                                }}
+                                autoFocus
+                                className="flex-1 bg-white border-2 border-blue-500 rounded-lg px-2.5 py-1.5 text-xs sm:text-sm font-bold text-slate-900 outline-none shadow-xs"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRenameRoster(roster.id, editingRosterName)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                              >
+                                저장
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingRosterId(null)}
+                                className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                              >
+                                취소
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="w-5 h-5 rounded-md bg-blue-100 text-blue-800 text-xs font-black flex items-center justify-center shrink-0">
+                                  {idx + 1}
+                                </span>
+                                <h4 className="font-black text-slate-900 text-sm sm:text-base truncate max-w-[320px] sm:max-w-[400px]">
+                                  {roster.name}
+                                </h4>
+                                {isSelected && (
+                                  <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[11px] font-black px-2 py-0.5 rounded-md">
+                                    ✓ 현재 사용 중
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 text-xs text-slate-500 mt-1 pl-7">
+                                <span>소속 기관: <strong className="text-slate-700">{roster.schools.length}개소</strong></span>
+                                <span>•</span>
+                                <span>등록일: {new Date(roster.createdAt).toLocaleDateString('ko-KR')}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 우측: 조작 버튼 그룹 */}
+                        <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                          {!isSelected && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedRegion(roster.id);
+                                setTargetSchools(roster.schools);
+                                setCustomRosterName(roster.name);
+                              }}
+                              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold py-1.5 px-3 rounded-lg transition-colors cursor-pointer"
+                              title="이 명부를 현재 수합 기준으로 즉시 선택"
+                            >
+                              선택 적용
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingRosterId(roster.id);
+                              setEditingRosterName(roster.name);
+                            }}
+                            className="text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 text-xs font-bold p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-200 transition-colors flex items-center gap-1 cursor-pointer"
+                            title="명부 이름 변경"
+                          >
+                            <Edit2 size={13} />
+                            <span className="hidden sm:inline">이름수정</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setPreviewRosterModal(roster)}
+                            className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 text-xs font-bold p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-indigo-200 transition-colors flex items-center gap-1 cursor-pointer"
+                            title="소속 학교 명단 1~N번 열람"
+                          >
+                            <Eye size={13} />
+                            <span className="hidden sm:inline">명단보기</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteRoster(roster.id)}
+                            className="text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 text-xs font-bold p-1.5 sm:px-2 sm:py-1.5 rounded-lg border border-rose-200 transition-colors cursor-pointer"
+                            title="이 명부 삭제"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* 보안 안심 알림 */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 flex items-center gap-2">
+                <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+                <span>모든 명부는 담당자 PC 브라우저(`localStorage`)에만 영구 보관되며 외부 서버로 유출되지 않습니다.</span>
+              </div>
+            </div>
+
+            {/* 모달 푸터 */}
+            <div className="bg-white border-t border-slate-200 p-3 sm:px-6 sm:py-4 flex items-center justify-between shrink-0">
+              <span className="text-xs text-slate-500 font-medium">
+                총 {savedRosters.length}개 명부 보관 중
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRosterModalOpen(false);
+                  setEditingRosterId(null);
+                }}
+                className="bg-slate-800 hover:bg-slate-900 text-white text-xs sm:text-sm font-bold px-6 py-2 rounded-xl transition-colors cursor-pointer"
+              >
+                닫기
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 👁️ [소속 학교 명단 상세 미리보기 서브 모달] */}
+      {/* ========================================================================= */}
+      {previewRosterModal && (
+        <div className="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-[560px] max-h-[80vh] rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+            <div className="bg-slate-800 text-white p-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <School size={18} className="text-blue-400" />
+                <h4 className="font-bold text-sm sm:text-base truncate max-w-[380px]">
+                  {previewRosterModal.name} ({previewRosterModal.schools.length}개소)
+                </h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewRosterModal(null)}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-4 overflow-y-auto flex-1">
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead className="bg-slate-100 text-slate-700 sticky top-0 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="py-2 px-3 text-center w-16">연번</th>
+                      <th className="py-2 px-3 text-center w-28">학교코드</th>
+                      <th className="py-2 px-3">기관/학교명</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {previewRosterModal.schools.map((item) => (
+                      <tr key={item.seq} className="hover:bg-slate-50">
+                        <td className="py-1.5 px-3 text-center font-mono font-bold text-slate-500">{item.seq}</td>
+                        <td className="py-1.5 px-3 text-center font-mono text-slate-400">{item.code || '-'}</td>
+                        <td className="py-1.5 px-3 font-bold text-slate-800">{item.name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 border-t border-slate-200 p-3 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setPreviewRosterModal(null)}
+                className="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-5 py-1.5 rounded-lg cursor-pointer"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}
