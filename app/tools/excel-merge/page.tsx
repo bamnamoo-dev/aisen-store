@@ -478,13 +478,17 @@ export default function ExcelMergePage() {
     let match = targetSchools.find(s => normalizeSchoolName(s.name) === cleanRaw);
     if (match) return match;
 
-    // 2. 부분 일치 (타겟 학교명이 원본 문자열에 포함되거나, 원본이 타겟에 포함)
+    // 2. 고유 교명 추출 및 일치 (초등/중/고/학교 접미어 제거한 순수 교명 비교)
+    const pureRaw = cleanRaw.replace(/(초등학교|중학교|고등학교|특수학교|유치원|초등|여고|여중|학교|초|중|고)$/g, '');
+    if (!pureRaw || pureRaw.length < 2) {
+      return undefined;
+    }
+
     match = targetSchools.find(s => {
       const cleanTarget = normalizeSchoolName(s.name);
-      if (!cleanTarget || cleanTarget.length < 2) return false;
-      if (cleanRaw.includes(cleanTarget)) return true;
-      if (cleanRaw.length >= 3 && cleanTarget.includes(cleanRaw)) return true;
-      return false;
+      const pureTarget = cleanTarget.replace(/(초등학교|중학교|고등학교|특수학교|유치원|초등|여고|여중|학교|초|중|고)$/g, '');
+      if (!pureTarget || pureTarget.length < 2) return false;
+      return pureRaw === pureTarget;
     });
     if (match) return match;
 
@@ -494,9 +498,7 @@ export default function ExcelMergePage() {
     match = targetSchools.find(s => {
       const targetShort = toShort(normalizeSchoolName(s.name));
       if (!targetShort || targetShort.length < 2) return false;
-      if (rawShort.includes(targetShort)) return true;
-      if (rawShort.length >= 3 && targetShort.includes(rawShort)) return true;
-      return false;
+      return rawShort === targetShort;
     });
 
     return match;
@@ -1421,10 +1423,10 @@ export default function ExcelMergePage() {
             rawSchoolName = extractedSchoolFromName || cleanFileName;
           }
 
-          const matchedSchool = findMatchingSchool(rawSchoolName) || 
+          const matchedSchool = 
             (extractedSchoolFromName ? findMatchingSchool(extractedSchoolFromName) : undefined) || 
+            findMatchingSchool(rawSchoolName) || 
             matchedSchoolByName;
-
 
           // 🌟 기준 명부가 등록되어 있는 경우 -> 명부의 연번(seq)을 100% 최우선 적용하여 칼정렬!
           let finalSeq = (i + 1);
@@ -1439,7 +1441,7 @@ export default function ExcelMergePage() {
             finalSeq = 10000 + (i + 1);
           }
 
-          const finalSchoolName = matchedSchool?.name || matchedSchoolByName?.name || rawSchoolName || `기관_${finalSeq}`;
+          const finalSchoolName = matchedSchool?.name || extractedSchoolFromName || matchedSchoolByName?.name || rawSchoolName || cleanFileName || file.name;
 
           // 🚨 D. 본문 데이터 전무 검사 (엉뚱한 빈 서식 패스)
           let hasContent = false;
