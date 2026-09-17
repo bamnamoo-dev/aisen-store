@@ -1203,6 +1203,14 @@ export default function ExcelMergePage() {
             });
           }
           registeredMergesMap.set(cfg.sheetIndex, keptMerges);
+
+          // 🌟 템플릿 원본에 미리 채워져 있던 예시(샘플) 데이터 클리어 (헤더 스타일은 보존하고 본문 값만 초기화)
+          for (let r = cfg.headerEndRow + 1; r <= ws.rowCount; r++) {
+            const row = ws.getRow(r);
+            row.eachCell({ includeEmpty: true }, (cell: any) => {
+              cell.value = null;
+            });
+          }
         }
       }
 
@@ -1665,24 +1673,88 @@ export default function ExcelMergePage() {
           const currentDstRow = currentDstRowMap.get(cfg.sheetIndex) || cfg.blockStartRow;
           const rowOffset = currentDstRow - cfg.blockStartRow;
 
+          // 🌟 [예시 및 미작성 시트 자동 필터링 헬퍼]
+          // 행 내에 '예시' 텍스트가 포함되어 있거나, 기본 템플릿 샘플 데이터(은성중, 세화여고 등)인지 검사
+          const checkIsExampleOrSampleRow = (row: any): boolean => {
+            let isEx = false;
+            row.eachCell({ includeEmpty: false }, (cell: any) => {
+              const val = cell.value;
+              const txt = String(val && typeof val === 'object' ? (val.result || val.formula || '') : (val || '')).trim();
+              if (txt.includes('예시')) {
+                isEx = true;
+              }
+            });
+            if (isEx) return true;
+
+            // 현재 학교가 아닌 타 학교(기본 템플릿 샘플 은성중/세화여고 등)의 예시 행인지 검사
+            const sNameCol = cfg.schoolCellCol || 6;
+            const rowSchool = String(row.getCell(sNameCol).value || '').trim();
+            if (rowSchool && !info.school.name.includes(rowSchool) && !rowSchool.includes(info.school.name)) {
+              if (rowSchool.includes('은성중') || rowSchool.includes('세화여고') || rowSchool.includes('세화여자고')) {
+                return true;
+              }
+            }
+            return false;
+          };
+
           if (cfg.mode === 'block') {
             const detectedRows = cfg.isAutoDetectRows 
               ? Math.max(1, findLastDataRow(srcWs, cfg.blockStartRow) - cfg.blockStartRow + 1)
               : cfg.blockRowCount;
-            const actualRowCount = detectedRows;
+
+            // 🌟 1. 이번 학교의 해당 시트에 실제 작성된 유효 데이터가 존재하는지 사전 검증
+            // (예: 3번 시트에 해당 사항이 없어 기본 템플릿 예시만 남아있는 133개교는 취합에서 자동 제외)
+            let hasRealSchoolData = false;
+            for (let r = 0; r < detectedRows; r++) {
+              const srcRow = srcWs.getRow(cfg.blockStartRow + r);
+              if (checkIsExampleOrSampleRow(srcRow)) continue;
+
+              let hasMeaningfulVal = false;
+              srcRow.eachCell({ includeEmpty: false }, (c: any) => {
+                const v = c.value;
+                const t = String(v && typeof v === 'object' ? (v.result || v.formula || '') : (v || '')).trim();
+                if (t.length > 0 && t !== '0') hasMeaningfulVal = true;
+              });
+              if (hasMeaningfulVal) {
+                hasRealSchoolData = true;
+                break;
+              }
+            }
+
+            // 실제 유효 데이터가 1줄도 없는 경우(예시만 남겨둔 학교 등) 취합 제외
+            if (!hasRealSchoolData) {
+              continue;
+            }
+
+            // 🌟 2. 실제 데이터 복사: 예시 행은 건너뛰고 실제 데이터 행만 복사
+            const validSrcRows: any[] = [];
+            for (let r = 0; r < detectedRows; r++) {
+              const srcRowNum = cfg.blockStartRow + r;
+              const srcRow = srcWs.getRow(srcRowNum);
+              if (checkIsExampleOrSampleRow(srcRow)) {
+                continue;
+              }
+              validSrcRows.push({ srcRowNum, srcRow });
+            }
+
+            if (validSrcRows.length === 0) {
+              continue;
+            }
+
+            const actualRowCount = validSrcRows.length;
 
             try {
-              for (let r = 0; r < actualRowCount; r++) {
-                const srcRowNum = cfg.blockStartRow + r;
-                const dstRowNum = currentDstRow + r;
-                const srcRow = srcWs.getRow(srcRowNum);
+              for (let i = 0; i < actualRowCount; i++) {
+                const { srcRowNum, srcRow } = validSrcRows[i];
+                const dstRowNum = currentDstRow + i;
                 const dstRow = tWs.getRow(dstRowNum);
+                const rOffset = dstRowNum - srcRowNum;
 
                 if (srcRow.height) dstRow.height = srcRow.height;
 
                 srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
                   const dstCell = dstRow.getCell(colNumber);
-                  dstCell.value = copyCellValueSafely(cell, rowOffset, currentSchoolSheetOffsets);
+                  dstCell.value = copyCellValueSafely(cell, rOffset, currentSchoolSheetOffsets);
 
                   if (cell.font) dstCell.font = { ...cell.font };
                   if (cell.fill) dstCell.fill = { ...cell.fill };
@@ -1705,7 +1777,7 @@ export default function ExcelMergePage() {
                       const col2 = match2[1];
                       const r2 = parseInt(match2[2], 10);
 
-                      if (r1 >= cfg.blockStartRow && r2 < cfg.blockStartRow + actualRowCount) {
+                      if (r1 >= cfg.blockStartRow && r2 < cfg.blockStartRow + detectedRows) {
                         const targetRange = `${col1}${r1 + rowOffset}:${col2}${r2 + rowOffset}`;
                         const mergesSet = registeredMergesMap.get(cfg.sheetIndex);
                         if (mergesSet && !mergesSet.has(targetRange)) {
@@ -1727,14 +1799,34 @@ export default function ExcelMergePage() {
           } else {
             // 단순 목록형 취합
             const lastR = findLastDataRow(srcWs, cfg.blockStartRow);
-            const count = Math.max(1, lastR - cfg.blockStartRow + 1);
+            const totalRows = Math.max(1, lastR - cfg.blockStartRow + 1);
+
+            const validRows: any[] = [];
+            for (let r = 0; r < totalRows; r++) {
+              const srcRowNum = cfg.blockStartRow + r;
+              const srcRow = srcWs.getRow(srcRowNum);
+              if (checkIsExampleOrSampleRow(srcRow)) continue;
+
+              let hasVal = false;
+              srcRow.eachCell({ includeEmpty: false }, (c: any) => {
+                const v = c.value;
+                const t = String(v && typeof v === 'object' ? (v.result || v.formula || '') : (v || '')).trim();
+                if (t.length > 0) hasVal = true;
+              });
+              if (hasVal) {
+                validRows.push({ srcRowNum, srcRow });
+              }
+            }
+
+            if (validRows.length === 0) {
+              continue;
+            }
 
             try {
-              for (let r = 0; r < count; r++) {
-                const srcRowNum = cfg.blockStartRow + r;
-                const dstRowNum = currentDstRow + r;
+              for (let i = 0; i < validRows.length; i++) {
+                const { srcRowNum, srcRow } = validRows[i];
+                const dstRowNum = currentDstRow + i;
                 const offset = dstRowNum - srcRowNum;
-                const srcRow = srcWs.getRow(srcRowNum);
                 const dstRow = tWs.getRow(dstRowNum);
                 if (srcRow.height) dstRow.height = srcRow.height;
 
@@ -1748,7 +1840,7 @@ export default function ExcelMergePage() {
                   if (cell.numFmt) dstCell.numFmt = cell.numFmt;
                 });
               }
-              currentDstRowMap.set(cfg.sheetIndex, currentDstRow + count);
+              currentDstRowMap.set(cfg.sheetIndex, currentDstRow + validRows.length);
             } catch (listMergeErr: any) {
               console.error(`[${info.school.name}][${cfg.sheetName}] 목록형 서식 오류:`, listMergeErr);
             }
