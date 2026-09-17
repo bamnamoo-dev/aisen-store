@@ -502,18 +502,55 @@ export default function ExcelMergePage() {
     return match;
   };
 
-  // 수식 오프셋 조정 함수 (상대 행 번호만 + offset)
-  const shiftFormula = (formula: string, rowOffset: number): string => {
-    if (!formula || rowOffset === 0) return formula;
-    const pattern = /(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
-    return formula.replace(pattern, (match, colAbs, col, rowAbs, row) => {
-      if (rowAbs === '$') return match; // 절대참조 행은 고정
-      return `${colAbs}${col}${rowAbs}${parseInt(row, 10) + rowOffset}`;
+  // 수식 오프셋 조정 함수 (상대 행 번호만 + offset, 시트 간 참조 정밀 추적)
+  const shiftFormula = (
+    formula: string, 
+    rowOffset: number,
+    sheetOffsetsByName?: Record<string, number>
+  ): string => {
+    if (!formula) return formula;
+
+    // 1. 시트 간 참조 정규식: '시트명'!Cell 또는 시트명!Cell (예: '1.인건비'!C18 또는 Sheet1!A1)
+    const crossPattern = /(?:'([^']+)'|([A-Za-z0-9_\uAC00-\uD7A3]+))!(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
+    
+    let processed = formula.replace(crossPattern, (fullMatch, quotedSheet, unquotedSheet, colAbs, col, rowAbs, row) => {
+      const sheetName = quotedSheet || unquotedSheet;
+      if (rowAbs === '$') return fullMatch; // 절대참조 행은 고정
+      
+      let targetOffset = rowOffset;
+      if (sheetOffsetsByName) {
+        if (sheetOffsetsByName[sheetName] !== undefined) {
+          targetOffset = sheetOffsetsByName[sheetName];
+        } else {
+          const cleanSheetName = sheetName.replace(/^[0-9]+[\.\s_-]*/, '');
+          if (sheetOffsetsByName[cleanSheetName] !== undefined) {
+            targetOffset = sheetOffsetsByName[cleanSheetName];
+          }
+        }
+      }
+        
+      const newRow = parseInt(row, 10) + targetOffset;
+      const sheetRef = quotedSheet ? `'${quotedSheet}'` : sheetName;
+      return `${sheetRef}!${colAbs}${col}${rowAbs}${newRow}`;
     });
+
+    // 2. 일반 동일 시트 내 참조 (시트명 없는 A1, B2 등)
+    const localPattern = /(^|[^A-Za-z0-9_'\uAC00-\uD7A3!])(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
+    processed = processed.replace(localPattern, (fullMatch, prefix, colAbs, col, rowAbs, row) => {
+      if (rowAbs === '$' || rowOffset === 0) return fullMatch;
+      const newRow = parseInt(row, 10) + rowOffset;
+      return `${prefix}${colAbs}${col}${rowAbs}${newRow}`;
+    });
+
+    return processed;
   };
 
-  // 🛡️ 셀 값 및 수식 안전 복사 함수 (Shared Formula 및 잘못된 신청서 수식 완벽 방어)
-  const copyCellValueSafely = (cell: any, rowOffset: number) => {
+  // 🛡️ 셀 값 및 수식 안전 복사 함수 (Shared Formula 및 시트 간 참조 완벽 방어)
+  const copyCellValueSafely = (
+    cell: any, 
+    rowOffset: number,
+    sheetOffsetsByName?: Record<string, number>
+  ) => {
     if (!cell) return null;
 
     // 1. 빗금 사선 셀 방어 (빗금 테두리 빈 셀은 null 처리)
@@ -541,10 +578,10 @@ export default function ExcelMergePage() {
       return safeResult;
     }
 
-    // 3. 단독 수식(formula)이 정상 명시된 셀 -> 오프셋만큼 행 번호 이동 보존
+    // 3. 단독 수식(formula)이 정상 명시된 셀 -> 오프셋 및 시트 간 참조 정밀 이동 보존
     if (cell.formula && !cell.model?.sharedFormula) {
       return {
-        formula: shiftFormula(cell.formula, rowOffset),
+        formula: shiftFormula(cell.formula, rowOffset, sheetOffsetsByName),
         result: cell.result !== undefined ? cell.result : null
       };
     }
@@ -552,7 +589,7 @@ export default function ExcelMergePage() {
     // 4. cell.value가 객체이고 formula 속성을 가진 경우
     if (cell.value && typeof cell.value === 'object' && cell.value.formula && !cell.value.sharedFormula) {
       return {
-        formula: shiftFormula(cell.value.formula, rowOffset),
+        formula: shiftFormula(cell.value.formula, rowOffset, sheetOffsetsByName),
         result: cell.value.result !== undefined ? cell.value.result : (cell.result !== undefined ? cell.result : null)
       };
     }
@@ -1106,9 +1143,10 @@ export default function ExcelMergePage() {
         return;
       }
 
-      // 템플릿 내 취합 대상 시트들 매핑 & 초기 시작행 설정
+      // 템플릿 내 취합 대상 시트들 매핑 & 초기 시작행 설정 & 본문 잔여 병합 클린 소독
       const targetWsMap = new Map<number, any>();
       const currentDstRowMap = new Map<number, number>();
+      const registeredMergesMap = new Map<number, Set<string>>();
 
       for (const cfg of activeConfigs) {
         let ws = templateWb.worksheets.find((s: any) => s.name === cfg.sheetName) || templateWb.worksheets[cfg.sheetIndex];
@@ -1118,6 +1156,23 @@ export default function ExcelMergePage() {
         if (ws) {
           targetWsMap.set(cfg.sheetIndex, ws);
           currentDstRowMap.set(cfg.sheetIndex, cfg.blockStartRow);
+
+          // 헤더 영역(1~headerEndRow)의 기존 병합은 100% 보존하고,
+          // 본문(headerEndRow 초과) 영역의 잔여 템플릿 병합은 깨끗이 초기화하여 학교 간 겹침 방지!
+          const keptMerges = new Set<string>();
+          if (ws.model && ws.model.merges && Array.isArray(ws.model.merges)) {
+            ws.model.merges = ws.model.merges.filter((range: string) => {
+              const parts = range.split(':');
+              const m = parts[0].match(/\d+/);
+              const r = m ? parseInt(m[0], 10) : 1;
+              if (r <= cfg.headerEndRow) {
+                keptMerges.add(range);
+                return true;
+              }
+              return false;
+            });
+          }
+          registeredMergesMap.set(cfg.sheetIndex, keptMerges);
         }
       }
 
@@ -1519,6 +1574,18 @@ export default function ExcelMergePage() {
 
         if (!srcWb || !srcWb.worksheets) continue;
 
+        // 🌟 1단계: 이번 학교의 각 시트별 시작 행 및 오프셋 사전 수합 (시트 간 참조 정밀 추적용)
+        const currentSchoolSheetOffsets: Record<string, number> = {};
+        for (const cfg of activeConfigs) {
+          const curDst = currentDstRowMap.get(cfg.sheetIndex) || cfg.blockStartRow;
+          const off = curDst - cfg.blockStartRow;
+          currentSchoolSheetOffsets[cfg.sheetName] = off;
+          const cleanName = cfg.sheetName.replace(/^[0-9]+[\.\s_-]*/, '');
+          if (cleanName && cleanName !== cfg.sheetName) {
+            currentSchoolSheetOffsets[cleanName] = off;
+          }
+        }
+
         // 선택된 모든 시트 순회 병합
         for (const cfg of activeConfigs) {
           const tWs = targetWsMap.get(cfg.sheetIndex);
@@ -1562,7 +1629,7 @@ export default function ExcelMergePage() {
 
                 srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
                   const dstCell = dstRow.getCell(colNumber);
-                  dstCell.value = copyCellValueSafely(cell, rowOffset);
+                  dstCell.value = copyCellValueSafely(cell, rowOffset, currentSchoolSheetOffsets);
 
                   if (cell.font) dstCell.font = { ...cell.font };
                   if (cell.fill) dstCell.fill = { ...cell.fill };
@@ -1572,8 +1639,8 @@ export default function ExcelMergePage() {
                 });
               }
 
-              // 병합 셀 오프셋 이동 적용
-              if (idx > 0 && srcWs.model && srcWs.model.merges) {
+              // 병합 셀 오프셋 이동 적용 (모든 학교 idx >= 0 전수 등록 및 중복 0% 방어)
+              if (srcWs.model && srcWs.model.merges && Array.isArray(srcWs.model.merges)) {
                 srcWs.model.merges.forEach((mergeRange: string) => {
                   const parts = mergeRange.split(':');
                   if (parts.length === 2) {
@@ -1586,9 +1653,14 @@ export default function ExcelMergePage() {
                       const r2 = parseInt(match2[2], 10);
 
                       if (r1 >= cfg.blockStartRow && r2 < cfg.blockStartRow + actualRowCount) {
-                        try {
-                          tWs.mergeCells(`${col1}${r1 + rowOffset}:${col2}${r2 + rowOffset}`);
-                        } catch (e) {}
+                        const targetRange = `${col1}${r1 + rowOffset}:${col2}${r2 + rowOffset}`;
+                        const mergesSet = registeredMergesMap.get(cfg.sheetIndex);
+                        if (mergesSet && !mergesSet.has(targetRange)) {
+                          try {
+                            tWs.mergeCells(targetRange);
+                            mergesSet.add(targetRange);
+                          } catch (e) {}
+                        }
                       }
                     }
                   }
@@ -1615,7 +1687,7 @@ export default function ExcelMergePage() {
 
                 srcRow.eachCell({ includeEmpty: true }, (cell: any, colNumber: number) => {
                   const dstCell = dstRow.getCell(colNumber);
-                  dstCell.value = copyCellValueSafely(cell, offset);
+                  dstCell.value = copyCellValueSafely(cell, offset, currentSchoolSheetOffsets);
                   if (cell.font) dstCell.font = { ...cell.font };
                   if (cell.fill) dstCell.fill = { ...cell.fill };
                   if (cell.border) dstCell.border = { ...cell.border };
@@ -1760,6 +1832,27 @@ export default function ExcelMergePage() {
           });
         });
       });
+
+      // 🌟 [미선택 시트 완전 제거]: 사용자가 취합 대상으로 선택하지 않은 시트는 마스터 엑셀에서 완전 삭제
+      const activeSheetNames = new Set(activeConfigs.map(c => c.sheetName));
+      const sheetsToRemove: any[] = [];
+      templateWb.worksheets.forEach((ws: any) => {
+        if (!activeSheetNames.has(ws.name)) {
+          sheetsToRemove.push(ws);
+        }
+      });
+      sheetsToRemove.forEach((ws: any) => {
+        try {
+          templateWb.removeWorksheet(ws.id);
+        } catch (e) {}
+      });
+
+      // 🌟 [낡은 계산 체인(calcChain) 캐시 클린 삭제]:
+      // 133개교 대규모 병합 후 옛날 단일 학교 기준 calcChain이 남아있으면 엑셀 열람 시 무조건 복구 경고가 발생함
+      try {
+        delete (templateWb as any).calcChain;
+        if ((templateWb as any)._calcChain) delete (templateWb as any)._calcChain;
+      } catch (e) {}
 
       // 5. 최종 파일 빌드 (무정지 2단계 안전 그물망 적용)
       setProgress(95);
