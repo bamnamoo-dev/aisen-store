@@ -1652,7 +1652,7 @@ export default function ExcelMergePage() {
           const tWs = targetWsMap.get(cfg.sheetIndex);
           if (!tWs) continue;
 
-          // 학교 워크북에서 해당 시트 탐색 (1. 시트명 일치 -> 2. 시트명 정규화 부분 일치 -> 3. 순번 일치)
+          // 학교 워크북에서 해당 시트 탐색 (1. 시트명 일치 -> 2. 정규화 부분 일치 -> 3. 핵심 시트명 일치)
           let srcWs: any = srcWb.worksheets.find((s: any) => s.name === cfg.sheetName);
           if (!srcWs) {
             const cleanCfgName = cfg.sheetName.replace(/[\s\(\)\[\]_\-·\.]/g, '');
@@ -1661,12 +1661,22 @@ export default function ExcelMergePage() {
               return cleanSName.includes(cleanCfgName) || cleanCfgName.includes(cleanSName);
             });
           }
-          if (!srcWs && srcWb.worksheets[cfg.sheetIndex]) {
-            srcWs = srcWb.worksheets[cfg.sheetIndex];
+          if (!srcWs) {
+            const bareCfgName = cfg.sheetName.replace(/^[0-9]+[\.\s_-]*/, '').replace(/[\s\(\)\[\]_\-·\.]/g, '');
+            if (bareCfgName.length >= 2) {
+              srcWs = srcWb.worksheets.find((s: any) => {
+                const bareSName = s.name.replace(/^[0-9]+[\.\s_-]*/, '').replace(/[\s\(\)\[\]_\-·\.]/g, '');
+                return bareSName.includes(bareCfgName) || bareCfgName.includes(bareSName);
+              });
+            }
+          }
+          // 단일 시트 워크북(시트가 딱 1개뿐인 엑셀 파일)인 경우에만 0번 시트 폴백
+          if (!srcWs && srcWb.worksheets.length === 1 && cfg.sheetIndex === 0) {
+            srcWs = srcWb.worksheets[0];
           }
 
           if (!srcWs) {
-            // 이 학교에 해당 시트가 없는 경우 안전하게 패스
+            // 이 학교에 해당 시트가 없거나(중간 시트를 삭제하고 제출한 경우 등) 안전하게 패스!
             continue;
           }
 
