@@ -504,7 +504,7 @@ export default function ExcelMergePage() {
     return match;
   };
 
-  // 수식 오프셋 조정 함수 (상대 행 번호만 + offset, 시트 간 참조 정밀 추적)
+  // 수식 오프셋 조정 및 외부 연결 정제 함수 (상대 행 번호 + offset, 외부 파일 링크 '[...]' 제거 및 시트 간 참조 정밀 추적)
   const shiftFormula = (
     formula: string, 
     rowOffset: number,
@@ -512,12 +512,14 @@ export default function ExcelMergePage() {
   ): string => {
     if (!formula) return formula;
 
-    // 1. 시트 간 참조 정규식: '시트명'!Cell 또는 시트명!Cell (예: '1.인건비'!C18 또는 Sheet1!A1)
-    const crossPattern = /(?:'([^']+)'|([A-Za-z0-9_\uAC00-\uD7A3]+))!(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
+    // 1. 시트 간 참조 정규식: '[파일명]시트명'!Cell 또는 '시트명'!Cell 또는 시트명!Cell
+    // (예: '[2026_신청서_개원중.xlsx]1.인건비'!$E$18 또는 '1.인건비'!C18 또는 Sheet1!A1)
+    const crossPattern = /(?:'([^']+)'|([A-Za-z0-9_\uAC00-\uD7A3\[\]\.\-]+))!(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
     
     let processed = formula.replace(crossPattern, (fullMatch, quotedSheet, unquotedSheet, colAbs, col, rowAbs, row) => {
-      const sheetName = quotedSheet || unquotedSheet;
-      if (rowAbs === '$') return fullMatch; // 절대참조 행은 고정
+      let rawSheet = quotedSheet || unquotedSheet || '';
+      // 🚨 외부 워크북 참조 '[...]' 제거하여 순수 내부 시트명 추출 (외부 연결 에러 100% 방지)
+      const sheetName = rawSheet.replace(/\[[^\]]+\]/g, '').trim();
       
       let targetOffset = rowOffset;
       if (sheetOffsetsByName) {
@@ -527,17 +529,19 @@ export default function ExcelMergePage() {
           const cleanSheetName = sheetName.replace(/^[0-9]+[\.\s_-]*/, '');
           if (sheetOffsetsByName[cleanSheetName] !== undefined) {
             targetOffset = sheetOffsetsByName[cleanSheetName];
+          } else {
+            // 이번 취합에 포함되지 않은 시트나 외부 통합문서 참조인 경우 깨진 연결(#REF!)로 마킹
+            return `#REF!${colAbs}${col}${rowAbs}${row}`;
           }
         }
       }
         
       const newRow = parseInt(row, 10) + targetOffset;
-      const sheetRef = quotedSheet ? `'${quotedSheet}'` : sheetName;
-      return `${sheetRef}!${colAbs}${col}${rowAbs}${newRow}`;
+      return `'${sheetName}'!${colAbs}${col}${rowAbs}${newRow}`;
     });
 
     // 2. 일반 동일 시트 내 참조 (시트명 없는 A1, B2 등)
-    const localPattern = /(^|[^A-Za-z0-9_'\uAC00-\uD7A3!])(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
+    const localPattern = /(^|[^A-Za-z0-9_'\uAC00-\uD7A3!\[\]])(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
     processed = processed.replace(localPattern, (fullMatch, prefix, colAbs, col, rowAbs, row) => {
       if (rowAbs === '$' || rowOffset === 0) return fullMatch;
       const newRow = parseInt(row, 10) + rowOffset;
@@ -547,7 +551,7 @@ export default function ExcelMergePage() {
     return processed;
   };
 
-  // 🛡️ 셀 값 및 수식 안전 복사 함수 (Shared Formula 및 시트 간 참조 완벽 방어)
+  // 🛡️ 셀 값 및 수식 안전 복사 함수 (외부 연결 에러 제거, Shared Formula 및 시트 간 참조 완벽 방어)
   const copyCellValueSafely = (
     cell: any, 
     rowOffset: number,
@@ -582,16 +586,37 @@ export default function ExcelMergePage() {
 
     // 3. 단독 수식(formula)이 정상 명시된 셀 -> 오프셋 및 시트 간 참조 정밀 이동 보존
     if (cell.formula && !cell.model?.sharedFormula) {
+      const shifted = shiftFormula(cell.formula, rowOffset, sheetOffsetsByName);
+      // 🚨 외부 연결 에러 방어:
+      // 수식에 여전히 외부 파일 참조('[', ']')나 손상된 참조(#REF!)가 남아있는 경우,
+      // 엑셀 열람 시 "연결 에러" 복구 팝업을 발생시키지 않도록 계산된 확정값(cell.result)으로 안전 주입!
+      if (shifted.includes('[') || shifted.includes(']') || shifted.includes('#REF!')) {
+        const safeVal = cell.result !== undefined 
+          ? cell.result 
+          : (cell.model?.result !== undefined 
+              ? cell.model.result 
+              : (typeof cell.value === 'object' && cell.value?.result !== undefined ? cell.value.result : (typeof cell.value === 'number' || typeof cell.value === 'string' ? cell.value : null)));
+        return safeVal;
+      }
       return {
-        formula: shiftFormula(cell.formula, rowOffset, sheetOffsetsByName),
+        formula: shifted,
         result: cell.result !== undefined ? cell.result : null
       };
     }
 
     // 4. cell.value가 객체이고 formula 속성을 가진 경우
     if (cell.value && typeof cell.value === 'object' && cell.value.formula && !cell.value.sharedFormula) {
+      const shifted = shiftFormula(cell.value.formula, rowOffset, sheetOffsetsByName);
+      if (shifted.includes('[') || shifted.includes(']') || shifted.includes('#REF!')) {
+        const safeVal = cell.value.result !== undefined 
+          ? cell.value.result 
+          : (cell.result !== undefined 
+              ? cell.result 
+              : (cell.model?.result !== undefined ? cell.model.result : (typeof cell.value === 'number' || typeof cell.value === 'string' ? cell.value : null)));
+        return safeVal;
+      }
       return {
-        formula: shiftFormula(cell.value.formula, rowOffset, sheetOffsetsByName),
+        formula: shifted,
         result: cell.value.result !== undefined ? cell.value.result : (cell.result !== undefined ? cell.result : null)
       };
     }
@@ -1793,8 +1818,8 @@ export default function ExcelMergePage() {
         });
       }
 
-      // 5. 최종 파일 빌드 전 워크시트 내 잔존 공유 수식(Shared Formula) 전수 안전 살균
-      // (cell.model 내부의 sharedFormula 속성까지 100% 제거하여 ExcelJS 크래시 원천 차단)
+      // 5. 최종 파일 빌드 전 워크시트 내 잔존 공유 수식(Shared Formula) 및 외부 연결('[', ']')·오류(#REF!) 수식 전수 안전 살균
+      // (cell.model 내부의 sharedFormula 속성 및 깨진 외부 수식까지 100% 제거하여 "연결 에러" 복구 팝업 원천 차단)
       templateWb.eachSheet((ws: any) => {
         ws.eachRow({ includeEmpty: true }, (row: any) => {
           row.eachCell({ includeEmpty: true }, (cell: any) => {
@@ -1804,22 +1829,24 @@ export default function ExcelMergePage() {
               (cell.value && typeof cell.value === 'object' && cell.value.sharedFormula)
             );
 
-            if (hasShared) {
+            const rawFormula = cell.formula || cell.model?.formula || (cell.value && typeof cell.value === 'object' ? cell.value.formula : null);
+            const isBrokenLink = typeof rawFormula === 'string' && (rawFormula.includes('[') || rawFormula.includes(']') || rawFormula.includes('#REF!'));
+
+            if (hasShared || isBrokenLink) {
               const safeVal = cell.model?.result !== undefined
                 ? cell.model.result
                 : ((cell.value && typeof cell.value === 'object' && cell.value.result !== undefined)
                     ? cell.value.result
-                    : (cell.result !== undefined ? cell.result : null));
+                    : (cell.result !== undefined ? cell.result : (typeof cell.value === 'number' || typeof cell.value === 'string' ? cell.value : null)));
               
               cell.value = safeVal;
               if (cell.model) {
+                delete cell.model.formula;
                 delete cell.model.sharedFormula;
                 delete cell.model.shareType;
                 delete cell.model.ref;
-                if (!cell.model.formula) {
-                  cell.model.type = typeof safeVal === 'number' ? 2 : (typeof safeVal === 'string' ? 3 : (safeVal === null ? 0 : 2));
-                  cell.model.value = safeVal;
-                }
+                cell.model.type = typeof safeVal === 'number' ? 2 : (typeof safeVal === 'string' ? 3 : (safeVal === null ? 0 : 2));
+                cell.model.value = safeVal;
               }
             }
 
@@ -1854,6 +1881,21 @@ export default function ExcelMergePage() {
       try {
         delete (templateWb as any).calcChain;
         if ((templateWb as any)._calcChain) delete (templateWb as any)._calcChain;
+      } catch (e) {}
+
+      // 🌟 [외부 링크(externalLinks) 및 낡은 이름 정의(definedNames) 완전 소독]:
+      // 엑셀 열람 시 "연결 에러" 및 "내용에 문제가 있습니다" 복구 팝업의 핵심 원인 100% 원천 차단
+      try {
+        if ((templateWb as any)._definedNames) {
+          (templateWb as any)._definedNames.model = [];
+          (templateWb as any)._definedNames.matrixMap = {};
+        }
+        if ((templateWb as any).definedNames) {
+          (templateWb as any).definedNames.model = [];
+          (templateWb as any).definedNames.matrixMap = {};
+        }
+        delete (templateWb as any)._externalLinks;
+        delete (templateWb as any).externalLinks;
       } catch (e) {}
 
       // 5. 최종 파일 빌드 (무정지 2단계 안전 그물망 적용)
