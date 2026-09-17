@@ -529,9 +529,12 @@ export default function ExcelMergePage() {
           const cleanSheetName = sheetName.replace(/^[0-9]+[\.\s_-]*/, '');
           if (sheetOffsetsByName[cleanSheetName] !== undefined) {
             targetOffset = sheetOffsetsByName[cleanSheetName];
+          } else if (/배치|현황|기준|명부|코드|목록/i.test(sheetName) || /배치|현황|기준|명부|코드|목록/i.test(cleanSheetName)) {
+            // 🌟 배치현황, 기준표 등 고정 정적 참조 시트는 오프셋 0으로 원본 범위 100% 안전 보존!
+            return `'${sheetName}'!${colAbs}${col}${rowAbs}${row}`;
           } else {
-            // 이번 취합에 포함되지 않은 시트나 외부 통합문서 참조인 경우 깨진 연결(#REF!)로 마킹
-            return `#REF!${colAbs}${col}${rowAbs}${row}`;
+            // 이번 취합에 포함되지 않은 외부 통합문서 참조인 경우 표준 엑셀 #REF! 로 마킹
+            return '#REF!';
           }
         }
       }
@@ -1247,9 +1250,23 @@ export default function ExcelMergePage() {
           .replace(/(신청서|신청|서식|조사표|명세서|취합본|제출본|수합용|결과보고|계획서|양식|최종|수정|제출|안내)/g, ' ')
           .trim();
 
-        // 파일명 내 학교명 패턴 직접 추출 (예: (서울개원초등학교_도미정) -> 서울개원초등학교, ((서울고등학교_강성희)...) -> 서울고등학교)
-        const schoolPatternMatch = nameWithoutExt.match(/([가-힣]{2,10}(?:초등학교|중학교|고등학교|특수학교|유치원|학교|초등|초|여고|여중|고|중))/);
-        const extractedSchoolFromName = schoolPatternMatch ? schoolPatternMatch[1] : '';
+        // 파일명 내 학교명 패턴 직접 추출
+        // 🌟 1순위: K-에듀파인 표준 공문 접수 파일명 `(학교명_담당자)...` 패턴에서 언더바 앞 교명 100% 무손실 통째 추출
+        // 예: (단국대학교사범대학부속중학교_강민구) -> 단국대학교사범대학부속중학교, (중앙대학교사범대학부속고등학교_차지연) -> 중앙대학교사범대학부속고등학교
+        const bracketUnderMatch = nameWithoutExt.match(/^\(([가-힣A-Za-z0-9]+)_/);
+        let extractedSchoolFromName = bracketUnderMatch ? bracketUnderMatch[1] : '';
+
+        // 🌟 2순위: 파일명 내 괄호 안의 학교명 (예: (단대부중), (개포고등학교))
+        if (!extractedSchoolFromName) {
+          const bracketOnlyMatch = nameWithoutExt.match(/\(([가-힣A-Za-z0-9]{2,25}(?:초등학교|중학교|고등학교|특수학교|유치원|학교|여고|여중|고|중))\)/);
+          if (bracketOnlyMatch) extractedSchoolFromName = bracketOnlyMatch[1];
+        }
+
+        // 🌟 3순위: 일반 정규식 패턴 (글자수 25자까지 확장 및 '초등학교|중학교|고등학교'를 '학교'보다 무조건 우선 매칭)
+        if (!extractedSchoolFromName) {
+          const schoolPatternMatch = nameWithoutExt.match(/([가-힣]{2,25}(?:초등학교|중학교|고등학교|특수학교|유치원|초등|초|여고|여중|학교|고|중))/);
+          if (schoolPatternMatch) extractedSchoolFromName = schoolPatternMatch[1];
+        }
 
         // 원본 파일명, 정제 파일명, 추출 학교명 3중으로 명부 매칭 시도
         const matchedSchoolByName = 
@@ -1405,28 +1422,37 @@ export default function ExcelMergePage() {
             const candidate1 = primaryVal ? String(primaryVal).trim() : '';
 
             // 1순위: 지정된 schoolCellCol 위치의 값이 학교명이면 채택
-            if (candidate1 && (findMatchingSchool(candidate1) || /(초등?학교|중학교|고등학교|특수학교|유치원|지원청|기관|학교)/.test(candidate1))) {
+            if (candidate1 && !candidate1.includes('예시') && (findMatchingSchool(candidate1) || /(초등?학교|중학교|고등학교|특수학교|유치원|지원청|기관|학교)/.test(candidate1))) {
               rawSchoolName = candidate1;
             } else {
-              // 2순위: 헤더 행(headerEndRow)에서 '학교명', '기관명', '학교', '기관', '대상교' 컬럼 위치 자동 탐색
+              // 2순위: 헤더 행 영역(headerEndRow 주변 ±3행)에서 '학교명', '기관명', '학교', '기관', '소속', '대상교' 컬럼 위치 스마트 자동 탐색
               let autoDetectedCol = -1;
-              for (let c = 1; c <= 25; c++) {
-                const headerVal = String(ws.getCell(headerEndRow, c).value || '').trim();
-                if (/^(학교명|기관명|학교|기관|소속|대상교)$/.test(headerVal)) {
-                  autoDetectedCol = c;
-                  break;
+              const scanStartH = Math.max(1, headerEndRow - 3);
+              const scanEndH = Math.min(headerEndRow + 2, ws.rowCount || 30);
+              for (let hr = scanStartH; hr <= scanEndH; hr++) {
+                for (let c = 1; c <= 25; c++) {
+                  const headerVal = String(ws.getCell(hr, c).value || '').trim();
+                  if (/^(학교명|기관명|학교|기관|소속|대상교)$/.test(headerVal) || /학교명|기관명/.test(headerVal)) {
+                    autoDetectedCol = c;
+                    break;
+                  }
                 }
+                if (autoDetectedCol > 0) break;
               }
+
               if (autoDetectedCol > 0) {
                 const autoVal = ws.getCell(targetRow, autoDetectedCol).value;
-                if (autoVal) rawSchoolName = String(autoVal).trim();
+                const autoStr = autoVal ? String(autoVal).trim() : '';
+                if (autoStr && !autoStr.includes('예시')) {
+                  rawSchoolName = autoStr;
+                }
               }
 
               // 3순위: 그래도 못 찾으면 targetRow의 1~15열 전체를 스캔하여 학교명 패턴 또는 명부 일치 셀 자동 포착
               if (!rawSchoolName) {
                 for (let c = 1; c <= 15; c++) {
                   const cellText = String(ws.getCell(targetRow, c).value || '').trim();
-                  if (cellText && cellText.length >= 2) {
+                  if (cellText && cellText.length >= 2 && !cellText.includes('예시')) {
                     if (findMatchingSchool(cellText) || /(초등?학교|중학교|고등학교|특수학교|유치원)$/.test(cellText)) {
                       rawSchoolName = cellText;
                       break;
@@ -1435,8 +1461,8 @@ export default function ExcelMergePage() {
                 }
               }
 
-              // 4순위: candidate1이 비어있지 않다면 일단 후보로 설정
-              if (!rawSchoolName && candidate1) {
+              // 4순위: candidate1이 비어있지 않고 예시가 아니라면 후보로 설정
+              if (!rawSchoolName && candidate1 && !candidate1.includes('예시')) {
                 rawSchoolName = candidate1;
               }
             }
@@ -1862,11 +1888,35 @@ export default function ExcelMergePage() {
         });
       });
 
-      // 🌟 [미선택 시트 완전 제거]: 사용자가 취합 대상으로 선택하지 않은 시트는 마스터 엑셀에서 완전 삭제
+      // 🌟 [미선택 시트 정리 & VLOOKUP 참조 시트 100% 안전 보존]:
+      // 활성 취합 시트의 수식에서 참조하는 시트(예: '배치현황(전체)', '배치현황(공동조리교)' 등)나
+      // 기준표/코드표는 절대 삭제하지 않고 보존하여 수식 깨짐 및 엑셀 복구 에러 팝업 원천 차단!
       const activeSheetNames = new Set(activeConfigs.map(c => c.sheetName));
+      const referencedSheets = new Set<string>();
+
+      templateWb.worksheets.forEach((ws: any) => {
+        if (activeSheetNames.has(ws.name)) {
+          ws.eachRow({ includeEmpty: false }, (row: any) => {
+            row.eachCell({ includeEmpty: false }, (cell: any) => {
+              if (cell.formula) {
+                const matches = cell.formula.match(/'([^']+)'!/g);
+                if (matches) {
+                  matches.forEach((m: string) => {
+                    const sName = m.replace(/'|!/g, '').trim();
+                    referencedSheets.add(sName);
+                  });
+                }
+              }
+            });
+          });
+        }
+      });
+
       const sheetsToRemove: any[] = [];
       templateWb.worksheets.forEach((ws: any) => {
-        if (!activeSheetNames.has(ws.name)) {
+        const isReferenced = referencedSheets.has(ws.name);
+        const isStaticLookup = /배치|현황|기준|명부|코드|목록/i.test(ws.name);
+        if (!activeSheetNames.has(ws.name) && !isReferenced && !isStaticLookup) {
           sheetsToRemove.push(ws);
         }
       });
